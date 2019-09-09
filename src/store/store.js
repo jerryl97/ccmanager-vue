@@ -6,9 +6,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    //Accounts
     allAccounts:[],
     maxAccId:0,
 
+    //Accounts Groups
     accGroups:[
       {groupName:'Credit Card',grpid:1},
       {groupName:'Debit Card',grpid:2},
@@ -17,6 +19,11 @@ export default new Vuex.Store({
     ],
     maxAccGrpId:0,
 
+    //Transactions
+    allTrans:[],
+    maxTransId:0,
+
+    //Expense Category
     expCat:[
       {expCatName:'Food',expcatid:1},
       {expCatName:'Movies',expcatid:2},
@@ -24,6 +31,7 @@ export default new Vuex.Store({
     ],
     maxExpCatId:0,
 
+    //Income Category
     incCat:[
       {incCatName:'Bonus',inccatid:1},
       {incCatName:'Salary',inccatid:2},
@@ -91,6 +99,35 @@ export default new Vuex.Store({
     //Set Max Id of Account Group
     setMaxAccGrpId(state,value){
       state.maxAccGrpId = value;
+    },
+    /////////////////////////////////
+
+    //////////////////Account
+    //Add Transactions to Vuex Store
+    addTrans(state,value){
+      //Assigning id to account
+      if(state.allTrans.length<1&&state.maxTransId==0)
+        value.transid=1;
+      else if(state.allTrans.length<1)
+        value.transid = state.maxTransId+1; 
+      else{
+        const maxId = state.allTrans.reduce(
+        (max, trans) => (trans.transid>max ? trans.transid:max),state.allTrans[0].transid);
+        if((maxId+1)==state.maxTransId)
+          value.transid = maxId + 2;
+        else
+          value.transid = maxId + 1; 
+      } 
+      state.maxTransId = value.transid;
+      state.allTrans.push(value);
+    },
+    //Set Transactions to Vuex Store
+    setTrans(state,value){
+      state.allTrans = value;
+    },
+    //Set Max Id of Accounts
+    setMaxTransId(state,value){
+      state.maxTransId = value;
     },
     /////////////////////////////////
 
@@ -198,6 +235,29 @@ export default new Vuex.Store({
       })
     },
     ////////////////////////////////
+
+    //////////////////Transactions
+    //Store Transactions
+    storeTrans(context){
+      localForage.setItem('transactions',context.state.allTrans);
+      localForage.setItem('maxTransId',context.state.maxTransId);
+    }, 
+    //Get Transactions 
+    getTrans(context){
+      localForage.getItem('transactions').then(value=>{
+        if(value!=null){
+          let trans = value;
+          context.commit('setTrans',trans);
+        } 
+      })
+      localForage.getItem('maxTransId').then(value=>{
+        if(value!=null){
+          let maxid = value;
+          context.commit('setMaxTransId',maxid);
+        } 
+      })
+    },
+    /////////////////////////////////
 
     //////////////////Expense Categories
     //Store Expense Categories 

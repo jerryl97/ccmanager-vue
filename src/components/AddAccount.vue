@@ -177,9 +177,7 @@
       //Save New Account
       saveNewAcc(){
         let hasError = false;
-
         hasError = this.saveValidation(hasError);
-
         if(hasError==false){
           if(this.accItem.accgroup!=1&&this.displayBalance=='')
             this.accItem.balance = 0;
@@ -198,7 +196,6 @@
             this.accItem.nextduedate = this.$moment(this.accItem.pduedate).toDate();
             this.accItem.nextduedate = this.$moment(this.accItem.nextduedate).add('1','months').format('D MMMM YYYY');  
           }
-
           this.$store.commit('addAccount',this.accItem);
           this.$store.dispatch('storeAccounts');
           this.setDefault();
