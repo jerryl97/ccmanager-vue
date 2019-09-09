@@ -1,0 +1,115 @@
+<template>
+  <div>
+    <!--Top Nav Bar-->
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Add" @click-right="addIncCat"/>
+
+    <!-- Income Categories List -->
+    <van-cell-group>
+      <van-cell v-for="(cat,key) in getIncCat" :border="true" :title="cat.incCatName">
+        <template slot="default" v-if="cat.inccatid!=3">
+          <van-button size="small" type="primary" plain @click="editIncCat(key)">Edit</van-button>
+          <van-button size="small" type="danger" @click="deleteIncCat(key)">Delete</van-button>
+        </template>
+      </van-cell>
+    </van-cell-group>
+
+    <!-- Add Income Categories Pop -->
+    <van-popup v-model="addIncCatPop" closeable position="bottom" :style="{ height: '20%' }">
+        <van-field v-model="cat.incCatName" required label="Name: " :error-message="errorMessage"/>
+
+        <van-button type="default" @click="addIncCatPop=false,cat={}">Cancel</van-button>
+        <van-button type="primary" @click="saveIncCat">Save</van-button>
+    </van-popup>
+
+  </div>
+</template>
+
+<script>
+
+  export default{
+    data(){
+      return{
+        title:'Income Categories',
+
+        //Variable Initialize
+        incCat:[],
+        cat:{},
+
+        //Popup Initialize
+        isEdit:false,
+        tempKey:'',
+        addIncCatPop:false,
+
+        //Error Msg Initialize
+        errorMessage:'',
+      }
+    },
+    methods:{
+      //Set Default
+      setDefault(){
+        this.errorMessage='';
+        this.cat={};
+        this.addIncCatPop=false;
+        this.isEdit=false;
+        this.tempKey=''; 
+      },
+      //Back to Settings
+      back(){
+        this.$emit("closeManageIncCat");
+      },
+      //Add Income Category Pop
+      addIncCat(){
+        this.addIncCatPop=true;
+        this.isEdit=false;
+      },
+      //Save Income Category
+      saveIncCat(){
+        let hasError = false;
+        hasError = this.saveValidation(hasError);
+        if(hasError)
+          this.errorMessage = 'Please input a name';
+        else{
+          this.errorMessage = '';
+          if(this.isEdit == true){
+            this.incCat[this.tempKey].incCatName = this.cat.incCatName; 
+            this.$store.commit('setIncCat',this.incCat);
+            this.$store.dispatch('storeIncCat');
+          }else{
+            this.$store.commit('addIncCat',this.cat); 
+            this.$store.dispatch('storeIncCat');
+          }
+          this.setDefault();
+        }
+      },
+      //Edit Income Category 
+      editIncCat(key){
+        this.isEdit = true;
+        this.addIncCatPop = true;
+        this.cat.inccatid = this.incCat[key].inccatid;
+        this.cat.incCatName = this.incCat[key].incCatName;
+        this.tempKey = key;
+      },
+      //Delete Income Category 
+      deleteIncCat(key){
+        this.incCat.splice(key,1);
+        this.$store.commit('setIncCat',this.incCat);
+        this.$store.dispatch('storeIncCat');
+      },
+      //Save Validation
+      saveValidation(value){
+        let validstate = value;
+        if(this.cat.incCatName==null||this.cat.incCatName=='')
+          return validstate = true; 
+      },
+      
+    },
+    computed:{
+      getIncCat(){
+        return this.$store.state.incCat; 
+      }
+    },
+    mounted(){
+      this.incCat = this.getIncCat;
+    }
+  }
+</script>

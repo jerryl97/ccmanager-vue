@@ -17,6 +17,19 @@ export default new Vuex.Store({
     ],
     maxAccGrpId:0,
 
+    expCat:[
+      {expCatName:'Food',expcatid:1},
+      {expCatName:'Movies',expcatid:2},
+      {expCatName:'Other',expcatid:3}, 
+    ],
+    maxExpCatId:0,
+
+    incCat:[
+      {incCatName:'Bonus',inccatid:1},
+      {incCatName:'Salary',inccatid:2},
+      {incCatName:'Other',inccatid:3}, 
+    ],
+    maxIncCatId:0,
   },
   
   getters: {
@@ -24,6 +37,7 @@ export default new Vuex.Store({
   
   mutations: {
 
+    //////////////////Account
     //Add Account to Vuex Store
     addAccount(state,value){
       //Assigning id to account
@@ -50,7 +64,9 @@ export default new Vuex.Store({
     setMaxAccId(state,value){
       state.maxAccId = value;
     },
-
+    /////////////////////////////////
+    
+    //////////////////Account Groups
     //Add Account Group
     addAccGroup(state,value){
       if(state.accGroups.length<1&&state.maxAccGrpId==0)
@@ -76,10 +92,68 @@ export default new Vuex.Store({
     setMaxAccGrpId(state,value){
       state.maxAccGrpId = value;
     },
+    /////////////////////////////////
+
+    //////////////////Expense Categories
+    //Add Expense Categories
+    addExpCat(state,value){
+      if(state.expCat.length<1&&state.maxExpCatId==0)
+        value.expcatid=1;
+      else if(state.expCat.length<1)
+        value.expcatid = state.maxExpCatId+1; 
+      else{
+        const maxId = state.expCat.reduce(
+        (max, expcat) => (expcat.expcatid>max ? expcat.expcatid:max),state.expCat[0].expcatid);
+        if((maxId+1)==state.maxExpCatId)
+          value.expcatid = maxId+2;
+        else
+          value.expcatid = maxId + 1;
+      } 
+      state.maxExpCatId = value.expcatid;
+      state.expCat.push(value);
+    },
+    //Set Expense Categories to Vuex Store
+    setExpCat(state,value){
+      state.expCat = value;
+    },
+    //Set Max Id of Expense Category 
+    setMaxExpCatId(state,value){
+      state.maxExpCatId = value;
+    },
+    /////////////////////////////////
+
+    //////////////////Income Categories
+    //Add Income Categories
+    addIncCat(state,value){
+      if(state.incCat.length<1&&state.maxIncCatId==0)
+        value.inccatid=1;
+      else if(state.incCat.length<1)
+        value.inccatid = state.maxIncCatId+1; 
+      else{
+        const maxId = state.incCat.reduce(
+        (max, inccat) => (inccat.inccatid>max ? inccat.inccatid:max),state.incCat[0].inccatid);
+        if((maxId+1)==state.maxIncCatId)
+          value.inccatid = maxId+2;
+        else
+          value.inccatid = maxId + 1;
+      } 
+      state.maxIncCatId = value.inccatid;
+      state.incCat.push(value);
+    },
+    //Set Income Categories to Vuex Store
+    setIncCat(state,value){
+      state.incCat = value;
+    },
+    //Set Max Id of Income Category 
+    setMaxIncCatId(state,value){
+      state.maxIncCatId = value;
+    },
+    /////////////////////////////////
   },
   
   actions: {
     
+    //////////////////Accounts
     //Store Accounts
     storeAccounts(context){
       localForage.setItem('accounts',context.state.allAccounts);
@@ -100,7 +174,9 @@ export default new Vuex.Store({
         } 
       })
     },
+    /////////////////////////////////
 
+    //////////////////Accounts Groups
     //Store Account Groups
     storeAccGroups(context){
       localForage.setItem('accgroups',context.state.accGroups);
@@ -121,6 +197,53 @@ export default new Vuex.Store({
         } 
       })
     },
+    ////////////////////////////////
+
+    //////////////////Expense Categories
+    //Store Expense Categories 
+    storeExpCat(context){
+      localForage.setItem('expcat',context.state.expCat);
+      localForage.setItem('maxexpcatid',context.state.maxExpCatId);
+    }, 
+    //Get Expense Categories
+    getExpCat(context){
+      localForage.getItem('expcat').then(value=>{
+        if(value!=null){
+          let expcats = value;
+          context.commit('setExpCat',expcats);
+        } 
+      })
+      localForage.getItem('maxexpcatid').then(value=>{
+        if(value!=null){
+          let maxid = value;
+          context.commit('setMaxExpCatId',maxid);
+        } 
+      })
+    },
+    /////////////////////////////////
+
+    //////////////////Income Categories
+    //Store Income Categories 
+    storeIncCat(context){
+      localForage.setItem('inccat',context.state.incCat);
+      localForage.setItem('maxinccatid',context.state.maxIncCatId);
+    }, 
+    //Get Income Categories
+    getIncCat(context){
+      localForage.getItem('inccat').then(value=>{
+        if(value!=null){
+          let inccats = value;
+          context.commit('setIncCat',inccats);
+        } 
+      })
+      localForage.getItem('maxinccatid').then(value=>{
+        if(value!=null){
+          let maxid = value;
+          context.commit('setMaxIncCatId',maxid);
+        } 
+      })
+    },
+    /////////////////////////////////
   }
   
 });

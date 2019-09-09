@@ -93,7 +93,7 @@
       deleteAccGroup(key){
         this.accGroups.splice(key,1);
         this.$store.commit('setAccGroup',this.accGroups);
-        this.$store.dispatch('storeAccGroups',this.accGroups);
+        this.$store.dispatch('storeAccGroups');
       },
       //Add Account Group Validation
       saveValidation(value){

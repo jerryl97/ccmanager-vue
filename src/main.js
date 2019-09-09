@@ -38,6 +38,8 @@ new Vue({
   created(){
     this.$store.dispatch('getAccounts');
     this.$store.dispatch('getAccGroups');
+    this.$store.dispatch('getExpCat');
+    this.$store.dispatch('getIncCat');
   },
   render: h => h(App),
 }).$mount('#app')
