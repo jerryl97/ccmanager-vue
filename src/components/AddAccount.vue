@@ -56,7 +56,7 @@
     <!--Pop Ups-->
     <!--Account Group Picker-->
     <van-popup v-model="showGroupPicker" position="bottom">
-      <van-picker show-toolbar :columns="accGroup" value-key="groupName" @cancel="showGroupPicker = false" @confirm="accGroupConfirm"/> 
+      <van-picker show-toolbar :columns="getAccGrps" value-key="groupName" @cancel="showGroupPicker = false" @confirm="accGroupConfirm"/> 
     </van-popup>
     <!--Expiry Date Picker-->
     <van-popup v-model="showExpiryDate" position="bottom">
@@ -179,12 +179,14 @@
         let hasError = false;
         hasError = this.saveValidation(hasError);
         if(hasError==false){
-          if(this.accItem.accgroup!=1&&this.displayBalance=='')
+          if(this.accItem.accgroup!=1&&this.displayBalance==''){
             this.accItem.balance = 0;
-
-          else if(this.accItem.accgroup!=1)
+            this.accItem.baseBalance = this.accItem.balance;
+          }
+          else if(this.accItem.accgroup!=1){
             this.accItem.balance = parseFloat(this.displayBalance);
-
+            this.accItem.baseBalance = this.accItem.balance;
+          }
           else if(this.accItem.accgroup==1){
             this.accItem.sattlestatus = 'Not Settled';
             this.accItem.dueamount = 0;
@@ -263,7 +265,6 @@
       }
     },
     mounted(){
-      this.accGroup = this.getAccGrps;
     }
   }
 

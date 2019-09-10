@@ -36,10 +36,13 @@
             <van-tag type="danger">Not Settled</van-tag>
           </template>
           <template slot="label">
-            <span>Due: ${{acc.dueamount}}</span>
           </template>
           <template slot="default">
-            <span>$ {{acc.outstdbalance}}</span>
+            <span>
+              Outstd. ${{acc.outstdbalance}}
+              <br/>
+              Due ${{acc.dueamount}}
+            </span>
           </template>
         </van-cell>
         <template slot="right">
@@ -66,7 +69,6 @@
       </div>
     </van-cell-group>
     </div>
-
   </div>
 </template>
 
@@ -156,3 +158,6 @@
   }
 
 </script>
+<style scoped>
+
+</style>

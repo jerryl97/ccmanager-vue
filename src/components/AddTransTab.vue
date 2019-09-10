@@ -187,6 +187,7 @@
           this.$store.commit('addTrans',this.transItem);
           this.$store.dispatch('storeTrans');
           this.setDefault();
+          this.$router.push({path:'/acctrans'});
         }       
       },
       

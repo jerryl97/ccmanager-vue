@@ -37,10 +37,10 @@
         activeName:'accounts'
       }
     },
-
     components:{
       'v-accounts':Accounts,
       'v-transactions':Transactions
-    }
+    },
+    
   }
 </script>

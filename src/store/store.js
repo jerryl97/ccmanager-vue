@@ -186,7 +186,38 @@ export default new Vuex.Store({
       state.maxIncCatId = value;
     },
     /////////////////////////////////
+
+    //////////////////Accounts&Transactions Calculations
+    calAccBalance(state){
+      var transcalresult = state.allTrans.reduce((acc,val)=>{
+        var o = acc.filter(obj=>{
+          return obj.account == val.account;
+        }).pop()||{account:val.account,amount:0};
+        if(val.type=='Expense')
+          o.amount -= val.amount;
+        else if(val.type=='Income')
+          o.amount += val.amount;
+        acc.push(o);
+        return acc;
+      },[]);
+      var finaltranscalresult = transcalresult.filter((itm, i, a)=>{
+        return i == a.indexOf(itm);
+      });
+      console.log(finaltranscalresult);
+      state.allAccounts.forEach(acc=>{
+        finaltranscalresult.forEach(result=>{
+          if(result.account == acc.accid){
+              if(acc.accgroup==1)
+                acc.outstdbalance -= result.amount;
+              else
+                acc.balance = acc.baseBalance + result.amount;
+            }
+        });
+      });
+      console.log(state.allAccounts);
+    }
   },
+  /////////////////////////////////
   
   actions: {
     
@@ -226,20 +257,23 @@ export default new Vuex.Store({
           let accgrps = value;
           context.commit('setAccGroup',accgrps);
         } 
-      })
+      });
       localForage.getItem('maxaccgrpid').then(value=>{
         if(value!=null){
           let maxid = value;
           context.commit('setMaxAccGrpId',maxid);
         } 
-      })
+      });
     },
     ////////////////////////////////
 
     //////////////////Transactions
     //Store Transactions
     storeTrans(context){
-      localForage.setItem('transactions',context.state.allTrans);
+      localForage.setItem('transactions',context.state.allTrans).then(()=>{
+        context.commit('calAccBalance');
+        localForage.setItem('accounts',context.state.allAccounts);
+      });
       localForage.setItem('maxTransId',context.state.maxTransId);
     }, 
     //Get Transactions 
@@ -304,6 +338,7 @@ export default new Vuex.Store({
       })
     },
     /////////////////////////////////
+    
   }
   
 });
