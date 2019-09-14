@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="accmaindiv">
     <!--Add Account Float Action Button-->
     <vue-fab :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
 
@@ -10,32 +10,27 @@
 
     <!--Accounts List-->
     <div style="margin-bottom:40%;">
-    <van-cell-group v-for="(group,key) in getGroupedAccounts" :title="getGroupName(key)">
-      <div v-if="key!=1&&key!=2">
-      <van-swipe-cell v-for="acc in group" :on-close="onClose" :name="acc.accid">
-        <van-cell>
-          <template slot="title">
-            <span>{{acc.name}}</span>
-          </template>
-          <template slot="label">
-          </template>
-          <template slot="default">
-            <span>$ {{acc.balance}}</span>
+      <van-cell-group v-for="(group,key) in getGroupedAccounts" >
+        <van-cell :title="getGroupName(key)" style="background-color:#f9f9f9" size="large"/>
+          <van-swipe-cell v-for="acc in group" :on-close="accOnClose" :name="acc.accid">
+            <van-cell v-if="key!=1&&key!=2">
+            <template slot="title">
+              <span>{{acc.name}}</span>
+            </template>
+            <template slot="label">
+            </template>
+            <template slot="default">
+              <span style="color:#FF3434" v-if="checkBalance(acc.balance)==-1">$ {{acc.balance}}</span>
+              <span style="color:#7acc7a" v-if="checkBalance(acc.balance)==1">$ {{acc.balance}}</span>
+              <span style="color:#333333" v-if="checkBalance(acc.balance)==0">$ {{acc.balance}}</span>
           </template>
         </van-cell>
-        <template slot="right">
-         <van-button square type="danger" text="Delete" /> 
-        </template>
-      </van-swipe-cell>
-      </div>
-      <div v-if="key==1">
-      <van-swipe-cell v-for="acc in group" :on-close="onClose" :name="acc.accid">
-        <van-cell>
+        <van-cell v-if="key==1">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
-            <van-tag type="danger">Not Settled</van-tag>
           </template>
           <template slot="label">
+            <van-tag type="danger">Not Settled</van-tag>
           </template>
           <template slot="default">
             <span>
@@ -45,29 +40,21 @@
             </span>
           </template>
         </van-cell>
-        <template slot="right">
-         <van-button square type="danger" text="Delete" /> 
-        </template>
-      </van-swipe-cell>
-      </div>
-      <div v-if="key==2">
-      <van-swipe-cell v-for="acc in group" :on-close="onClose" :name="acc.accid">
-        <van-cell>
+        <van-cell v-if="key==2">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
           <template slot="label">
           </template>
           <template slot="default">
-            <span>$ {{acc.balance}}</span>
+            <span>${{acc.balance}}</span>
           </template>
         </van-cell>
         <template slot="right">
          <van-button square type="danger" text="Delete" /> 
         </template>
       </van-swipe-cell>
-      </div>
-    </van-cell-group>
+      </van-cell-group>
     </div>
   </div>
 </template>
@@ -82,6 +69,7 @@
     data(){ 
       return{
         accList:[],
+        activeCollapse:[],
         addAccPop:false, 
         hideFab:false,
       }
@@ -108,9 +96,12 @@
         else
           return temp.groupName; 
       },
+      checkBalance(value){
+        return Math.sign(value);
+      },
 
       //SwipeCell onClose Account Delete
-      onClose(clickPosition, instance,detail){
+      accOnClose(clickPosition, instance,detail){
         switch(clickPosition){
           case 'left':
           case 'cell':
@@ -121,7 +112,6 @@
             this.$dialog.confirm({
               message:'Are you sure to delete?'
             }).then(()=>{
-              console.log(detail.name);
               this.accList = _.filter(this.accList,x=>{
                 return x.accid != detail.name;
               })
@@ -133,7 +123,6 @@
             break;
         }
       },
-
     },
 
     computed:{
@@ -145,11 +134,10 @@
       },
       getAccGroups(){
         return this.$store.state.accGroups;
-      }
+      },  
     },
-
     mounted(){
-      this.accList = this.getAccounts; 
+      this.accList = this.getAccounts;
     },
 
     components:{
@@ -159,5 +147,8 @@
 
 </script>
 <style scoped>
-
+#accmaindiv{
+  background-color:#f6f6f9;
+}
+  
 </style>

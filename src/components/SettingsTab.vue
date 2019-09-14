@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="settingmaindiv">
     <!--Top Navbar-->
     <van-nav-bar :title="title"/>
 
@@ -73,3 +73,8 @@
   }
 
 </script>
+<style scoped>
+#settingmaindiv{
+  background-color:#f6f6f6
+}
+</style>

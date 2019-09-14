@@ -26,7 +26,7 @@
       </div>
 
     <!-- Field for Amount -->
-       <van-field readonly clickable label="Amount" :value="transAmount" @touchstart.native.stop="showNumbKeyboard = true"/>
+       <van-field readonly clickable label="Amount" :value="transAmount" @touchstart.native.stop="showNumbKeyboard = true" placeholder="0"/>
        <van-number-keyboard v-model="transAmount" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/>
 
     <!-- Field for Accounts(with Popup Picker)-->
@@ -131,6 +131,12 @@
       transTypeConfirm(value){
         this.transItem.type = value;
         this.showTransOptions = false;
+        this.transItem.category = '';
+        this.displayCategory = '';
+        this.transItem.fromaccount = '';
+        this.transItem.toaccount = '';
+        this.displayFromAccount = '';
+        this.displayToAccount = '';
       },
 
       //Date Confirm
@@ -183,6 +189,10 @@
             this.transItem.amount = 0;
           }else{
             this.transItem.amount = parseFloat(this.transAmount); 
+          }
+          if(this.transItem.type=='Transfer'){
+            this.transItem.account = '';
+            this.transItem.category = '';
           }
           this.$store.commit('addTrans',this.transItem);
           this.$store.dispatch('storeTrans');

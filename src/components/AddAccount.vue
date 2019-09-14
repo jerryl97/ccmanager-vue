@@ -181,11 +181,9 @@
         if(hasError==false){
           if(this.accItem.accgroup!=1&&this.displayBalance==''){
             this.accItem.balance = 0;
-            this.accItem.baseBalance = this.accItem.balance;
           }
           else if(this.accItem.accgroup!=1){
             this.accItem.balance = parseFloat(this.displayBalance);
-            this.accItem.baseBalance = this.accItem.balance;
           }
           else if(this.accItem.accgroup==1){
             this.accItem.sattlestatus = 'Not Settled';

@@ -40,6 +40,7 @@ new Vue({
     this.$store.dispatch('getAccGroups');
     this.$store.dispatch('getExpCat');
     this.$store.dispatch('getIncCat');
+    this.$store.dispatch('getTrans');
   },
   render: h => h(App),
 }).$mount('#app')
