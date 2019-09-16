@@ -1,45 +1,44 @@
 <template>
   <div>
     <!-- Tabs -->
-    <van-tabs v-model="activeName" sticky>
+    <van-tabs v-model="active" sticky>
       <!--Accounts Tab-->
-      <van-tab name="accounts">
+      <van-tab>
         <div slot="title">
           <van-icon name="credit-pay"/>
             Accounts
         </div>
-        <v-accounts></v-accounts>
+        <v-accounts/>
       </van-tab>
 
       <!-- Transactions Tab-->
-      <van-tab name="transactions">
+      <van-tab>
         <div slot="title">
           <van-icon name="orders-o"/>
             Transactions
         </div>
-        <v-transactions></v-transactions>
+        <v-transactions :acc="acc" :isProfile="isProfile" />
       </van-tab>
-
     </van-tabs>
 
   </div>
 </template>
 
 <script>
-  //Import Accounts component
-  import Accounts from './Accounts.vue'; 
-  //Import Transactions component
-  import Transactions from './Transactions.vue';
+  import Accounts from '../components/Accounts.vue'
+  import Transactions from '../components/Transactions.vue'
   
   export default{
     data(){
       return{
-        activeName:'accounts'
+        active:0,
+        acc:'',
+        isProfile:false,
       }
     },
     components:{
       'v-accounts':Accounts,
-      'v-transactions':Transactions
+      'v-transactions':Transactions,
     },
     
   }

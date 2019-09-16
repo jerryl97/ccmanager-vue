@@ -1,31 +1,28 @@
 <template>
-  <div>
-    <!-- Add Transaction Float Action Button-->
-    <vue-fab :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
+<div>
+   <!-- Transaction Summary-->
+   <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">
+     {{getDateFormatted(currentMonth)}}
+   </van-divider>
 
-    <!-- Transaction Summary-->
-    <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">
-      {{getDateFormatted(currentMonth)}}
-    </van-divider>
-    
-    <van-row style="text-align:center" type="flex" align="center">
-      <van-col span="3">
-        <van-icon name="arrow-left" @click="changeMonth('prev')"/>
-      </van-col>
-      <van-col span="6" style="background-color:#f1f9f1">
-        <span style="font-size:13px;color:#7acc7a">Income<br/>$ {{monthTotalInc}}</span>
-      </van-col>
-      <van-col span="6" style="background-color:#ffeaea">
-        <span style="font-size:13px;color:#FF3434">Expense<br/>$ {{monthTotalExp}}</span>
-      </van-col>
-      <van-col span="6" style="background-color:#eaeaea">
-        <span style="font-size:13px">Total<br/>$ {{monthTotal}}</span>
-      </van-col>
-      <van-col span="3">
-        <van-icon name="arrow" @click="changeMonth('next')"/>
-      </van-col>
-    </van-row>
-    
+  <van-row style="text-align:center" type="flex" align="center">
+     <van-col span="3">
+       <van-icon name="arrow-left" @click="changeMonth('prev')"/>
+     </van-col>
+     <van-col span="6" style="background-color:#f1f9f1">
+       <span style="font-size:13px;color:#7acc7a">Income<br/>$ {{monthTotalInc}}</span>
+     </van-col>
+     <van-col span="6" style="background-color:#ffeaea">
+       <span style="font-size:13px;color:#FF3434">Expense<br/>$ {{monthTotalExp}}</span>
+     </van-col>
+     <van-col span="6" style="background-color:#eaeaea">
+       <span style="font-size:13px">Total<br/>$ {{monthTotal}}</span>
+     </van-col>
+     <van-col span="3">
+       <van-icon name="arrow" @click="changeMonth('next')"/>
+     </van-col>
+  </van-row>
+
     <!-- Transaction List-->
     <div style="margin-bottom:40px;">
       <van-collapse v-model="activeNames" style="margin-bottom:40px;" accordion>
@@ -69,13 +66,13 @@
         </van-collapse-item>
       </van-collapse>
       </div>
-
-  </div>
+</div>
 </template>
 <script>
   export default{
     data(){
       return{
+        selectedAcc:'',
         hideFab:false,
         activeNames:'1',
         currentMonth:new Date(),
@@ -181,23 +178,22 @@
             break;
         }
       },
-      
+
+    
     },
     computed:{
-      getTrans(){
-        return this.$store.state.allTrans;
-      },
+      getFilteredTrans(){
+        let temp = _.filter(this.$store.state.allTrans,x=>{
+          return x.account == this.accid||x.fromaccount == this.accid||x.toaccount == this.accid;
+        })
+        console.log(this.accid);
+        return temp;
+      }, 
       getDateGroupedTrans(){
         this.monthTotalInc = 0;
         this.monthTotalExp = 0;
         this.monthTotal = 0;
-        let temp = [];
-        if(this.isProfile)
-           temp = _.filter(this.transList, x=>{
-            return x.account == this.acc.accid || x.fromaccount == this.acc.accid || x.toaccount == this.acc.accid;
-          }); 
-        else
-          temp = this.transList;
+        let temp = this.getFilteredTrans; 
         let tempList = [];
         for(let i in temp){
           let tempDate = this.$moment(temp[i].date);
@@ -229,7 +225,6 @@
           }
           this.dateSummary.push(summary);
         }
-        console.log(this.dateSummary);
         return grouped;
       },
       getAccounts(){
@@ -243,10 +238,11 @@
       }
     },
     mounted(){
-      this.transList = this.getTrans;
+      this.transList = this.getFilteredTrans;
       this.expCat = this.getExpCat;
       this.incCat = this.getIncCat;
+      this.selectedAcc = this.accid;
     },
-    props:['acc','isProfile']
+    props:['accid']
   }
 </script>

@@ -9,6 +9,8 @@ import AddTransTab from '../components/AddTransTab.vue'
 import AccTransTab from '../components/AccTransTab.vue'
 import PromotionsTab from '../components/PromotionsTab.vue'
 import SettingsTab from '../components/SettingsTab.vue'
+import Accounts from '../components/Accounts.vue'
+import Transactions from '../components/Transactions.vue'
 
 //Configure the routes
 const routes = [

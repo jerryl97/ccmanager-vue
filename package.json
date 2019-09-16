@@ -11,7 +11,7 @@
     "core-js": "^2.6.5",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
-    "vant": "^2.2.0",
+    "vant": "^2.2.1",
     "vue": "^2.6.10",
     "vue-float-action-button": "^0.6.4",
     "vue-moment": "^4.0.0",
