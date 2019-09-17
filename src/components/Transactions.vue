@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Add Transaction Float Action Button-->
-    <vue-fab :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
+    <vue-fab v-if="!isProfile" :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
 
     <!-- Transaction Summary-->
     <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">

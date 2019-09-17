@@ -64,6 +64,14 @@ export default new Vuex.Store({
       state.maxAccId = value.accid;
       state.allAccounts.push(value);
     },
+    //Edit Account
+    editAccount(state,value){
+      for(let i in state.allAccounts){
+        if(state.allAccounts[i].accid == value.accid){
+          state.allAccounts[i] = value; 
+        }
+      }
+    },
     //Set Accounts to Vuex Store
     setAccounts(state,value){
       state.allAccounts = value;

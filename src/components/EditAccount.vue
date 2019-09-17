@@ -119,7 +119,6 @@
     methods:{
       //Set Default
       setDefault(){
-       this.accItem={};
        this.displayExpiry='';
        this.displayBalance='';
        this.displayAccGroup='';
@@ -133,7 +132,8 @@
 
       //Back to Account Page
       back(){
-        this.$emit("closeAddAcc") ;
+        this.$emit("closeEditAcc");
+        this.setDefault();
       
       },
 
@@ -191,7 +191,7 @@
             this.accItem.nextduedate = this.$moment(this.accItem.pduedate).toDate();
             this.accItem.nextduedate = this.$moment(this.accItem.nextduedate).add('1','months').format('D MMMM YYYY');  
           }
-          this.$store.commit('addAccount',this.accItem);
+          this.$store.commit('editAccount',this.accItem);
           this.$store.dispatch('storeAccounts');
           this.setDefault();
           this.back();
@@ -254,10 +254,29 @@
       },
       getAccGrps(){
         return this.$store.state.accGroups; 
+      },
+    },
+    watch:{
+      acc(){
+        this.accItem = this.acc;
+        if(this.accItem.balance)
+          this.displayBalance = this.accItem.balance.toString();
+        if(this.accItem.expiry)
+          this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
+       let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
+       this.displayAccGroup = temp.groupName;
       }
     },
     mounted(){
-    
-    }
+      this.accItem = this.acc;
+      if(this.accItem.balance)
+        this.displayBalance = this.accItem.balance.toString();
+      if(this.accItem.expiry)
+        this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
+      let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
+      this.displayAccGroup = temp.groupName;
+      
+    },
+    props:['acc']
   }
 </script> 

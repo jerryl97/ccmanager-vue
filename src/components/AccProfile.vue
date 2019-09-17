@@ -1,8 +1,10 @@
 <template>
   <div>
     <!-- Top Nav Bar-->
-    <van-nav-bar :title="getTitle(acc)" left-text="Back" left-arrow @click-left="back()" right-text="Edit">
-    </van-nav-bar>
+    <van-nav-bar :title="getTitle(acc)" left-text="Back" left-arrow @click-left="back()" right-text="Edit" @click-right="showEditAcc"/>
+
+    <!-- FAB for adding Transaction-->
+    <vue-fab :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
 
     <!-- Account Details-->
     <van-cell-group>
@@ -71,21 +73,44 @@
     </van-row>
     </div>
     <v-transactions :acc="acc" :isProfile="isProfile"></v-transactions>
+
+  <!-- Edit Account Page(Popup)-->
+  <van-popup v-model="editAccPop" position="bottom" :style="{height:'100%'}">
+    <v-editaccount @closeEditAcc="closeEditAcc" :acc="acc"></v-editaccount>
+  </van-popup>
   </div>
 </template>
 <script>
-  import Transactions from './Transactions.vue';
+  import Transactions from './Transactions.vue'
+  import EditAccount from './EditAccount.vue'
+
   export default{
     data(){
       return{
         title:'',      
         isProfile:true,
+        editAccPop:false,
+        hideFab:false,
       }
     },
     methods:{
       back(){
         this.$emit("closeAccProfile"); 
-      }, 
+      },
+      //Add Transaction Button
+      addTransButton(){
+        this.$router.push("/addtrans");
+      },
+      //Show Edit Account
+      showEditAcc(){
+        this.editAccPop = true;
+        this.hideFab = true;
+      },
+      //Close Edit Account
+      closeEditAcc(){
+        this.editAccPop = false;
+        this.hideFab = false;
+      },
       //Get Title of Account
       getTitle(acc){
         if(acc.last4digits==''||acc.last4digits==undefined)
@@ -117,7 +142,8 @@
     mounted(){
     },
     components:{
-      'v-transactions':Transactions
+      'v-transactions':Transactions,
+      'v-editaccount':EditAccount
     },
     props:['acc']
   }
