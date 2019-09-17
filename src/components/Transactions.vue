@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Add Transaction Float Action Button-->
-    <vue-fab v-if="!isProfile" :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
+    <vue-fab v-if="!isProfile" :hidden="hideAddTransFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
 
     <!-- Transaction Summary-->
     <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">
@@ -31,7 +31,7 @@
       <van-collapse v-model="activeNames" style="margin-bottom:40px;" accordion>
         <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :title="key" :name="key">
          <van-swipe-cell v-for="one in trans" :on-close="transOnClose" :name="one.transid">
-            <van-cell style="background-color:#f9f9f9" size="small" is-link arrow-direction="left">
+            <van-cell style="background-color:#f9f9f9" size="small" is-link arrow-direction="left" @click="showEditTrans(one)">
               <!--Not Transfer-->
               <template v-if="one.type!='Transfer'" slot="title">
                 <span>{{one.contents}} &nbsp</span>
@@ -69,29 +69,45 @@
         </van-collapse-item>
       </van-collapse>
       </div>
-
+    <!-- Edit Transaction Page(Popup)-->
+    <van-popup v-model="editTransPop" position="bottom" :style="{height:'100%'}">
+      <v-edit-trans @closeEditTrans="closeEditTrans" :trans="selectedTrans"></v-edit-trans>
+    </van-popup>
   </div>
 </template>
 <script>
+  import EditTrans from './EditTrans.vue'
+
   export default{
     data(){
       return{
-        hideFab:false,
+        hideAddTransFab:false,
         activeNames:'1',
         currentMonth:new Date(),
-        transList:[],
-        expCat:[],
-        incCat:[],
         dateSummary:[],
         monthTotalExp:0,
         monthTotalInc:0,
         monthTotal:0,
+        editTransPop:false,
+        selectedTrans:'',
       }
     },
     methods:{
       //Add Transaction Button
       addTransButton(){
         this.$router.push("/addtrans");
+      },
+      //Show Edit Account
+      showEditTrans(trans){
+        this.editTransPop = true;
+        this.hideAddTransFab = true;
+        this.selectedTrans = trans;
+      }, 
+      //Close Edit Trans
+      closeEditTrans(){
+        this.editTransPop = false;
+        this.hideAddTransFab = false; 
+        this.selectedTrans = '';
       },
       //Formatting the date
       getDateFormatted(date){
@@ -169,11 +185,7 @@
             this.$dialog.confirm({
               message:'Are you sure to delete?'
             }).then(()=>{
-              this.transList = _.filter(this.transList,x=>{
-                return x.transid != detail.name;
-              });
               this.$store.commit('deleteTrans',detail.name);
-              this.$store.commit('setTrans',this.transList);
               this.$store.dispatch('storeTrans');
             }).catch(()=>{
               this.$dialog.close();
@@ -193,11 +205,11 @@
         this.monthTotal = 0;
         let temp = [];
         if(this.isProfile)
-           temp = _.filter(this.transList, x=>{
+           temp = _.filter(this.getTrans, x=>{
             return x.account == this.acc.accid || x.fromaccount == this.acc.accid || x.toaccount == this.acc.accid;
           }); 
         else
-          temp = this.transList;
+          temp = this.getTrans;
         let tempList = [];
         for(let i in temp){
           let tempDate = this.$moment(temp[i].date);
@@ -243,9 +255,9 @@
       }
     },
     mounted(){
-      this.transList = this.getTrans;
-      this.expCat = this.getExpCat;
-      this.incCat = this.getIncCat;
+    },
+    components:{
+      'v-edit-trans':EditTrans
     },
     props:['acc','isProfile']
   }

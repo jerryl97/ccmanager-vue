@@ -1,8 +1,7 @@
 <template>
   <div id="accmaindiv">
     <!--Add Account Float Action Button-->
-    <vue-fab :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
-
+    <vue-fab :hidden="hideAddAccFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
 
     <!--Accounts List-->
     <div style="margin-bottom:40%;">
@@ -73,10 +72,9 @@
 
     data(){ 
       return{
-        accList:[],
         activeCollapse:[],
         addAccPop:false, 
-        hideFab:false,
+        hideAddAccFab:false,
         accGroupSummary:[],
         accProfilePop:false,
         selectedAcc:'',
@@ -87,23 +85,23 @@
  
       //Show Add Account Pop Up
       showAddAcc(){
-        this.hideFab = true;
+        this.hideAddAccFab = true;
         this.addAccPop = true;
       },
       //Close Add Account Pop Up
       closeAddAcc(){
-        this.hideFab = false;
+        this.hideAddAccFab = false;
         this.addAccPop = false; 
       },
       //Show Account Profile
       showAccProfile(acc){
           this.accProfilePop = true;
-          this.hideFab = true;
+          this.hideAddAccFab = true;
           this.selectedAcc = acc;
       },
       //Close Account Profile
       closeAccProfile(){
-        this.hideFab = false;
+        this.hideAddAccFab = false;
         this.accProfilePop = false;
       },
       //Get Account Groups Name
@@ -138,10 +136,7 @@
             this.$dialog.confirm({
               message:'Are you sure to delete?'
             }).then(()=>{
-              this.accList = _.filter(this.accList,x=>{
-                return x.accid != detail.name;
-              })
-              this.$store.commit('setAccounts',this.accList);
+              this.$store.commit('deleteAccount',detail.name);
               this.$store.dispatch('storeAccounts');
             }).catch(()=>{
               this.$dialog.close();
@@ -156,8 +151,7 @@
         return this.$store.state.allAccounts;
       },
       getGroupedAccounts(){
-        let temp = this.$store.state.allAccounts;
-        let grouped = _.groupBy(temp,'accgroup'); 
+        let grouped = _.groupBy(this.getAccounts,'accgroup'); 
 
         this.accGroupSummary = [];
         for(let i in grouped){
@@ -188,7 +182,6 @@
       },  
     },
     mounted(){
-      this.accList = this.getAccounts;
     },
 
     components:{

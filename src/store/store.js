@@ -69,8 +69,15 @@ export default new Vuex.Store({
       for(let i in state.allAccounts){
         if(state.allAccounts[i].accid == value.accid){
           state.allAccounts[i] = value; 
+          console.log(value);
         }
       }
+    },
+    //Delete Account
+    deleteAccount(state,value){
+      state.allAccounts = _.filter(state.allAccounts,x=>{
+        return x.accid != value; 
+      });
     },
     //Set Accounts to Vuex Store
     setAccounts(state,value){
@@ -114,6 +121,7 @@ export default new Vuex.Store({
     //Add Transactions to Vuex Store
     addTrans(state,value){
       //Assigning id to account
+      if(!value.transid){
       if(state.allTrans.length<1&&state.maxTransId==0)
         value.transid=1;
       else if(state.allTrans.length<1)
@@ -127,22 +135,26 @@ export default new Vuex.Store({
           value.transid = maxId + 1; 
       } 
       state.maxTransId = value.transid;
+      }
+      state.allTrans.push(value);
       switch(value.type){
         case 'Expense':
-          for(let i = 0;i<state.allAccounts.length;i++)
+          for(let i = 0;i<state.allAccounts.length;i++){
             if(state.allAccounts[i].accid == value.account)
               if(state.allAccounts[i].accgroup == 1)
                 state.allAccounts[i].outstdbalance += value.amount;
               else
                 state.allAccounts[i].balance -= value.amount;
+          }
           break;
         case 'Income':
-          for(let i = 0;i<state.allAccounts.length;i++)
+          for(let i = 0;i<state.allAccounts.length;i++){
             if(state.allAccounts[i].accid == value.account)
               if(state.allAccounts[i].accgroup == 1)
                 state.allAccounts[i].outstdbalance -= value.amount;
               else
                 state.allAccounts[i].balance += value.amount;
+          }
           break;
         case 'Transfer':
           for(let i=0;i<state.allAccounts.length;i++){
@@ -159,7 +171,11 @@ export default new Vuex.Store({
             }
           break;
       }
-      state.allTrans.push(value);
+    },
+    //Edit Transactions
+    editTrans(state,value){
+      this.commit('deleteTrans',value.transid);
+      this.commit('addTrans',value);
     },
     //Set Transactions to Vuex Store
     setTrans(state,value){
@@ -170,36 +186,43 @@ export default new Vuex.Store({
       let deletedTrans = state.allTrans.find(trans => trans.transid == value);
       switch(deletedTrans.type){
         case 'Expense':
-          for(let i = 0;i<state.allAccounts.length;i++)
+          for(let i = 0;i<state.allAccounts.length;i++){
             if(state.allAccounts[i].accid == deletedTrans.account)
               if(state.allAccounts[i].accgroup == 1)
                 state.allAccounts[i].outstdbalance -= deletedTrans.amount;
               else
                 state.allAccounts[i].balance += deletedTrans.amount;
+          }
           break;
         case 'Income':
-          for(let i = 0;i<state.allAccounts.length;i++)
+          for(let i = 0;i<state.allAccounts.length;i++){
             if(state.allAccounts[i].accid == deletedTrans.account)
               if(state.allAccounts[i].accgroup == 1)
                 state.allAccounts[i].outstdbalance += deletedTrans.amount;
               else
                 state.allAccounts[i].balance -= deletedTrans.amount;
+          } 
           break;
         case 'Transfer':
           for(let i=0;i<state.allAccounts.length;i++){
-            if(state.allAccounts[i].accid == deletedTrans.fromaccount)
+            if(state.allAccounts[i].accid == deletedTrans.fromaccount){
               if(state.allAccounts[i].accgroup == 1)
                 state.allAccounts[i].outstdbalance -= deletedTrans.amount;
               else
                 state.allAccounts[i].balance += deletedTrans.amount;
-            if(state.allAccounts[i].accid == deletedTrans.toaccount)
+            }
+            if(state.allAccounts[i].accid == deletedTrans.toaccount){
               if(state.allAccounts[i].accgroup == 1)
                 state.allAccounts[i].outstdbalance += deletedTrans.amount;
               else
                 state.allAccounts[i].balance -= deletedTrans.amount;
             }
+          } 
           break;
       }
+      state.allTrans = _.filter(state.allTrans,x=>{
+        return x.transid != value 
+      });
     },
     //Set Max Id of Accounts
     setMaxTransId(state,value){

@@ -31,7 +31,7 @@
   export default{
     data(){
       return{
-        active:0,
+        active:this.$route.query.activeTab,
         acc:'',
         isProfile:false,
       }

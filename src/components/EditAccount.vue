@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()"/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Delete" @click-right="deleteAcc()"/>
 
     <van-cell-group>
 
@@ -31,10 +31,10 @@
       <!-- To check if group is Credit Card-->
         <div v-if="accItem.accgroup==1">
       <!--Statement Date-->
-          <van-field readonly clickable label="Statement Date" :value="accItem.sdate" placeholder="Choose a date" @click="showSDatePicker = true" required :error-message="sdateError"/>
+          <van-field readonly clickable label="Statement Date" :value="displaySDate" placeholder="Choose a date" @click="showSDatePicker = true" required :error-message="sdateError"/>
 
       <!-- Payment Due Date-->
-          <van-field readonly clickable label="Payment Due Date" :value="accItem.pduedate" placeholder="Choose a date" @click="showPDueDatePicker = true" required :error-message="pduedateError"/>
+          <van-field readonly clickable label="Payment Due Date" :value="displayPDueDate" placeholder="Choose a date" @click="showPDueDatePicker = true" required :error-message="pduedateError"/>
         </div>
 
         <!--To check if group is NOT Credit Card-->
@@ -97,6 +97,8 @@
         displayExpiry:'',
         displayBalance:'',
         displayAccGroup:'',
+        displaySDate:'',
+        displayPDueDate:'',
 
         //Picker Initialize
         showGroupPicker:false,
@@ -132,9 +134,7 @@
 
       //Back to Account Page
       back(){
-        this.$emit("closeEditAcc");
-        this.setDefault();
-      
+        this.$emit("closeEditAcc"); 
       },
 
       //Account Group Confirm
@@ -161,12 +161,14 @@
       sDateConfirm(value){
         this.accItem.sdate = value;
         this.showSDatePicker = false;
+        this.displaySDate = this.accItem.sdate;
       },
 
       //Payment Due Date Confirm
       pDueDateConfirm(value){
         this.accItem.pduedate = value;
         this.showPDueDatePicker = false;
+        this.displayPDueDate = this.accItem.pduedate;
       },
 
       //Save New Account
@@ -191,13 +193,24 @@
             this.accItem.nextduedate = this.$moment(this.accItem.pduedate).toDate();
             this.accItem.nextduedate = this.$moment(this.accItem.nextduedate).add('1','months').format('D MMMM YYYY');  
           }
+          this.acc = this.accItem;
           this.$store.commit('editAccount',this.accItem);
           this.$store.dispatch('storeAccounts');
-          this.setDefault();
           this.back();
         } 
       },
-
+      //Delete Account
+      deleteAcc(){
+            this.$dialog.confirm({
+              message:'Are you sure to delete?'
+            }).then(()=>{
+              this.$store.commit('deleteAccount',this.accItem.accid);
+              this.$store.dispatch('storeAccounts');
+              this.back();
+            }).catch(()=>{
+              this.$dialog.close();
+            });
+      },
       //Add Account Validation
       saveValidation(value){
         let validstate = value; 
@@ -259,23 +272,38 @@
     watch:{
       acc(){
         this.accItem = this.acc;
+        if(this.accItem){
+        let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
+        this.displayAccGroup = temp.groupName;
         if(this.accItem.balance)
           this.displayBalance = this.accItem.balance.toString();
-        if(this.accItem.expiry)
-          this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
-       let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
-       this.displayAccGroup = temp.groupName;
+        if(this.accItem.accgroup == 1 || this.accItem.accgroup ==2){
+          if(this.accItem.expiry)
+            this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
+        }
+        if(this.accItem.accgroup == 1){
+            this.displaySDate = this.accItem.sdate.substring(0,2);
+            this.displayPDueDate = this.accItem.pduedate.substring(0,2);
+          }
+        }
       }
     },
     mounted(){
-      this.accItem = this.acc;
-      if(this.accItem.balance)
-        this.displayBalance = this.accItem.balance.toString();
-      if(this.accItem.expiry)
-        this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
-      let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
-      this.displayAccGroup = temp.groupName;
-      
+       this.accItem = this.acc;
+       if(this.accItem){
+        let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
+        this.displayAccGroup = temp.groupName;
+        if(this.accItem.balance)
+          this.displayBalance = this.accItem.balance.toString();
+        if(this.accItem.accgroup == 1 || this.accItem.accgroup ==2){
+          if(this.accItem.expiry)
+            this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
+        }
+        if(this.accItem.accgroup == 1){
+            this.displaySDate = this.accItem.sdate.substring(0,2);
+            this.displayPDueDate = this.accItem.pduedate.substring(0,2);
+        }
+      }
     },
     props:['acc']
   }

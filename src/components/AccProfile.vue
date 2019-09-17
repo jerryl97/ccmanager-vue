@@ -3,9 +3,6 @@
     <!-- Top Nav Bar-->
     <van-nav-bar :title="getTitle(acc)" left-text="Back" left-arrow @click-left="back()" right-text="Edit" @click-right="showEditAcc"/>
 
-    <!-- FAB for adding Transaction-->
-    <vue-fab :hidden="hideFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
-
     <!-- Account Details-->
     <van-cell-group>
       <van-cell style="background-color:#f6f6f6">
@@ -23,6 +20,7 @@
           </span>
         </template>
         <template slot="label">
+          <span v-if="acc.accgroup==1||acc.accgroup==2">{{acc.bank}}<br/></span>
           <span v-if="acc.accgroup==1||acc.accgroup==2">Expiry:{{getExpiryFormatted(acc.expiry)}}<br/></span>
           <span>
             {{acc.contents}}
@@ -90,26 +88,19 @@
         title:'',      
         isProfile:true,
         editAccPop:false,
-        hideFab:false,
       }
     },
     methods:{
       back(){
         this.$emit("closeAccProfile"); 
       },
-      //Add Transaction Button
-      addTransButton(){
-        this.$router.push("/addtrans");
-      },
       //Show Edit Account
       showEditAcc(){
         this.editAccPop = true;
-        this.hideFab = true;
       },
       //Close Edit Account
       closeEditAcc(){
         this.editAccPop = false;
-        this.hideFab = false;
       },
       //Get Title of Account
       getTitle(acc){
@@ -131,8 +122,6 @@
         let formatted = this.$moment(expiry).format("MM/YY");
         return formatted; 
       },
-
-
     },
     computed:{
       getAccGroups(){

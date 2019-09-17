@@ -15,7 +15,12 @@ import Transactions from '../components/Transactions.vue'
 //Configure the routes
 const routes = [
   {path: '/addtrans', component: AddTransTab},
-  {path: '/acctrans', component: AccTransTab},
+  {path: '/acctrans', component: AccTransTab,
+    children:[
+      {path:'/acctrans/accounts',component:Accounts},
+      {path:'/acctrans/trans',component:Transactions},
+    ] 
+  },
   {path: '/promotions', component: PromotionsTab},
   {path: '/settings', component: SettingsTab},
 

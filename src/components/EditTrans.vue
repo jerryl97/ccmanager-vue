@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--Top Navbar-->
-    <van-nav-bar :title="title"/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Delete" @click-right="deleteTrans()"/>
 
     <van-cell-group>
     <!--Field for Transaction Type(with Popup Picker)-->
@@ -75,13 +75,10 @@
   export default{
     data(){
       return{
-        title:"Add Transactions",
+        title:"Edit Transactions",
 
         //Variables Initialize
-        transItem:{
-          type:'Expense',
-          date:new Date(),
-        },
+        transItem:{},
         transOptions:['Expense','Income','Transfer'],
 
         //Picker Initialize
@@ -94,7 +91,7 @@
         showToAccList:false,
 
         //Display Variables
-        transDate:this.$moment(new Date()).format('Do MMMM YYYY'), //Default Display Date
+        transDate:'', //Default Display Date
         displayCategory:'',
         displayFromAccount:'',
         displayAccount:'',
@@ -112,9 +109,7 @@
       //Set Default
       setDefault(){
         this.transItem = {};
-        this.transItem.type = 'Expense';
-        this.transItem.date = new Date();
-        this.transDate=this.$moment(new Date()).format('Do MMMM YYYY'), //Default Display Date
+        this.transDate='', //Default Display Date
         this.transItem.amount = 0;
         this.transAmount = ''; 
         this.accountError = '';
@@ -126,7 +121,10 @@
         this.displayFromAccount='';
         this.displayToAccount='';
       },
-
+      //Back Button
+      back(){
+        this.$emit('closeEditTrans'); 
+      },
       //Transaction Type Confirm
       transTypeConfirm(value){
         this.transItem.type = value;
@@ -194,10 +192,10 @@
             this.transItem.account = '';
             this.transItem.category = '';
           }
-          this.$store.commit('addTrans',this.transItem);
+          this.$store.commit('editTrans',this.transItem);
           this.$store.dispatch('storeTrans');
-          this.setDefault();
-          this.$router.push({path:'/acctrans',query:{activeTab:1}});
+          this.$store.dispatch('storeAccounts');
+          this.back();
         }       
       },
       
@@ -225,6 +223,19 @@
         } 
         return validstate;
       }, 
+      
+      //Delete Transactions
+      deleteTrans(){
+        this.$dialog.confirm({
+            message:'Are you sure to delete?'
+          }).then(()=>{
+            this.$store.commit('deleteTrans',this.transItem.transid);
+            this.$store.dispatch('storeTrans');
+            this.back();
+          }).catch(()=>{
+              this.$dialog.close();
+          });
+      },
       testSuggest(){
       
       },
@@ -241,9 +252,89 @@
         return this.$store.state.allAccounts;
       }
     },
-    mounted(){
-    
+    watch:{
+      trans(){ 
+        this.transItem = Object.assign({},this.trans);
+        if(this.transItem){
+        if(this.transItem.type == 'Expense'){
+          let tempCat = this.getExpCat.find(o=>o.expcatid==this.transItem.category);
+          if(tempCat)
+            this.displayCategory = tempCat.expCatName;
+          else
+            this.displayCategory = 'Other';
+          let tempAcc = this.getAccounts.find(o=>o.accid==this.transItem.account);
+          if(tempAcc)
+            this.displayAccount = tempAcc.name;
+          else
+            this.displayAccount = '';
+        }
+        else if(this.transItem.type == 'Income'){
+          let tempCat = this.getIncCat.find(o=>o.inccatid==this.transItem.category);
+          if(tempCat)
+            this.displayCategory = tempCat.incCatName;
+          else
+            this.displayCategory = 'Other';
+          let tempAcc = this.getAccounts.find(o=>o.accid==this.transItem.account);
+          if(tempAcc)
+            this.displayAccount = tempAcc.name;
+          else
+            this.displayAccount = '';
+        }
+        else if(this.transItem.type=='Transfer'){
+          let tempFromAcc = this.getAccounts.find(o=>o.accid==this.transItem.fromaccount);
+          if(tempFromAcc)
+            this.displayFromAccount = tempFromAcc.name;
+          let tempToAcc = this.getAccounts.find(o=>o.accid==this.transItem.toaccount);
+          if(tempToAcc)
+            this.displayToAccount = tempToAcc.name;  
+        }
+        this.transDate = this.$moment(this.transItem.date).format('DD MMMM YYYY');
+        if(this.transItem.amount)
+          this.transAmount = this.transItem.amount.toString();
+        }
+      }
     },
+    mounted(){ 
+        this.transItem = Object.assign({},this.trans);
+        if(this.transItem){
+        if(this.transItem.type == 'Expense'){
+          let tempCat = this.getExpCat.find(o=>o.expcatid==this.transItem.category);
+          if(tempCat)
+            this.displayCategory = tempCat.expCatName;
+          else
+            this.displayCategory = 'Other';
+          let tempAcc = this.getAccounts.find(o=>o.accid==this.transItem.account);
+          if(tempAcc)
+            this.displayAccount = tempAcc.name;
+          else
+            this.displayAccount = '';
+        }
+        else if(this.transItem.type == 'Income'){
+          let tempCat = this.getIncCat.find(o=>o.inccatid==this.transItem.category);
+          if(tempCat)
+            this.displayCategory = tempCat.incCatName;
+          else
+            this.displayCategory = 'Other';
+          let tempAcc = this.getAccounts.find(o=>o.accid==this.transItem.account);
+          if(tempAcc)
+            this.displayAccount = tempAcc.name;
+          else
+            this.displayAccount = '';
+        }
+        else if(this.transItem.type=='Transfer'){
+          let tempFromAcc = this.getAccounts.find(o=>o.accid==this.transItem.fromaccount);
+          if(tempFromAcc)
+            this.displayFromAccount = tempFromAcc.name;
+          let tempToAcc = this.getAccounts.find(o=>o.accid==this.transItem.toaccount);
+          if(tempToAcc)
+            this.displayToAccount = tempToAcc.name;  
+        }
+        this.transDate = this.$moment(this.transItem.date).format('DD MMMM YYYY');
+        if(this.transItem.amount)
+          this.transAmount = this.transItem.amount.toString();
+        }
+    },
+    props:['trans']
   
   }
 </script>
