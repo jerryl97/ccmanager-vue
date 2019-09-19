@@ -10,6 +10,11 @@
       <v-add-promo @closeAddPromo="closeAddPromo"></v-add-promo>
     </van-popup>
 
+    <!--Promotions List-->
+    <div>
+
+    </div>
+
   </div>
 </template>
 <script>

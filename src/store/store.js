@@ -38,6 +38,18 @@ export default new Vuex.Store({
       {incCatName:'Other',inccatid:3}, 
     ],
     maxIncCatId:0,
+
+    //Promotions
+    allPromo:[],
+    maxPromoId:0,
+
+    //Rewards Category
+    rewardsCat:[
+      {rewardsCatName:'Discount',rewardscatid:1},
+      {rewardsCatName:'Cashback',rewardscatid:2},
+      {rewardsCatName:'Other',rewardscatid:3}, 
+    ],
+    maxRewardsCatId:0,
   },
   
   getters: {
@@ -285,6 +297,60 @@ export default new Vuex.Store({
       state.maxIncCatId = value;
     },
     ///////////////////////////////// 
+
+    //////////////////Promotions
+    //Add Promotions
+    addNewPromo(state,value){
+      //Assigning id to promotion
+      if(state.allPromo.length<1&&state.maxPromoId==0)
+        value.promoid=1;
+      else if(state.allPromo.length<1)
+        value.promoid = state.maxPromoId+1; 
+      else{
+        const maxId = state.allPromo.reduce(
+        (max, promo) => (promo.promoid>max ? promo.promoid:max),state.allPromo[0].promoid);
+        if((maxId+1)==state.maxPromoId)
+          value.promoid = maxId + 2;
+        else
+          value.promoid = maxId + 1; 
+      } 
+      state.maxPromoId = value.promoid;
+      state.allPromo.push(value);
+    },
+    //Set Promotions to Vuex Store
+    setPromotions(state,value){
+      state.allPromo = value;
+    },
+    //Set Max Id of Promo
+    setMaxPromoId(state,value){
+      state.maxPromoId = value;
+    }, 
+    //////////////////Rewards Categories
+    //Add Rewards Categories
+    addRewardsCat(state,value){
+      if(state.rewardsCat.length<1&&state.maxRewardsCatId==0)
+        value.rewardscatid=1;
+      else if(state.rewardsCat.length<1)
+        value.rewardscatid = state.maxRewardsCatId+1; 
+      else{
+        const maxId = state.rewardsCat.reduce(
+        (max, rewardscat) => (rewardscat.rewardscatid>max ? rewardscat.rewardscatid:max),state.rewardsCat[0].rewardscatid);
+        if((maxId+1)==state.maxRewardsCatId)
+          value.rewardscatid = maxId+2;
+        else
+          value.rewardscatid = maxId + 1;
+      } 
+      state.maxRewardsCatId = value.rewardscatid;
+      state.rewardsCat.push(value);
+    },
+    //Set Rewards Categories to Vuex Store
+    setRewardsCat(state,value){
+      state.rewardsCat = value;
+    },
+    //Set Max Id of Rewards Category 
+    setMaxRewardsCatId(state,value){
+      state.maxRewardsCatId = value;
+    },
   },
   /////////////////////////////////
   
@@ -402,6 +468,52 @@ export default new Vuex.Store({
         if(value!=null){
           let maxid = value;
           context.commit('setMaxIncCatId',maxid);
+        } 
+      })
+    },
+    /////////////////////////////////
+
+    //////////////////Promotions
+    //Store Promotions
+    storePromotions(context){
+      localForage.setItem('promotions',context.state.allPromo);
+      localForage.setItem('maxPromoId',context.state.maxPromoId);
+    },
+    //Get Promotions
+    getPromotions(context){  
+      localForage.getItem('promotions').then(value=>{
+        if(value!=null){
+          let promotions = value;
+          context.commit('setPromotions',promotions);
+        } 
+      })
+      localForage.getItem('maxPromoId').then(value=>{
+        if(value!=null){
+          let maxid = value;
+          context.commit('setMaxPromoId',maxid);
+        } 
+      })
+    },
+    /////////////////////////////////
+
+    //////////////////Rewards Categories
+    //Store Rewards Categories 
+    storeRewardsCat(context){
+      localForage.setItem('rewardscat',context.state.rewardsCat);
+      localForage.setItem('maxrewardscatid',context.state.maxRewardsCatId);
+    }, 
+    //Get Rewards Categories
+    getRewardsCat(context){
+      localForage.getItem('rewardscat').then(value=>{
+        if(value!=null){
+          let rewardscats = value;
+          context.commit('setRewardsCat',rewardscats);
+        } 
+      })
+      localForage.getItem('maxrewardscatid').then(value=>{
+        if(value!=null){
+          let maxid = value;
+          context.commit('setMaxRewardsCatId',maxid);
         } 
       })
     },
