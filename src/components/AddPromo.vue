@@ -18,6 +18,8 @@
       <!--Minimum Spend-->
       <van-field readonly clickable label="Minimum" :value="displayMinimum" @touchstart.native.stop="showNumbKeyboard = true" placeholder="$ 0"/>
       <van-number-keyboard v-model="displayMinimum" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/>
+      <!--Promotion's Desc-->
+      <van-field label="Description" clearable placeholder="Promotion's Description" v-model="promoItem.promodesc"/>
 
       <!--Duration-->
       <van-switch-cell v-model="promoItem.duration" :title="'Has duration? '+ getDurationStatus()" />
@@ -86,6 +88,7 @@
         title:"Add Promotion",
         promoItem:{
           duration:false,
+          promodesc:'',
         },
         nextBtnText:'Next',
 
@@ -250,6 +253,7 @@
       //Save New Promotion
       saveNewPromo(){
         this.promoItem.rltacc = this.activeAccIds;
+        this.promoItem.rltexpense = this.expcatchecked;
         this.promoItem.rltrewards = this.rewardscatchecked;
         if(this.displayMinimum != '')
           this.promoItem.minimum = parseFloat(this.displayMinimum);
