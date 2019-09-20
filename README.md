@@ -36,8 +36,9 @@
   </li>
 </ul>
 
+<br>
+
 ## Command Lines Guide:
-<h3>Vue Dependencies:</h3>
 ```
 vue create ccmanager
 cd ccmanager
@@ -62,6 +63,8 @@ cordova plugin add cordova-plugin-local-notification
 cordova plugin add https://github.com/card-io/card.io-Cordova-Plugin
 cordova run android
 ```
+
+<br>
 
 ## Project setup
 ```
