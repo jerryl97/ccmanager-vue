@@ -29,9 +29,12 @@
   <li>Potential plugins to be added in:
     <ul>
       <li>Data Visualization(chart.js) - https://www.chartjs.org</li>
-      <li>Card IO(OCR) - https://developers.braintreepayments.com/</li>
-      <li>Local Notification - https://github.com/katzer/cordova-plugin-local-notifications</li>
-      <li>Create local backup json file - https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-file/</li>
+      <ul>
+        <lh>Cordova Plugins reguire vue-clie-plugin-cordova to be added into the project</lh>
+        <li>Card IO(OCR) - https://developers.braintreepayments.com/</li>
+        <li>Local Notification - https://github.com/katzer/cordova-plugin-local-notifications</li>
+        <li>Create local backup json file - https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-file/</li>
+      </ul>
     </ul>
   </li>
 </ul>
@@ -51,8 +54,7 @@ npm install vue-float-action-button
 npm install vuex --save
 npm run serve
 ```
-<h3>Extra Features and Plugins:</h3>
-<p>Cordova Plugins relies on Cordova added into the project.</p>
+## Extra Features and Plugins:
 ```
 npm install chart.js --save
 vue add cordova
