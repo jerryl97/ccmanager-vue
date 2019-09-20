@@ -1,9 +1,9 @@
-# expense-manager
+# Multiple Credit Card Management Application(ccmanager)
 
 
-## Development Setup Guide
+## Development Build Setup Guide
 
-Cordova Project setup guide:
+<h2>Development build setup guide:</h2>
 <ul>
   <li>https://github.com/m0dch3n/vue-cli-plugin-cordova - vue add cordova</li>
   <li>ccmanager dependencies:
@@ -16,8 +16,18 @@ Cordova Project setup guide:
       <li>Vue Floating Point Button - https://www.npmjs.com/package/vue-float-action-button</li>
       <li>Vuex Store - https://vuex.vuejs.org/installation.html</li>
     </ul>
+  </li>
+  <li>Potential plugins to be added in:
+    <ul>
+      <li>Data Visualization(chart.js) - https://www.chartjs.org</li>
+      <li>Card IO(OCR) - https://developers.braintreepayments.com/</li>
+      <li>Local Notification - https://github.com/katzer/cordova-plugin-local-notifications</li>
+      <li>Create local backup json file - https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-file/</li>
+    </ul>
+  </li>
 </ul>
 
+## Command Lines Guide:
 ```
 vue create ccmanager
 cd ccmanager
