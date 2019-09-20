@@ -31,8 +31,7 @@
 
     <!-- Field for Accounts(with Popup Picker)-->
     <div v-if="transItem.type!='Transfer'">
-       <van-field required readonly clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayAccount" @click="showAccList = true">
-       <van-button slot="button" v-if="transItem.type=='Expense'" size="small" type="primary" @click="showSuggestList()">Suggest</van-button>
+       <van-field required readonly clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayAccount" @click="showAccSelection">
        </van-field>
 
        <van-popup v-model="showAccList" position="bottom">
@@ -100,7 +99,7 @@
         suggestListPop:false,
 
         //Display Variables
-        transDate:this.$moment(new Date()).format('Do MMMM YYYY'), //Default Display Date
+        transDate:this.$moment(new Date()).format('DD MMMM YYYY'), //Default Display Date
         displayCategory:'',
         displayFromAccount:'',
         displayAccount:'',
@@ -120,7 +119,7 @@
         this.transItem = {};
         this.transItem.type = 'Expense';
         this.transItem.date = new Date();
-        this.transDate=this.$moment(new Date()).format('Do MMMM YYYY'), //Default Display Date
+        this.transDate=this.$moment(new Date()).format('DD MMMM YYYY'), //Default Display Date
         this.transItem.amount = 0;
         this.transAmount = ''; 
         this.accountError = '';
@@ -148,7 +147,7 @@
       //Date Confirm
       dateConfirm(value){
         this.transItem.date = value;
-        this.transDate = this.$moment(value).format('Do MMMM YYYY');
+        this.transDate = this.$moment(value).format('DD MMMM YYYY');
         this.showTransDate = false;
       },
 
@@ -163,6 +162,28 @@
           this.displayCategory = value.incCatName;
         }
         this.showCategoryList = false;
+      },
+
+      //Show Account List Selection
+      showAccSelection(){
+        let rqm = {};
+        rqm.transdate = this.transItem.date;
+
+        if(this.transItem.category)
+          rqm.transcat = this.transItem.category;
+        else
+          rqm.transcat = '';
+
+        if(this.transAmount == '')
+          rqm.transamount = 0; 
+        else
+          rqm.transamount = parseFloat(this.transAmount); 
+
+        this.$store.commit("genSuggestAcc",rqm); 
+        this.accountSelect[0].children = this.getSuggestAcc;
+        this.accountSelect[0].info = this.accountSelect[0].children.length;
+        console.log(this.accountSelect[0]);
+        this.showAccList = true; 
       },
 
       //Account Confirm
@@ -259,11 +280,6 @@
         } 
         return validstate;
       }, 
-      //Show Suggest List
-      showSuggestList(){
-        this.suggestListPop = true;
-        this.showAccList = false; 
-      },
 
     },
     computed:{
@@ -281,6 +297,12 @@
       },
       getGroupedAccounts(){ 
         let grouped = [];
+        let suggestAcc = {
+          text:'Suggest',
+          children:[],
+        };
+        suggestAcc.info = suggestAcc.children.length;
+        grouped.push(suggestAcc);
         let accgrps = this.getAccGroups;
         let accounts = this.getAccounts;
         for(let i in accgrps){
@@ -296,14 +318,18 @@
               temp.children.push(tempAcc); 
             }
           }
+          if(temp.children.length>0)
+            temp.info = temp.children.length;
           grouped.push(temp);
         }
         return grouped;
       },
+      getSuggestAcc(){
+        return this.$store.state.suggestAcc; 
+      },
     },
     updated(){
       this.accountSelect = this.getGroupedAccounts; 
-    },
-  
+    }, 
   }
 </script>

@@ -50,6 +50,8 @@ export default new Vuex.Store({
       {rewardsCatName:'Other',rewardscatid:3}, 
     ],
     maxRewardsCatId:0,
+
+    suggestAcc:[],
   },
   
   getters: {
@@ -340,6 +342,8 @@ export default new Vuex.Store({
     setMaxPromoId(state,value){
       state.maxPromoId = value;
     }, 
+    /////////////////////////////////
+
     //////////////////Rewards Categories
     //Add Rewards Categories
     addRewardsCat(state,value){
@@ -366,6 +370,44 @@ export default new Vuex.Store({
     setMaxRewardsCatId(state,value){
       state.maxRewardsCatId = value;
     },
+
+    //////////////////Suggesting Feature
+    //Generate Suggest Accounts
+    genSuggestAcc(state,value){
+      state.suggestAcc = [];
+      if(state.allPromo){
+      let filteredPromo = _.filter(state.allPromo,x=>{
+        //Check Minimum
+        if(x.minimum <= value.transamount){
+          //Check Duration
+          if(x.duration==false || (x.duration==true&&Vue.moment(value.transdate).isBetween(x.fromdate,x.todate))){
+            //Check Expense Category
+            if(x.rltexpense.includes(value.transcat)){
+              return x; 
+              }
+            }
+          }
+        }); 
+        for(let i in state.allAccounts){
+          let tempacc = {
+            text: state.allAccounts[i].name,
+            id: state.allAccounts[i].accid,
+            rltpromo:[],
+          };
+          for(let j in filteredPromo){
+            if(filteredPromo[j]){
+              if(filteredPromo[j].rltacc.includes(state.allAccounts[i].accid)){
+                tempacc.rltpromo.push(filteredPromo[j].promoid);
+              }
+            if(tempacc.rltpromo.length>0){
+              state.suggestAcc.push(tempacc);
+              }
+            }
+          }
+        }
+      }
+    },
+    /////////////////////////////////
   },
   /////////////////////////////////
   
