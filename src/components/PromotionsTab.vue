@@ -25,18 +25,22 @@
           <span>Expense: <span v-for="exp in promo.rltexpense">{{getExpenseName(exp)}}, </span></span><br/>
           <span>Accounts: <span v-for="acc in promo.rltacc">{{getAccName(acc)}}, </span></span></br>
           <span>Rewards: <span v-for="reward in promo.rltrewards">{{getRewardsName(reward)}}, </span></span><br/>
-          <van-button type="info" size="mini" @click="editPromoPop = true">Edit</van-button>
+          <van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
           <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>
         </div>
       </van-collapse-item>
     </van-collapse>
 
-
+    <!--Edit Promotions Page(Popup)-->
+    <van-popup v-model="editPromoPop" position="bottom" :style="{height:'100%'}">
+      <v-edit-promo @closeEditPromo="closeEditPromo" :promo="selectedPromo"></v-edit-promo>
+    </van-popup>
   </div>
 </template>
 <script>
 
 import AddPromo from './AddPromo.vue';
+import EditPromo from './EditPromotion.vue';
 
 export default{
   data(){
@@ -47,6 +51,7 @@ export default{
       activePromoNames:[],
 
       editPromoPop:false,
+      selectedPromo:[],
     
     }
   },
@@ -95,6 +100,15 @@ export default{
       }).catch(()=>{
         this.$dialog.close();
       });
+    },
+    showEditPromo(promoid){
+      this.editPromoPop = true;
+      this.hideAddPromoFab = true; 
+      this.selectedPromo = promoid;
+    },
+    closeEditPromo(){
+      this.editPromoPop = false;
+      this.hideAddPromoFab = false;
     }
   },
   computed:{
@@ -113,6 +127,7 @@ export default{
   },
   components:{
     'v-add-promo':AddPromo,
+    'v-edit-promo':EditPromo,
   }
 }
 </script>

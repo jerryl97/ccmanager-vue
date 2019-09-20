@@ -32,11 +32,15 @@
     <!-- Field for Accounts(with Popup Picker)-->
     <div v-if="transItem.type!='Transfer'">
        <van-field required readonly clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayAccount" @click="showAccList = true">
-         <van-button slot="button" v-if="transItem.type=='Expense'" size="small" type="primary" @click="testSuggest">Suggest</van-button>
+       <van-button slot="button" v-if="transItem.type=='Expense'" size="small" type="primary" @click="showSuggestList()">Suggest</van-button>
        </van-field>
 
        <van-popup v-model="showAccList" position="bottom">
-         <van-picker show-toolbar :columns="getAccounts" @cancel="showAccList = false" @confirm="accConfirm" value-key="name" />
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')"/>
+        <van-tree-select :items="accountSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+       </van-popup>
+       <van-popup v-model="suggestListPop" position="bottom">
+        <p>haha</p> 
        </van-popup>
     </div>
 
@@ -44,9 +48,8 @@
     <div v-if="transItem.type=='Transfer'">
        <van-field readonly required clickable :error-message="fromAccountError" label="From" placeholder="Choose an account" :value="displayFromAccount" @click="showFromAccList = true"/>
        <van-popup v-model="showFromAccList" position="bottom">
-
-         <van-picker show-toolbar :columns="getAccounts" @cancel="showFromAccList = false" value-key="name" @confirm="fromAccConfirm" />
-
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
+        <van-tree-select :items="accountSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
        </van-popup>
     </div>
 
@@ -54,9 +57,8 @@
     <div v-if="transItem.type=='Transfer'">
        <van-field readonly required clickable label="To" :error-message="toAccountError" placeholder="Choose an account" :value="displayToAccount" @click="showToAccList = true"/>
        <van-popup v-model="showToAccList" position="bottom">
-
-         <van-picker show-toolbar :columns="getAccounts" @cancel="showToAccList = false" value-key="name" @confirm="toAccConfirm" />
-
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
+        <van-tree-select :items="accountSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
        </van-popup>
     </div>
     
@@ -83,6 +85,9 @@
           date:new Date(),
         },
         transOptions:['Expense','Income','Transfer'],
+        accountSelect:[],
+        activeAccId:'',
+        activeAccIndex:0,
 
         //Picker Initialize
         showTransOptions:false,
@@ -92,6 +97,7 @@
         showAccList:false,
         showFromAccList:false,
         showToAccList:false,
+        suggestListPop:false,
 
         //Display Variables
         transDate:this.$moment(new Date()).format('Do MMMM YYYY'), //Default Display Date
@@ -160,24 +166,52 @@
       },
 
       //Account Confirm
-      accConfirm(value){
-        this.transItem.account = value.accid;
-        this.displayAccount = value.name;
-        this.showAccList = false;
+      accConfirm(value,type){
+        if(value){
+         let temp = this.getAccounts.find(o=>o.accid==value);
+         switch(type){
+           case 'account':
+             this.transItem.account = value;
+             this.displayAccount = temp.name;
+             this.showAccList = false;
+             this.activeAccId = '';
+             break;
+            case 'fromaccount':
+             this.transItem.fromaccount = value;
+             this.displayFromAccount = temp.name;
+             this.showFromAccList = false;
+             this.activeAccId = '';
+             break;
+            case 'toaccount':
+             this.transItem.toaccount = value;
+             this.displayToAccount = temp.name;
+             this.showToAccList = false;
+             this.activeAccId = '';
+             break;
+        
+          }
+        }
       },
 
-      //From Account Confirm
-      fromAccConfirm(value){
-        this.transItem.fromaccount = value.accid;
-        this.displayFromAccount = value.name;
-        this.showFromAccList = false;
-      },
-
-      //To Account Confirm
-      toAccConfirm(value){
-        this.transItem.toaccount = value.accid;
-        this.displayToAccount = value.name;
-        this.showToAccList = false;
+      //Cancel Account Confirm
+      cancelAccConfirm(value){
+        switch(value){
+          case 'account':
+            this.displayAccount = '';
+            this.activeAccId = '';
+            this.showAccList = false;
+            break;
+          case 'fromaccount': 
+            this.displayFromAccount = '';
+            this.activeAccId = '';
+            this.showAccList = false;
+            break;
+          case 'toaccount':
+            this.displayToAccount = '';
+            this.activeAccId = '';
+            this.showAccList = false;
+            break;
+        }
       },
 
       //Save New Transaction
@@ -225,8 +259,10 @@
         } 
         return validstate;
       }, 
-      testSuggest(){
-      
+      //Show Suggest List
+      showSuggestList(){
+        this.suggestListPop = true;
+        this.showAccList = false; 
       },
 
     },
@@ -239,10 +275,34 @@
       },
       getAccounts(){
         return this.$store.state.allAccounts;
-      }
+      },
+      getAccGroups(){
+        return this.$store.state.accGroups;
+      },
+      getGroupedAccounts(){ 
+        let grouped = [];
+        let accgrps = this.getAccGroups;
+        let accounts = this.getAccounts;
+        for(let i in accgrps){
+          let temp = {};
+          temp.text=accgrps[i].groupName;
+          temp.children = [];
+          for(let j in accounts){
+            if(accounts[j].accgroup == accgrps[i].grpid){
+              let tempAcc = {
+                text:accounts[j].name,
+                id:accounts[j].accid
+              };
+              temp.children.push(tempAcc); 
+            }
+          }
+          grouped.push(temp);
+        }
+        return grouped;
+      },
     },
-    mounted(){
-    
+    updated(){
+      this.accountSelect = this.getGroupedAccounts; 
     },
   
   }

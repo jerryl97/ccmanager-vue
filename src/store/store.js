@@ -317,6 +317,15 @@ export default new Vuex.Store({
       state.maxPromoId = value.promoid;
       state.allPromo.push(value);
     },
+    //Edit Promotion
+    editPromo(state,value){
+      for(let i in state.allPromo){
+        if(state.allPromo[i].promoid == value.promoid){ 
+          state.allPromo[i] = value;
+          console.log(value); 
+        }
+      }
+    },
     //Delete Promotion
     deletePromo(state,value){
       state.allPromo = _.filter(state.allPromo,x=>{
