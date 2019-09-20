@@ -54,7 +54,7 @@ npm install vue-float-action-button
 npm install vuex --save
 npm run serve
 ```
-## Extra Features and Plugins:
+### Extra Features and Plugins:
 ```
 npm install chart.js --save
 vue add cordova
