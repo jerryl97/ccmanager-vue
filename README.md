@@ -1,11 +1,20 @@
 # Multiple Credit Card Management Application(ccmanager)
 
+<br>
 
-## Development Build Setup Guide
-
-<h2>Development build setup guide:</h2>
+## About:
+<p>This application functions primarily as an expense manager, it is made up of 3 main components:</p>
 <ul>
-  <li>https://github.com/m0dch3n/vue-cli-plugin-cordova - vue add cordova</li>
+  <li><b>Accounts:<b/> represents credit cards/payment methods. Example: Credit Card, Debit Card, Cash account types</li>
+  <li><b>Transactions:<b/> represents expense and income flow saved within the application. Example: Expense, Income, Transfer transaction types</li>
+  <li><b>Promotions:<b/> used for recommendation feature that advices users on which Account to use for a Expense Transaction.</li>
+</ul>
+
+<br>
+
+## Development Build Setup Guide:
+<ul>
+  <li>Adding Cordova into Vue Project - https://github.com/m0dch3n/vue-cli-plugin-cordova</li>
   <li>ccmanager dependencies:
     <ul>
       <li>Lodash - https://github.com/lodash/lodash</li>
@@ -28,6 +37,7 @@
 </ul>
 
 ## Command Lines Guide:
+<h3>Vue Dependencies:</h3>
 ```
 vue create ccmanager
 cd ccmanager
@@ -38,6 +48,19 @@ npm install vue-router
 npm install vue-moment
 npm install vue-float-action-button
 npm install vuex --save
+npm run serve
+```
+<h3>Extra Features and Plugins:</h3>
+<p>Cordova Plugins relies on Cordova added into the project.</p>
+```
+npm install chart.js --save
+vue add cordova
+npm cordova-build-android
+cd src-cordova
+cordova plugin add cordova-plugin-file
+cordova plugin add cordova-plugin-local-notification
+cordova plugin add https://github.com/card-io/card.io-Cordova-Plugin
+cordova run android
 ```
 
 ## Project setup
