@@ -5,9 +5,12 @@
 ## About:
 <p>This application functions primarily as an expense manager, it is made up of 3 main components:</p>
 <ul>
-  <li><b>Accounts:<b/> represents credit cards/payment methods. Example: Credit Card, Debit Card, Cash account types</li>
-  <li><b>Transactions:<b/> represents expense and income flow saved within the application. Example: Expense, Income, Transfer transaction types</li>
-  <li><b>Promotions:<b/> used for recommendation feature that advices users on which Account to use for a Expense Transaction.</li>
+  <li>Accounts:  
+    &nbsp&nbsprepresents credit cards/payment methods. Example: Credit Card, Debit Card, Cash account types</li>
+  <li>Transactions:  
+    &nbsp&nbsprepresents expense and income flow saved within the application. Example: Expense, Income, Transfer transaction types</li>
+  <li>Promotions:  
+    &nbsp&nbspused for recommendation feature that advices users on which Account to use for a Expense Transaction.</li>
 </ul>
 
 <br>
@@ -41,19 +44,6 @@
 
 <br>
 
-## Command Lines Guide:
-```
-vue create ccmanager
-cd ccmanager
-npm i lodash
-npm install localforage
-npm i vant -S
-npm install vue-router
-npm install vue-moment
-npm install vue-float-action-button
-npm install vuex --save
-npm run serve
-```
 ### Extra Features and Plugins:
 ```
 npm install chart.js --save
