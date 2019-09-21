@@ -73,10 +73,10 @@
           if(this.isEdit == true){
             this.incCat[this.tempKey].incCatName = this.cat.incCatName; 
             this.$store.commit('setIncCat',this.incCat);
-            this.$store.dispatch('storeIncCat');
+            this.$store.dispatch('storeAllStateData');
           }else{
             this.$store.commit('addIncCat',this.cat); 
-            this.$store.dispatch('storeIncCat');
+            this.$store.dispatch('storeAllStateData');
           }
           this.setDefault();
         }
@@ -93,7 +93,7 @@
       deleteIncCat(key){
         this.incCat.splice(key,1);
         this.$store.commit('setIncCat',this.incCat);
-        this.$store.dispatch('storeIncCat');
+        this.$store.dispatch('storeAllStateData');
       },
       //Save Validation
       saveValidation(value){

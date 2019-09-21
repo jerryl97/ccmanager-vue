@@ -96,7 +96,7 @@ export default{
         message:'Are you sure to delete?'
       }).then(()=>{
         this.$store.commit('deletePromo',promoid);
-        this.$store.dispatch('storePromotions');
+        this.$store.dispatch('storeAllStateData');
       }).catch(()=>{
         this.$dialog.close();
       });

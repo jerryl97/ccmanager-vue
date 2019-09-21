@@ -193,8 +193,9 @@
             this.transItem.category = '';
           }
           this.$store.commit('editTrans',this.transItem);
-          this.$store.dispatch('storeTrans');
-          this.$store.dispatch('storeAccounts');
+          //this.$store.dispatch('storeTrans');
+          //this.$store.dispatch('storeAccounts');
+          this.$store.dispatch('storeAllStateData');
           this.back();
         }       
       },
@@ -230,7 +231,7 @@
             message:'Are you sure to delete?'
           }).then(()=>{
             this.$store.commit('deleteTrans',this.transItem.transid);
-            this.$store.dispatch('storeTrans');
+            this.$store.dispatch('storeAllStateData');
             this.back();
           }).catch(()=>{
               this.$dialog.close();

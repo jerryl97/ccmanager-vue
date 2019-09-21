@@ -73,10 +73,10 @@
           if(this.isEdit == true){
             this.rewardsCat[this.tempKey].rewardsCatName = this.cat.rewardsCatName; 
             this.$store.commit('setRewardsCat',this.rewardsCat);
-            this.$store.dispatch('storeRewardsCat');
+            this.$store.dispatch('storeAllStateData');
           }else{
             this.$store.commit('addRewardsCat',this.cat); 
-            this.$store.dispatch('storeRewardsCat');
+            this.$store.dispatch('storeAllStateData');
           }
           this.setDefault();
         }
@@ -93,7 +93,7 @@
       deleteRewardsCat(key){
         this.rewardsCat.splice(key,1);
         this.$store.commit('setRewardsCat',this.rewardsCat);
-        this.$store.dispatch('storeRewardsCat');
+        this.$store.dispatch('storeAllStateData');
       },
       //Save Validation
       saveValidation(value){

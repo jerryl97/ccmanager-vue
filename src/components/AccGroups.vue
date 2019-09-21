@@ -73,10 +73,10 @@
           if(this.isEdit == true){
             this.accGroups[this.tempKey].groupName = this.accGrpItem.groupName; 
             this.$store.commit('setAccGroup',this.accGroups);
-            this.$store.dispatch('storeAccGroups');
+            this.$store.dispatch('storeAllStateData');
           }else{
             this.$store.commit('addAccGroup',this.accGrpItem); 
-            this.$store.dispatch('storeAccGroups');
+            this.$store.dispatch('storeAllStateData');
           }
           this.setDefault();
         }
@@ -93,7 +93,7 @@
       deleteAccGroup(key){
         this.accGroups.splice(key,1);
         this.$store.commit('setAccGroup',this.accGroups);
-        this.$store.dispatch('storeAccGroups');
+        this.$store.dispatch('storeAllStateData');
       },
       //Add Account Group Validation
       saveValidation(value){

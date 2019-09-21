@@ -36,13 +36,14 @@ new Vue({
   store,
   router,
   created(){
-    store.dispatch('getAccounts');
-    store.dispatch('getAccGroups');
-    store.dispatch('getTrans');
-    store.dispatch('getExpCat');
-    store.dispatch('getIncCat');
-    store.dispatch('getPromotions');
-    store.dispatch('getRewardsCat');
+    //store.dispatch('getAccounts');
+    //store.dispatch('getAccGroups');
+    // store.dispatch('getTrans');
+    // store.dispatch('getExpCat');
+    // store.dispatch('getIncCat');
+    // store.dispatch('getPromotions');
+    // store.dispatch('getRewardsCat');
+    store.dispatch('getAllStateData');
   },
   render: h => h(App),
 }).$mount('#app')

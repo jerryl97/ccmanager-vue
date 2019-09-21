@@ -250,7 +250,7 @@
             this.transItem.category = '';
           }
           this.$store.commit('addTrans',this.transItem);
-          this.$store.dispatch('storeTrans');
+          this.$store.dispatch('storeAllStateData');
           this.setDefault();
           this.$router.push({path:'/acctrans',query:{activeTab:1}});
         }       

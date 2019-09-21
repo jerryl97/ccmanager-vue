@@ -197,7 +197,7 @@
             this.accItem.nextduedate = this.$moment(this.accItem.nextduedate).add('1','months').format('D MMMM YYYY');  
           }
           this.$store.commit('addAccount',this.accItem);
-          this.$store.dispatch('storeAccounts');
+          this.$store.dispatch('storeAllStateData');
           this.setDefault();
           this.back();
         } 

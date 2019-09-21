@@ -171,7 +171,7 @@
               });
               this.$store.commit('deleteTrans',detail.name);
               this.$store.commit('setTrans',this.transList);
-              this.$store.dispatch('storeTrans');
+              this.$store.dispatch('storeAllStateData');
             }).catch(()=>{
               this.$dialog.close();
             });

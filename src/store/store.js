@@ -3,9 +3,8 @@ import Vue from 'vue'
 import localForage from '../storage/storage.js'
 
 Vue.use(Vuex)
-
-export default new Vuex.Store({
-  state: {
+const getDefaultState = ()=>{
+  return {
     //Accounts
     allAccounts:[],
     maxAccId:0,
@@ -51,14 +50,28 @@ export default new Vuex.Store({
     ],
     maxRewardsCatId:0,
 
-    suggestAcc:[],
-  },
+    suggestAcc:[], 
+  }
+}
+
+const state = getDefaultState();
+
+export default new Vuex.Store({
+  state,
   
   getters: {
   },
   
   mutations: {
-
+    //////////////////State
+    //Set the State Data
+    setAllStateData(state,value){
+      Object.assign(state,value);
+    },
+    //Set the State Data to Default
+    setStateToDefault(state){
+      Object.assign(state,getDefaultState());
+    },
     //////////////////Account
     //Add Account to Vuex Store
     addAccount(state,value){
@@ -412,170 +425,23 @@ export default new Vuex.Store({
   /////////////////////////////////
   
   actions: {
-    
-    //////////////////Accounts
-    //Store Accounts
-    storeAccounts(context){
-      localForage.setItem('accounts',context.state.allAccounts);
-      localForage.setItem('maxAccId',context.state.maxAccId);
+    //Store All the State Data into Database
+    storeAllStateData(context,payload){
+      localForage.setItem('state',context.state);
     }, 
-    //Get Accounts 
-    getAccounts(context){
-      localForage.getItem('accounts').then(value=>{
+    //Get All the State Data from Database
+    getAllStateData(context){
+      localForage.getItem('state').then(value=>{
         if(value!=null){
-          let accounts = value;
-          context.commit('setAccounts',accounts);
-        } 
-      })
-      localForage.getItem('maxAccId').then(value=>{
-        if(value!=null){
-          let maxid = value;
-          context.commit('setMaxAccId',maxid);
-        } 
+          context.commit('setAllStateData',value);
+        }
       })
     },
-    /////////////////////////////////
-
-    //////////////////Accounts Groups
-    //Store Account Groups
-    storeAccGroups(context){
-      localForage.setItem('accgroups',context.state.accGroups);
-      localForage.setItem('maxaccgrpid',context.state.maxAccGrpId);
-    }, 
-    //Get Account Groups
-    getAccGroups(context){
-      localForage.getItem('accgroups').then(value=>{
-        if(value!=null){
-          let accgrps = value;
-          context.commit('setAccGroup',accgrps);
-        } 
+    //Clear Database
+    clearDatabase(context){
+      localForage.clear().then(()=>{
+        console.log('Database is empty now');
       });
-      localForage.getItem('maxaccgrpid').then(value=>{
-        if(value!=null){
-          let maxid = value;
-          context.commit('setMaxAccGrpId',maxid);
-        } 
-      });
-    },
-    ////////////////////////////////
-
-    //////////////////Transactions
-    //Store Transactions
-    storeTrans(context){
-      localForage.setItem('transactions',context.state.allTrans).then(()=>{
-        localForage.setItem('accounts',context.state.allAccounts);
-      });
-      localForage.setItem('maxTransId',context.state.maxTransId);
-    }, 
-    //Get Transactions 
-    getTrans(context){
-      localForage.getItem('transactions').then(value=>{
-        if(value!=null){
-          let trans = value;
-          context.commit('setTrans',trans);
-        } 
-      })
-      localForage.getItem('maxTransId').then(value=>{
-        if(value!=null){
-          let maxid = value;
-          context.commit('setMaxTransId',maxid);
-        } 
-      })
-    },
-    /////////////////////////////////
-
-    //////////////////Expense Categories
-    //Store Expense Categories 
-    storeExpCat(context){
-      localForage.setItem('expcat',context.state.expCat);
-      localForage.setItem('maxexpcatid',context.state.maxExpCatId);
-    }, 
-    //Get Expense Categories
-    getExpCat(context){
-      localForage.getItem('expcat').then(value=>{
-        if(value!=null){
-          let expcats = value;
-          context.commit('setExpCat',expcats);
-        } 
-      })
-      localForage.getItem('maxexpcatid').then(value=>{
-        if(value!=null){
-          let maxid = value;
-          context.commit('setMaxExpCatId',maxid);
-        } 
-      })
-    },
-    /////////////////////////////////
-
-    //////////////////Income Categories
-    //Store Income Categories 
-    storeIncCat(context){
-      localForage.setItem('inccat',context.state.incCat);
-      localForage.setItem('maxinccatid',context.state.maxIncCatId);
-    }, 
-    //Get Income Categories
-    getIncCat(context){
-      localForage.getItem('inccat').then(value=>{
-        if(value!=null){
-          let inccats = value;
-          context.commit('setIncCat',inccats);
-        } 
-      })
-      localForage.getItem('maxinccatid').then(value=>{
-        if(value!=null){
-          let maxid = value;
-          context.commit('setMaxIncCatId',maxid);
-        } 
-      })
-    },
-    /////////////////////////////////
-
-    //////////////////Promotions
-    //Store Promotions
-    storePromotions(context){
-      localForage.setItem('promotions',context.state.allPromo);
-      localForage.setItem('maxPromoId',context.state.maxPromoId);
-    },
-    //Get Promotions
-    getPromotions(context){  
-      localForage.getItem('promotions').then(value=>{
-        if(value!=null){
-          let promotions = value;
-          context.commit('setPromotions',promotions);
-        } 
-      })
-      localForage.getItem('maxPromoId').then(value=>{
-        if(value!=null){
-          let maxid = value;
-          context.commit('setMaxPromoId',maxid);
-        } 
-      })
-    },
-    /////////////////////////////////
-
-    //////////////////Rewards Categories
-    //Store Rewards Categories 
-    storeRewardsCat(context){
-      localForage.setItem('rewardscat',context.state.rewardsCat);
-      localForage.setItem('maxrewardscatid',context.state.maxRewardsCatId);
-    }, 
-    //Get Rewards Categories
-    getRewardsCat(context){
-      localForage.getItem('rewardscat').then(value=>{
-        if(value!=null){
-          let rewardscats = value;
-          context.commit('setRewardsCat',rewardscats);
-        } 
-      })
-      localForage.getItem('maxrewardscatid').then(value=>{
-        if(value!=null){
-          let maxid = value;
-          context.commit('setMaxRewardsCatId',maxid);
-        } 
-      })
-    },
-    /////////////////////////////////
-    
-  }
-  
+    }
+  } 
 });

@@ -137,7 +137,7 @@
               message:'Are you sure to delete?'
             }).then(()=>{
               this.$store.commit('deleteAccount',detail.name);
-              this.$store.dispatch('storeAccounts');
+              this.$store.dispatch('storeAllStateData');
             }).catch(()=>{
               this.$dialog.close();
             });

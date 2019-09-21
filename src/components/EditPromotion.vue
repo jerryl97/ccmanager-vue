@@ -241,7 +241,7 @@
         else
           this.promoItem.minimum = 0;
         this.$store.commit('editPromo',this.promoItem);
-        this.$store.dispatch('storePromotions');
+        this.$store.dispatch('storeAllStateData');
         this.back(); 
       }
     },

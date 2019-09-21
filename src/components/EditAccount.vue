@@ -195,7 +195,7 @@
           }
           this.acc = this.accItem;
           this.$store.commit('editAccount',this.accItem);
-          this.$store.dispatch('storeAccounts');
+          this.$store.dispatch('storeAllStateData');
           this.back();
         } 
       },
@@ -205,7 +205,7 @@
               message:'Are you sure to delete?'
             }).then(()=>{
               this.$store.commit('deleteAccount',this.accItem.accid);
-              this.$store.dispatch('storeAccounts');
+              this.$store.dispatch('storeAllStateData');
               this.back();
             }).catch(()=>{
               this.$dialog.close();

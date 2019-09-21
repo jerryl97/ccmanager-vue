@@ -186,7 +186,7 @@
               message:'Are you sure to delete?'
             }).then(()=>{
               this.$store.commit('deleteTrans',detail.name);
-              this.$store.dispatch('storeTrans');
+              this.$store.dispatch('storeAllStateData');
             }).catch(()=>{
               this.$dialog.close();
             });

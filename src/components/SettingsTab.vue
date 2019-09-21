@@ -23,6 +23,18 @@
       <van-cell title="Manage Rewards Categories" @click="showManageRewards=true" is-link/>
     </van-cell-group>
 
+    <!--Data Section-->
+    <van-cell-group title="Data">
+      <!--Backup Data-->
+      <van-cell title="Backup Data" @click="backupAllData()" is-link/>
+      <!--Import Data From File-->
+      <input type="file" ref="importinput" style="display:none" accept="text/plain" @change="readBackupFile($event)"/>
+      <van-cell title="Import Data From File" @click="$refs.importinput.click()" is-link/>
+      <!--Reset to Default-->
+      <van-cell title="Reset To Default" @click="resetAllData()" is-link/>
+    </van-cell-group>
+
+
     <!-- Setting Pop Ups-->
     <!-- Manage Account Groups Pop-->
     <van-popup v-model="showManageAccGroups" position="bottom" :style="{height:'100%'}">
@@ -61,6 +73,7 @@
         showManageIncCat:false,
         showManageRewards:false,
 
+
       }
     },
     methods:{
@@ -79,6 +92,79 @@
       //Close Manage Rewards Categories
       closeManageRewardsCat(){
         this.showManageRewards=false;
+      },
+      //Backup All Data
+      backupAllData(){
+        this.$dialog.confirm({
+          message:'Backup all the data?'
+        }).then(()=>{
+          this.createBackupFile();
+        }).catch(()=>{
+          this.$dialog.close();
+        });
+      },
+      //Create Backup File
+      createBackupFile(){
+        window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,(fs)=>{
+          let tempdate = this.$moment(new Date()).format('YYYY-MM-DD');
+          fs.getFile(tempdate+'.txt',{create:true,exclusive:false},(fileEntry)=>{
+            fileEntry.createWriter(fileWriter=>{
+              fileWriter.onwriteend = (e)=>{
+                alert('Backup Completed. Path: /Android/data/com.vue.expensemanager.app/files/'); 
+              };
+              fileWriter.onerror = (e)=>{
+                alert('Backup Failed '+e.toString()); 
+              };
+              let backupdata = JSON.stringify(this.getStateData);
+              console.log(backupdata);
+              var blob = new Blob([backupdata],{type:'text/plain'});
+              fileWriter.write(blob);
+            });
+          });
+        });
+      },
+      //Read and Import Backup Data
+      readBackupFile(e){
+        var readingpromise = new Promise((resolve,reject)=>{
+          var input = e.target;
+          var reader = new FileReader();
+          reader.onload = ()=>{
+            resolve(reader.result);
+          };
+          reader.readAsText(input.files[0]); 
+        });
+        readingpromise.then((result)=>{
+          let importedData = JSON.parse(result);
+          this.$store.commit('setAllStateData',importedData);
+          this.$store.dispatch('storeAllStateData');
+          this.$notify({
+            message:'Data Imported',
+            type:'primary',
+            duration:4000,
+          });
+        }); 
+      },
+      //Reset the data to default
+      resetAllData(){
+        this.$dialog.confirm({
+          message:'Are you sure to reset?'
+        }).then(()=>{
+          this.$store.commit('setStateToDefault');
+          this.$store.dispatch('storeAllStateData');
+          this.$notify({
+            message:'Reset Completed.',
+            type:'primary',
+            duration:4000,
+          });
+        }).catch(()=>{
+          this.$dialog.close();
+        });
+      
+      }
+    },
+    computed:{
+      getStateData(){
+        return this.$store.state;
       }
     },
     components:{

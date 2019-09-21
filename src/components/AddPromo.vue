@@ -260,7 +260,7 @@
         else
           this.promoItem.minimum = 0;
         this.$store.commit('addNewPromo',this.promoItem);
-        this.$store.dispatch('storePromotions');
+        this.$store.dispatch('storeAllStateData');
         this.back(); 
       }
     },
@@ -285,6 +285,8 @@
               temp.children.push(tempAcc); 
             }
           }
+          if(temp.children.length>0)
+            temp.info = temp.children.length;
           grouped.push(temp);
         }
         return grouped;
