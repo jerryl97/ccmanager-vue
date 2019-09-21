@@ -36,8 +36,8 @@
   </li>
  </ul>
 <p>
-  Requirements acts as a **filter** for only showing relevant Accounts for recommendation.<br/>
-  Rewards will act as the **weight** for the determining which Promotion is more significant.
+  Requirements acts as a <b>filter</b> for only showing relevant Accounts for recommendation.<br/>
+  Rewards will act as the <b>weight</b> for the determining which Promotion is more significant.
 </p>
 
 <br>
