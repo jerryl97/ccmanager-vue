@@ -29,7 +29,7 @@
   <li>
     Rewards:
     <ul>
-      <li>Cashback/li>
+      <li>Cashback</li>
       <li>Discount</li>
       <li>Others</li>
     </ul>
