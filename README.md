@@ -2,7 +2,9 @@
 
 <br>
 
-![appHomePage](https://drive.google.com/uc?export=view&id=<1k87b8_HnDDUPvv-HONNoic-4iaXZPdS->)
+<p align="center">
+![Homepage(AddTrans)](https://user-images.githubusercontent.com/23553138/65384809-60f4e200-dd59-11e9-9f34-5024639c9888.PNG)
+</p>
 
 ## About:
 <p>This application functions primarily as an expense manager, it is made up of 3 main components:</p>
