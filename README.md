@@ -2,6 +2,10 @@
 
 <br>
 
+<p align="center">
+  <img src="https://drive.google.com/file/d/1k87b8_HnDDUPvv-HONNoic-4iaXZPdS-/view?usp=sharing">
+</p>
+
 ## About:
 <p>This application functions primarily as an expense manager, it is made up of 3 main components:</p>
 <ul>
