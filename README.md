@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-![Homepage(AddTrans)](https://user-images.githubusercontent.com/23553138/65384809-60f4e200-dd59-11e9-9f34-5024639c9888.PNG)
+  <img src="https://user-images.githubusercontent.com/23553138/65384809-60f4e200-dd59-11e9-9f34-5024639c9888.PNG">
 </p>
 
 ## About:
