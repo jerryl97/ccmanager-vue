@@ -91,17 +91,20 @@ cordova run android
 
 ## Project setup
 ```
-npm install
+npm install //Install the npm modules
+npm run cordova-prepare //Prepare for cordova
 ```
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run serve //Development on Browser
+npm run cordova-serve-android //Development on Android
 ```
 
 ### Compiles and minifies for production
 ```
 npm run build
+npm run cordova-build-android //Build Android
 ```
 
 ### Run your tests
