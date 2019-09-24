@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <div style="margin-bottom:20%">
+    <van-tabs type="card" v-model="transtab" style="padding-top:5%">
+
+    <!--Summary-->
+    <van-tab title="Summary">
+    
     <!-- Add Transaction Float Action Button-->
     <vue-fab v-if="!isProfile" :hidden="hideAddTransFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
 
@@ -28,7 +33,7 @@
     
     <!-- Transaction List-->
     <div style="margin-bottom:40px;">
-      <van-collapse v-model="activeNames" style="margin-bottom:40px;" accordion>
+      <van-collapse v-model="activeNames" accordion>
         <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :title="key" :name="key">
          <van-swipe-cell v-for="one in trans" :on-close="transOnClose" :name="one.transid">
             <van-cell style="background-color:#f9f9f9" size="small" is-link arrow-direction="left" @click="showEditTrans(one)">
@@ -69,6 +74,35 @@
         </van-collapse-item>
       </van-collapse>
       </div>
+      </van-tab>
+
+      <!-- Statistics -->
+      <van-tab title="Statistics">
+        <van-row style="text-align:center;margin-top:15px" type="flex" align="center">
+          <van-col span="3">
+            <van-icon name="arrow-left" @click="changeMonth('prev')"/>
+          </van-col>
+          <van-col span="18">
+            {{getDateFormatted(currentMonth)}}
+          </van-col>
+          <van-col span="3">
+            <van-icon name="arrow" @click="changeMonth('next')"/>
+          </van-col>
+        </van-row>
+        <van-dropdown-menu>
+          <van-dropdown-item v-model="statsmode" :options="statsmodeoptions"/>   
+        </van-dropdown-menu>
+        <v-expense-chart v-if="statsmode==0" :expdata="setChartData(getMonthly('Expense'),'Expense')"></v-expense-chart>
+        <v-income-chart v-if="statsmode==1" :incdata="setChartData(getMonthly('Income'),'Income')"></v-income-chart>
+        <van-cell-group v-if="statsmode==0">
+          <van-cell v-for="cat in getMonthly('Expense')" :title="getCatName('Expense',cat.category)" :value="'$' + cat.expensesum"/>
+        </van-cell-group>
+        <van-cell-group v-if="statsmode==1">
+          <van-cell v-for="cat in getMonthly('Income')" :title="getCatName('Income',cat.category)" :value="'$' + cat.incomesum"/>
+        </van-cell-group>
+      </van-tab>
+    </van-tabs>
+
     <!-- Edit Transaction Page(Popup)-->
     <van-popup v-model="editTransPop" position="bottom" :style="{height:'100%'}">
       <v-edit-trans @closeEditTrans="closeEditTrans" :trans="selectedTrans"></v-edit-trans>
@@ -77,6 +111,8 @@
 </template>
 <script>
   import EditTrans from './EditTrans.vue'
+  import ExpenseChart from './ExpenseChart.vue'
+  import IncomeChart from './IncomeChart.vue'
 
   export default{
     data(){
@@ -90,6 +126,12 @@
         monthTotal:0,
         editTransPop:false,
         selectedTrans:'',
+        transtab:0,
+        statsmode:0,
+        statsmodeoptions:[
+          {text:'Expense',value:0},
+          {text:'Income',value:1},
+        ],
       }
     },
     methods:{
@@ -97,6 +139,7 @@
       addTransButton(){
         this.$router.push("/addtrans");
       },
+
       //Show Edit Account
       showEditTrans(trans){
         this.editTransPop = true;
@@ -113,6 +156,7 @@
       getDateFormatted(date){
         return this.$moment(date).format('MMMM YYYY');
       },
+
       //Arrow Button to change Month
       changeMonth(value){
         switch(value){
@@ -124,6 +168,7 @@
             break;
         } 
       },
+
       //Get Accounts Name
       getAccName(value){
         let temp = this.getAccounts.find(o=>o.accid==value);
@@ -132,6 +177,7 @@
         else
           return temp.name;
       },
+
       //Get Category Name
       getCatName(type,value){
         switch(type){
@@ -151,6 +197,7 @@
           break; 
         }
       },
+
       //Get Month's Summary
       getTotalSummary(list){
         this.monthTotalInc = 0;
@@ -173,6 +220,73 @@
         else if(type=='Income')
           return result.inctotal; 
       },
+
+      //Get Monthly Expense & Income
+      getMonthly(type){
+        let temp = [];
+        if(this.isProfile)
+           temp = _.filter(this.getTrans, x=>{
+            return x.account == this.acc.accid || x.fromaccount == this.acc.accid || x.toaccount == this.acc.accid;
+          }); 
+        else
+          temp = this.getTrans;
+        let tempList = [];
+        switch(type){
+          case 'Expense':
+            for(let i in temp){
+              let tempDate = this.$moment(temp[i].date);
+              let tempCurrentDate = this.$moment(this.currentMonth);
+              if(tempDate.month()==tempCurrentDate.month()&&tempDate.year()==tempCurrentDate.year()&&temp[i].type=="Expense")
+                tempList.push(temp[i]);
+              } 
+            tempList = _.groupBy(tempList,'category');
+            tempList = _.map(tempList,(obj,keys)=>({
+              'category':keys,
+              'expensesum':_.sumBy(obj,'amount') 
+            }));
+            break;
+          case 'Income':
+            for(let i in temp){
+              let tempDate = this.$moment(temp[i].date);
+              let tempCurrentDate = this.$moment(this.currentMonth);
+              if(tempDate.month()==tempCurrentDate.month()&&tempDate.year()==tempCurrentDate.year()&&temp[i].type=="Income")
+                tempList.push(temp[i]);
+            } 
+            tempList = _.groupBy(tempList,'category');
+            tempList = _.map(tempList,(obj,keys)=>({
+              'category':keys,
+              'incomesum':_.sumBy(obj,'amount') 
+            }));
+            break;
+        }
+        return tempList; 
+      },
+
+      //Set Data for Charts
+      setChartData(data,type){
+        let forchartdata = {
+          labels:[],
+          data:[],
+        }
+        switch(type){
+          case 'Expense':
+            for(let j in data){
+            let findcat = this.getExpCat.find(o=>o.expcatid==data[j].category);
+            forchartdata.labels.push(findcat.expCatName);
+            forchartdata.data.push(data[j].expensesum);
+            }  
+            break;
+          case 'Income':
+            for(let j in data){
+            let findcat = this.getIncCat.find(o=>o.inccatid==data[j].category);
+            forchartdata.labels.push(findcat.incCatName);
+            forchartdata.data.push(data[j].incomesum);
+            }  
+            break;
+        }
+        return forchartdata;
+      },
+
       //SwipeCell onClose Transaction Delete
       transOnClose(clickPosition, instance,detail){
         switch(clickPosition){
@@ -257,7 +371,9 @@
     mounted(){
     },
     components:{
-      'v-edit-trans':EditTrans
+      'v-edit-trans':EditTrans,
+      'v-expense-chart':ExpenseChart,
+      'v-income-chart':IncomeChart
     },
     props:['acc','isProfile']
   }

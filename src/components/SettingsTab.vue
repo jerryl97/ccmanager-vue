@@ -34,6 +34,9 @@
       <van-cell title="Reset To Default" @click="resetAllData()" is-link/>
     </van-cell-group>
 
+    <!--Notification Section-->
+    <van-cell-group title="Notification">
+    </van-cell-group>
 
     <!-- Setting Pop Ups-->
     <!-- Manage Account Groups Pop-->
@@ -178,6 +181,7 @@
 </script>
 <style scoped>
 #settingmaindiv{
-  background-color:#f6f6f6
+  background-color:#f6f6f6;
+  margin-bottom:20%;
 }
 </style>

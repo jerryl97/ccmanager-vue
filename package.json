@@ -21,11 +21,13 @@
     "cordova-serve-osx": "cross-env CORDOVA_PLATFORM=osx vue-cli-service cordova-serve-osx"
   },
   "dependencies": {
+    "chart.js": "^2.8.0",
     "core-js": "^2.6.5",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "vant": "^2.2.1",
     "vue": "^2.6.10",
+    "vue-chartjs": "^3.4.2",
     "vue-float-action-button": "^0.6.4",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.1.3",

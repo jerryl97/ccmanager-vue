@@ -4,7 +4,7 @@
     <vue-fab :hidden="hideAddAccFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
 
     <!--Accounts List-->
-    <div style="margin-bottom:40%;">
+    <div>
       <van-cell-group v-for="(group,key) in getGroupedAccounts" >
         <van-cell :title="getGroupName(key)" style="background-color:#f9f9f9" size="large" :value="getGroupSummary(key)" />
         </van-cell>
@@ -194,6 +194,7 @@
 <style scoped>
 #accmaindiv{
   background-color:#f6f6f9;
+  margin-bottom:40%;
 }
   
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin-bottom:20%">
     <!-- Top Nav Bar -->
     <van-nav-bar :title="title"/>
 
@@ -12,7 +12,7 @@
     </van-popup>
 
     <!--Promotions List-->
-    <van-collapse v-model="activePromoNames">
+    <van-collapse v-model="activePromoNames" accordion>
       <van-collapse-item v-for="(promo,index) in getPromo" :label="promo.promodesc" :name="promo.promoid">
         <div slot="title"> 
           {{promo.promotitle}}
