@@ -75,20 +75,6 @@
 
 <br>
 
-### Extra Features and Plugins:
-```
-npm install chart.js --save
-vue add cordova
-npm cordova-build-android
-cd src-cordova
-cordova plugin add cordova-plugin-file
-cordova plugin add cordova-plugin-local-notification
-cordova plugin add https://github.com/card-io/card.io-Cordova-Plugin
-cordova run android
-```
-
-<br>
-
 ## Project setup
 ```
 npm install //Install the npm modules
