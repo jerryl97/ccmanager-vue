@@ -130,6 +130,7 @@
         this.displayCategory = '';
         this.displayFromAccount='';
         this.displayToAccount='';
+        this.accountSelect=[];
       },
 
       //Transaction Type Confirm
@@ -329,7 +330,7 @@
       },
     },
     updated(){
-      this.accountSelect = this.getGroupedAccounts; 
-    }, 
+      this.accountSelect = this.getGroupedAccounts;
+    },
   }
 </script>

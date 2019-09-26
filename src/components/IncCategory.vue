@@ -91,9 +91,15 @@
       },
       //Delete Income Category 
       deleteIncCat(key){
-        this.incCat.splice(key,1);
-        this.$store.commit('setIncCat',this.incCat);
-        this.$store.dispatch('storeAllStateData');
+        this.$dialog.confirm({
+          message:'Are you sure to delete?'
+        }).then(()=>{
+          this.incCat.splice(key,1);
+          this.$store.commit('setIncCat',this.incCat);
+          this.$store.dispatch('storeAllStateData'); 
+        }).catch(()=>{
+          this.$dialog.close();
+        });
       },
       //Save Validation
       saveValidation(value){

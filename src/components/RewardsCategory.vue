@@ -91,9 +91,15 @@
       },
       //Delete Rewards Category 
       deleteRewardsCat(key){
-        this.rewardsCat.splice(key,1);
-        this.$store.commit('setRewardsCat',this.rewardsCat);
-        this.$store.dispatch('storeAllStateData');
+        this.$dialog.confirm({
+          message:'Are you sure to delete?'
+        }).then(()=>{
+          this.rewardsCat.splice(key,1);
+          this.$store.commit('setRewardsCat',this.rewardsCat);
+          this.$store.dispatch('storeAllStateData'); 
+        }).catch(()=>{
+          this.$dialog.close();
+        })
       },
       //Save Validation
       saveValidation(value){

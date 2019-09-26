@@ -91,9 +91,15 @@
       },
       //Delete Account Group
       deleteAccGroup(key){
-        this.accGroups.splice(key,1);
-        this.$store.commit('setAccGroup',this.accGroups);
-        this.$store.dispatch('storeAllStateData');
+        this.$dialog.confirm({
+          message:'Are you sure to delete'
+        }).then(()=>{
+          this.accGroups.splice(key,1);
+          this.$store.commit('setAccGroup',this.accGroups);
+          this.$store.dispatch('storeAllStateData');  
+        }).catch(()=>{
+          this.$dialog.close();
+        });
       },
       //Add Account Group Validation
       saveValidation(value){

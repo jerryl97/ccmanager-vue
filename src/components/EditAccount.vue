@@ -147,7 +147,6 @@
       //Expiry Confirm
       expiryDateConfirm(value){
         this.displayExpiry = this.$moment(value).format('MM/YY');
-        this.accItem.expiry = this.displayExpiry;
         this.showExpiryDate = false;
       },
 

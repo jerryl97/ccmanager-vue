@@ -23,8 +23,9 @@
         <div slot="default">
           <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
           <span>Expense: <span v-for="exp in promo.rltexpense">{{getExpenseName(exp)}}, </span></span><br/>
+          <span v-if="promo.expmemo.length>0">{{promo.expmemo}}</br></span>
           <span>Accounts: <span v-for="acc in promo.rltacc">{{getAccName(acc)}}, </span></span></br>
-          <span>Rewards: <span v-for="reward in promo.rltrewards">{{getRewardsName(reward)}}, </span></span><br/>
+          <span>Rewards: <span v-for="reward in promo.rltrewards">{{reward.rewardsCatName}} {{reward.rewardsValue}},</span></span><br/>
           <van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
           <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>
         </div>
@@ -52,7 +53,6 @@ export default{
 
       editPromoPop:false,
       selectedPromo:[],
-    
     }
   },
   methods:{

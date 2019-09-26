@@ -9,6 +9,7 @@
       <van-step>Step 2</van-step>
       <van-step>Step 3</van-step>
       <van-step>Step 4</van-step>
+      <van-step>Step 5</van-step>
     </van-steps>
 
     <!--Promotion’s Info-->
@@ -36,6 +37,11 @@
         <van-datetime-picker v-model="promoItem.todate" type="date" @cancel="showToPromoDate=false" @confirm="toPromoDateConfirm" />
       </van-popup>
       </div>
+
+      <!--Transactions Count-->
+      <van-cell title="Limited Usage">
+        <van-stepper v-model="promoItem.transcount" min="0"></van-stepper>
+      </van-cell>
     </van-cell-group>
 
     <!-- Related Accounts-->
@@ -49,6 +55,11 @@
         <van-cell v-for="(cat,index) in getExpCat" clickable :key="cat.expcatid" :title="cat.expCatName" @click="expCatToggle(index)">
           <van-checkbox :name="cat.expcatid" ref="expcatcheckboxes" slot="right-icon"/>
         </van-cell>
+        <van-cell title="+Add New Expense Category" style="font-style:italic;color:#555555" @click="showAddExpCat=true"/>
+          <van-popup v-model="showAddExpCat" position="bottom" style="{height:'100%'}">
+            <v-exp-category @closeManageExpCat="closeManageExpCat"/> 
+          </van-popup>
+        <van-field v-model="promoItem.expmemo" label="Memo" type="textarea" placeholder="Expenses' Memo" autosize rows="1"/>
       </van-cell-group>
     </van-checkbox-group>
 
@@ -58,8 +69,17 @@
         <van-cell v-for="(cat,index) in rewardsCat" clickable :key="cat.rewardscatid" :title="cat.rewardsCatName" @click="rewardsCatToggle(index)">
           <van-checkbox :name="cat.rewardscatid" ref="rewardscatcheckboxes" slot="right-icon"/>
         </van-cell>
+        <van-cell title="+Add New Reward Category" style="font-style:italic;color:#555555" @click="showAddRewardCat=true"/>
+          <van-popup v-model="showAddRewardCat" position="bottom" style="{height:'100%'}">
+            <v-rewards-category @closeManageRewardsCat="closeManageRewardsCat"/> 
+          </van-popup>
       </van-cell-group>
     </van-checkbox-group>
+
+    <!-- Rewards Inputs-->
+    <van-cell-group title="The value for the rewards" v-if="activeStep==4">
+      <van-field v-for="(input,index) in rewardsInputs" :label="input.rewardsCatName" v-model="input.rewardsValue"/>
+    </van-cell-group>
 
     <!-- Next, Prev Button-->
     <van-row align="center" gutter="20" style="text-align:center;margin:10px 5px">
@@ -76,6 +96,9 @@
   </div>
 </template>
 <script>
+  import ExpCategory from './ExpCategory.vue'
+  import RewardCategory from './RewardsCategory.vue'
+
   export default{
     data(){
       return{
@@ -84,6 +107,8 @@
         promoItem:{
           duration:false,
           promodesc:'',
+          transcount:0,
+          expmemo:'',
         },
         nextBtnText:'Next',
 
@@ -104,6 +129,8 @@
         showNumbKeyboard:false,
         showFromPromoDate:false,
         showToPromoDate:false,
+        showAddExpCat:false,
+        showAddRewardCat:false,
 
         //Accounts Tree Select Initialize
         accountSelect:[],
@@ -116,7 +143,7 @@
         //Rewards Categories Checkbox
         rewardsCat:[],
         rewardscatchecked:[],
-        //rewardsInputs:[], 
+        rewardsInputs:[],
       }
     },
     methods:{
@@ -124,6 +151,9 @@
       setDefault(){
         this.promoItem = {}; 
         this.promoItem.duration=false; 
+        this.promoItem.promodesc='';
+        this.promoItem.expmemo='';
+        this.promoItem.transcount=0;
         this.showFromPromoDate=false;
         this.showToPromoDate=false;
         this.fromPromoDate='';
@@ -141,6 +171,7 @@
         this.nextBtnText = 'Next';
       },
       back(){
+        this.activeStep = 0;
         this.$emit("closeEditPromo");
       }, 
       //Promotion's Duration status
@@ -164,13 +195,44 @@
       expCatToggle(index){ 
         this.$refs.expcatcheckboxes[index].toggle(); 
       },
+      //Close Add Expense Categories
+      closeManageExpCat(){
+        this.showAddExpCat = false;
+      },
       //Rewards Categories Checkboxes toggle
       rewardsCatToggle(index){ 
         this.$refs.rewardscatcheckboxes[index].toggle(); 
       },
+      //Close Add Rewards Categories
+      closeManageRewardsCat(){
+        this.showAddRewardCat = false;
+      },
+      //Rewards Categories Inputs
+      showRewardsInputs(){
+        this.rewardsInputs = [];
+        let existed = [];
+        console.log(this.promoItem.rltrewards);
+        if(this.promoItem.rltrewards.length>0){
+          this.rewardsInputs = this.promoItem.rltrewards;
+          for(let i in this.rewardsInputs){
+            existed.push(this.rewardsInputs[i].rewardsID);
+          }
+          console.log(existed);
+        }
+        for(let i in this.rewardscatchecked){
+          if(!existed.includes(this.rewardscatchecked[i])){
+          let temp = this.getRewardsCat.find(o=>o.rewardscatid==this.rewardscatchecked[i])
+          this.rewardsInputs.push({
+            rewardsID:temp.rewardscatid,
+            rewardsCatName:temp.rewardsCatName,
+            rewardsValue:'',
+            });
+          }
+        }
+      },
       //Next Button Text
       getNextBtnText(){
-        if(this.activeStep == 3){
+        if(this.activeStep == 4){
           return 'Submit';
         }
         else{
@@ -219,6 +281,9 @@
           console.log(this.promoItem);
         }
         if(this.activeStep==4){
+          this.showRewardsInputs();
+        }
+        if(this.activeStep==5){
           this.saveNewPromo();
           this.activeStep = 0;
         }
@@ -229,19 +294,20 @@
         if(this.activeStep>0)
           this.activeStep--;
         if(this.activeStep < 0)
-          this.activeStep = 3; 
+          this.activeStep = 4; 
       },
       //Save New Promotion
       saveNewPromo(){
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
-        this.promoItem.rltrewards = this.rewardscatchecked;
+        this.promoItem.rltrewards = this.rewardsInputs;
         if(this.displayMinimum != '')
           this.promoItem.minimum = parseFloat(this.displayMinimum);
         else
           this.promoItem.minimum = 0;
         this.$store.commit('editPromo',this.promoItem);
         this.$store.dispatch('storeAllStateData');
+        this.activeStep = 0;
         this.back(); 
       }
     },
@@ -289,7 +355,10 @@
           this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
           this.activeAccIds = this.promoItem.rltacc;
           this.expcatchecked = this.promoItem.rltexpense;
-          this.rewardscatchecked = this.promoItem.rltrewards;
+          this.rewardscatchecked = [];
+          for(let i in this.promoItem.rltrewards){
+            this.rewardscatchecked.push(this.promoItem.rltrewards[i].rewardsID);
+          }
         }
       
       }
@@ -304,8 +373,14 @@
         this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
         this.activeAccIds = this.promoItem.rltacc;
         this.expcatchecked = this.promoItem.rltexpense;
-        this.rewardscatchecked = this.promoItem.rltrewards;
+        for(let i in this.promoItem.rltrewards){
+          this.rewardscatchecked.push(this.promoItem.rltrewards[i].rewardsID);
+        }
       }
+    },
+    components:{
+      'v-exp-category':ExpCategory,
+      'v-rewards-category':RewardCategory,
     },
     props:['promo']
   }
