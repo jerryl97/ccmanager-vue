@@ -51,6 +51,7 @@ const getDefaultState = ()=>{
     maxRewardsCatId:0,
 
     suggestAcc:[], 
+    suggestAccRltPromo:[],
   }
 }
 
@@ -96,7 +97,6 @@ export default new Vuex.Store({
       for(let i in state.allAccounts){
         if(state.allAccounts[i].accid == value.accid){
           state.allAccounts[i] = value; 
-          console.log(value);
         }
       }
     },
@@ -337,7 +337,6 @@ export default new Vuex.Store({
       for(let i in state.allPromo){
         if(state.allPromo[i].promoid == value.promoid){ 
           state.allPromo[i] = value;
-          console.log(value); 
         }
       }
     },
@@ -413,7 +412,8 @@ export default new Vuex.Store({
                 tempacc.rltpromo.push(filteredPromo[j].promoid);
               }
             if(tempacc.rltpromo.length>0){
-              state.suggestAcc.push(tempacc);
+              if(!state.suggestAcc.includes(tempacc))
+                state.suggestAcc.push(tempacc);
               }
             }
           }

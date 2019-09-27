@@ -36,10 +36,28 @@
 
        <van-popup v-model="showAccList" position="bottom">
         <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')"/>
-        <van-tree-select :items="accountSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
-       </van-popup>
-       <van-popup v-model="suggestListPop" position="bottom">
-        <p>haha</p> 
+        <van-tree-select @click-item="showRelatedPromo" :items="accountSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+        
+        <!--Suggested Accounts' Promotion-->
+        <van-cell-group v-if="activeAccIndex==0&&activeAccId!=''&&accountSelect[0].children.length>0" title="Promotions of this account">
+         <van-collapse v-model="activePromoNames" accordion>
+           <van-collapse-item v-for="(promo,index) in relatedPromo" :label="promo.promodesc" :name="promo.promoid">
+           <div slot="title"> 
+            {{promo.promotitle}}
+           </div>
+           <div slot="value"> 
+            Minimum: $ {{promo.minimum}}
+          </div>
+          <div slot="default">
+            <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
+            <span>Expense: <span v-for="exp in promo.rltexpense">{{getExpenseName(exp)}}, </span></span><br/>
+            <span v-if="promo.expmemo!=null">{{promo.expmemo}}</br></span>
+            <span>Accounts: <span v-for="acc in promo.rltacc">{{getAccName(acc)}}, </span></span></br>
+            <span>Rewards: <span v-for="reward in promo.rltrewards">{{reward.rewardsCatName}} {{reward.rewardsValue}},</span></span><br/>
+            </div>
+            </van-collapse-item>
+         </van-collapse>
+        </van-cell-group>
        </van-popup>
     </div>
 
@@ -87,6 +105,9 @@
         accountSelect:[],
         activeAccId:'',
         activeAccIndex:0,
+        relatedPromo:[],
+        showPromoSec:false,
+        activePromoNames:[],
 
         //Picker Initialize
         showTransOptions:false,
@@ -183,10 +204,36 @@
         this.$store.commit("genSuggestAcc",rqm); 
         this.accountSelect[0].children = this.getSuggestAcc;
         this.accountSelect[0].info = this.accountSelect[0].children.length;
-        console.log(this.accountSelect[0]);
         this.showAccList = true; 
       },
 
+      showRelatedPromo(data){
+        this.relatedPromo = [];
+        for(let i in data.rltpromo){
+          let temp = this.getPromo.find(o => o.promoid == data.rltpromo[i]); 
+          this.relatedPromo.push(temp);
+        }
+        console.log(this.relatedPromo);
+      },
+
+      getDateFormatted(value){
+        let temp = this.$moment(value).format('DD MMM YYYY'); 
+        return temp;
+      },
+      getExpenseName(expid){
+        let temp = this.getExpCat.find(o=>o.expcatid == expid);
+        if(temp)
+          return temp.expCatName; 
+        else
+          return 'Other';
+      },
+      getAccName(accid){
+        let temp = this.getAccounts.find(o=>o.accid == accid);
+        if(temp)
+          return temp.name;
+        else
+          return 'Deleted Account'; 
+      },
       //Account Confirm
       accConfirm(value,type){
         if(value){
@@ -214,7 +261,6 @@
           }
         }
       },
-
       //Cancel Account Confirm
       cancelAccConfirm(value){
         switch(value){
@@ -295,6 +341,9 @@
       },
       getAccGroups(){
         return this.$store.state.accGroups;
+      },
+      getPromo(){
+        return this.$store.state.allPromo;
       },
       getGroupedAccounts(){ 
         let grouped = [];
