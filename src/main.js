@@ -35,15 +35,18 @@ Vue.config.productionTip = false
 new Vue({
   store,
   router,
+  methods:{
+    onDeviceReady(){
+      navigator.splashscreen.show();
+      store.dispatch('getAllStateData');
+      window.setTimeout(function () {
+        navigator.splashscreen.hide();
+      },3500);
+    } 
+  },
   created(){
-    //store.dispatch('getAccounts');
-    //store.dispatch('getAccGroups');
-    // store.dispatch('getTrans');
-    // store.dispatch('getExpCat');
-    // store.dispatch('getIncCat');
-    // store.dispatch('getPromotions');
-    // store.dispatch('getRewardsCat');
-    store.dispatch('getAllStateData');
+    document.addEventListener("deviceready",this.onDeviceReady(),false); 
   },
   render: h => h(App),
 }).$mount('#app')
+

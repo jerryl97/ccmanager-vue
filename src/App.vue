@@ -21,9 +21,22 @@ export default {
       active:0
     }
   },
+  methods:{
+    onBackKeyDown(){
+      this.$dialog.confirm({
+        message:'Are you sure to quit?'
+      }).then(()=>{
+        navigator.app.exitApp();
+      }).catch(()=>{
+        this.$dialog.close();
+      })
+    } 
+  },
+  mounted(){
+    document.addEventListener("backbutton",this.onBackKeyDown,false); 
+  }
 }
 </script>
-
 <style>
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
