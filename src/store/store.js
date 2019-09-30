@@ -434,6 +434,8 @@ export default new Vuex.Store({
       localForage.getItem('state').then(value=>{
         if(value!=null){
           context.commit('setAllStateData',value);
+        }else{
+          localForage.setItem('state',context.state);
         }
       })
     },

@@ -30,11 +30,42 @@ export default {
       }).catch(()=>{
         this.$dialog.close();
       })
+    },
+    updateAccDates(){
+      console.log('haha');
+      for(let i in this.getAccounts){
+        let today = new Date();
+        if(this.$moment(today).date() > this.$moment(this.getAccounts[i].sdate).date()){
+          if(this.$moment(today).month() != this.$moment(this.getAccounts[i].sdate).month()){
+            let tempsdate = this.$moment(this.getAccounts[i].sdate).date() + this.$moment(today).format(' MMMM YYYY');
+            this.getAccounts[i].sdate = tempsdate;
+            let temppdate = this.$moment(this.getAccounts[i].pduedate).date() + this.$moment(today).format(' MMMM YYYY');
+            this.getAccounts[i].pduedate = temppdate;
+            this.getAccounts[i].cutoffdate = this.$moment(this.getAccounts[i].sdate).toDate();
+            this.getAccounts[i].cutoffdate = this.$moment(this.getAccounts[i].cutoffdate).add('1','months').format('D MMMM YYYY');
+            this.getAccounts[i].nextduedate = this.$moment(this.getAccounts[i].pduedate).toDate();
+            this.getAccounts[i].nextduedate = this.$moment(this.getAccounts[i].nextduedate).add('1','months').format('D MMMM YYYY');  
+            if(this.getAccounts[i].outstdbalance != 0){
+              this.getAccounts[i].dueamount = this.getAccounts[i].dueamount + this.getAccounts[i].outstdbalance;
+              this.getAccounts[i].outstdbalance = 0;
+            }
+            this.getAccounts[i].settlestatus = false;
+            this.$store.dispatch('storeAllStateData');
+          }
+        }
+      } 
+      
+    },
+  },
+  computed:{
+    getAccounts(){
+      return this.$store.state.allAccounts;
     } 
   },
   mounted(){
     document.addEventListener("backbutton",this.onBackKeyDown,false); 
-  }
+    //this.updateAccDates();
+  },
 }
 </script>
 <style>

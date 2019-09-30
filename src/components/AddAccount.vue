@@ -186,7 +186,7 @@
             this.accItem.balance = parseFloat(this.displayBalance);
           }
           else if(this.accItem.accgroup==1){
-            this.accItem.sattlestatus = 'Not Settled';
+            this.accItem.settlestatus = false;
             this.accItem.dueamount = 0;
             this.accItem.outstdbalance = 0;
             this.accItem.sdate = this.accItem.sdate + this.$moment(new Date()).format(' MMMM YYYY');

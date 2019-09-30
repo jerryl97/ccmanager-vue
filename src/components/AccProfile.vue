@@ -70,6 +70,7 @@
       </van-col>
     </van-row>
     </div>
+    <van-switch-cell v-if="acc.accgroup==1" v-model="acc.settlestatus" :title="setSettleTitle(acc.settlestatus)" @change="setSettleStatus" :style="{color:settleTextColor}" active-color="#07c160" inactive-color="#ee0a24"/>
     <v-transactions :acc="acc" :isProfile="isProfile"></v-transactions>
 
   <!-- Edit Account Page(Popup)-->
@@ -88,6 +89,8 @@
         title:'',      
         isProfile:true,
         editAccPop:false,
+        settleTitle:'Not Settled',
+        settleTextColor:'red',
       }
     },
     methods:{
@@ -122,12 +125,37 @@
         let formatted = this.$moment(expiry).format("MM/YY");
         return formatted; 
       },
-
+      //Set Settle Title
+      setSettleTitle(settlestatus){
+          switch(settlestatus){
+            case true:
+              this.settleTextColor = 'green';
+              return 'Settled';
+              break;
+            case false:
+              this.settleTextColor = 'red';
+              return 'Not Settled';
+              break;
+            
+          }
+      },
+      //Set Settle Status
+      setSettleStatus(checked){
+         for(let i in this.getAccounts){
+           if(this.getAccounts[i].accid == this.acc.accid){
+             this.getAccounts[i].settlestatus = checked;
+           }
+        }
+       this.$store.dispatch('storeAllStateData');
+      }
     },
     computed:{
       getAccGroups(){
         return this.$store.state.accGroups;
       },
+      getAccounts(){
+        return this.$store.state.allAccounts;
+      }
     },
     mounted(){
     },

@@ -183,8 +183,8 @@
           }
           else if(this.accItem.accgroup==1){
             this.accItem.sattlestatus = 'Not Settled';
-            this.accItem.dueamount = 0;
-            this.accItem.outstdbalance = 0;
+            //this.accItem.dueamount = 0;
+            //this.accItem.outstdbalance = 0;
             this.accItem.sdate = this.accItem.sdate + this.$moment(new Date()).format(' MMMM YYYY');
             this.accItem.pduedate = this.accItem.pduedate + this.$moment(new Date()).format(' MMMM YYYY');
             this.accItem.cutoffdate = this.$moment(this.accItem.sdate).toDate();

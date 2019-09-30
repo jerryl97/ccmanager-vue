@@ -35,7 +35,12 @@
        </van-field>
 
        <van-popup v-model="showAccList" position="bottom">
+
         <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')"/>
+        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+          <i style="color:#aaaaaa">Please add a new account.</i>
+        </div>
+        <div v-if="getAccounts.length>0">
         <van-tree-select @click-item="showRelatedPromo" :items="accountSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
         
         <!--Suggested Accounts' Promotion-->
@@ -58,6 +63,7 @@
             </van-collapse-item>
          </van-collapse>
         </van-cell-group>
+        </div>
        </van-popup>
     </div>
 
@@ -100,6 +106,8 @@
         transItem:{
           type:'Expense',
           date:new Date(),
+          category:'',
+          amount:0,
         },
         transOptions:['Expense','Income','Transfer'],
         accountSelect:[],
@@ -185,7 +193,6 @@
         }
         this.showCategoryList = false;
       },
-
       //Show Account List Selection
       showAccSelection(){
         let rqm = {};

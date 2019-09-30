@@ -1,5 +1,8 @@
 <template>
   <div id="accmaindiv">
+    <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin-top:10%">
+      <i style="color:#bbbbbb">Please add a new account.</i>
+    </div>
     <!--Add Account Float Action Button-->
     <vue-fab :hidden="hideAddAccFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
 
@@ -14,9 +17,7 @@
             <span>{{acc.name}}</span>
           </template>
           <template slot="default">
-            <span style="color:#FF3434" v-if="checkBalance(acc.balance)==-1">$ {{acc.balance}}</span>
-            <span style="color:#7acc7a" v-if="checkBalance(acc.balance)==1">$ {{acc.balance}}</span>
-            <span style="color:#333333" v-if="checkBalance(acc.balance)==0">$ {{acc.balance}}</span>
+            <span :style="{color:getBalanceColor(acc.balance)}">$ {{acc.balance}}</span>
           </template>
           </van-cell>
           <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccProfile(acc)">
@@ -24,13 +25,14 @@
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
           <template slot="label">
-            <van-tag type="danger">Not Settled</van-tag>
+            <van-tag type="danger" v-if="!acc.settlestatus">Not Settled</van-tag>
+            <van-tag type="success" v-if="acc.settlestatus">Settled</van-tag>
           </template>
           <template slot="default">
             <span>
-              Outstd. ${{acc.outstdbalance}}
+              Outstd. <span :style="{color:getOutstdColor(acc.outstdbalance)}">${{acc.outstdbalance}}</span>
               <br/>
-              Due ${{acc.dueamount}}
+              Due <span :style="{color:getOutstdColor(acc.dueamount)}">${{acc.dueamount}}</span>
             </span>
           </template>
         </van-cell>
@@ -41,7 +43,7 @@
           <template slot="label">
           </template>
           <template slot="default">
-            <span>${{acc.balance}}</span>
+            <span :style="{color:getBalanceColor(acc.balance)}">${{acc.balance}}</span>
           </template>
         </van-cell>
         <template slot="right">
@@ -120,8 +122,21 @@
         else
           return  '$ '+ result.duetotal +'  $ '+ result.outstdtotal; 
       },
-      checkBalance(value){
-        return Math.sign(value);
+      getBalanceColor(value){
+        if(value > 0)
+          return '#7acc7a';
+        else if(value<0)
+          return '#FF3434';
+        else if(value == 0)
+          return '#33333';
+      },
+      getOutstdColor(value){
+        if(value < 0)
+          return '#7acc7a';
+        else if(value > 0)
+          return '#FF3434';
+        else if(value == 0)
+          return '#33333'; 
       },
 
       //SwipeCell onClose Account Delete
