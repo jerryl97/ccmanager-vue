@@ -63,7 +63,7 @@
   <li>Potential plugins to be added in:
     <ul>
       <li>Data Visualization(chart.js) - https://www.chartjs.org</li>
-      <li>Cordova Plugins reguire vue-clie-plugin-cordova to be added into the project</li>
+      <li>Cordova Plugins require vue-cli-plugin-cordova to be added into the project</li>
       <ul>
         <li>Card IO(OCR) - https://github.com/card-io/card.io-Cordova-Plugin</li>
         <li>Local Notification - https://github.com/katzer/cordova-plugin-local-notifications</li>
