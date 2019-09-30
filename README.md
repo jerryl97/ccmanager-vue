@@ -63,9 +63,9 @@
   <li>Potential plugins to be added in:
     <ul>
       <li>Data Visualization(chart.js) - https://www.chartjs.org</li>
+      <li>Cordova Plugins reguire vue-clie-plugin-cordova to be added into the project</li>
       <ul>
-        <lh>Cordova Plugins reguire vue-clie-plugin-cordova to be added into the project</lh>
-        <li>Card IO(OCR) - https://developers.braintreepayments.com/</li>
+        <li>Card IO(OCR) - https://github.com/card-io/card.io-Cordova-Plugin</li>
         <li>Local Notification - https://github.com/katzer/cordova-plugin-local-notifications</li>
         <li>Create local backup json file - https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-file/</li>
       </ul>
