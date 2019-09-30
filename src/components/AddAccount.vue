@@ -2,7 +2,8 @@
   <div>
 
     <!-- Top Nav Bar -->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()"/>
+    <!-- Card IO Scan Button -->
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Scan" @click-right="scanCardIO()"/>
 
     <van-cell-group>
 
@@ -117,7 +118,6 @@
         sdateError:'',
         pduedateError:'',
 
-      
       }
     },
 
@@ -139,7 +139,6 @@
       //Back to Account Page
       back(){
         this.$emit("closeAddAcc") ;
-      
       },
 
       //Account Group Confirm
@@ -247,7 +246,76 @@
           } 
         } 
         return validstate;
+      },
+
+      //Card IO Scan
+      scanCardIO(){
+        if(this.accItem.accgroup==1||this.accItem.accgroup==2){
+
+           var cardIOResponseFields = [
+            "cardType",
+            "redactedCardNumber",
+            "cardNumber",
+            "expiryMonth",
+            "expiryYear"
+          ];
+
+          let p = new Promise((resolve,reject)=> {
+            CardIO.canScan((canScan) => {
+              console.log("card.io canScan? " + canScan);
+              resolve("Device can use Card IO");
+              if (!canScan) {
+                alert("Manual Entry");
+              }
+            })
+          })
+          
+          p.then((message) => {
+            console.log(message);
+
+            let cardIOPromise = new Promise((resolve,reject)=> {
+                CardIO.scan({
+                  "requireExpiry": true,
+                  "requireCVV": false,
+                  "requirePostalCode": false,
+                  "restrictPostalCodeToNumericOnly": true
+                },
+                (response) => {
+                  console.log("Scan completed");
+
+                  var redactedCardNumber = response["redactedCardNumber"];
+                  var expiryMonth = String(response["expiryMonth"]);
+                  var expiryYear = String(response["expiryYear"]);
+
+                  var cardIOlast4digits = redactedCardNumber.substring(redactedCardNumber.length-4, redactedCardNumber.length);
+
+                  var formatExpiry = new Date(expiryYear, expiryMonth-1);
+
+                  resolve({cardIOlast4digits, formatExpiry});
+                },
+                () => {
+                  console.log('Card Scan Cancelled')
+                }
+              );
+            }).then(({cardIOlast4digits, formatExpiry}) =>{
+              this.accItem.last4digits = 0;
+              this.displayExpiry = '';
+              this.accItem.expiry = '';
+
+              console.log(cardIOlast4digits);
+              console.log(formatExpiry);
+              this.accItem.last4digits = Number(cardIOlast4digits);
+              this.displayExpiry = this.$moment(formatExpiry).format('MM/YY');
+              this.accItem.expiry = this.displayExpiry;
+            });
+          });
+        } else if(this.accItem.accgroup==null) {
+          this.$toast('Please select an account group\n before scanning');
+        } else {
+          this.$toast('Scan will only work for Credit Card and \nDebit Card account groups');
+        }
       }
+      //Card IO Scan END
     },
 
     computed:{

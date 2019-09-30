@@ -26,8 +26,17 @@
       </div>
 
     <!-- Field for Amount -->
-       <van-field readonly clickable label="Amount" :value="transAmount" @touchstart.native.stop="showNumbKeyboard = true" placeholder="0"/>
-       <van-number-keyboard v-model="transAmount" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/>
+     <!-- Calculator Here -->
+       <van-field readonly clickable label="Amount" :value="transAmount" @click="showCalculator = true" placeholder="0"/>
+       <van-popup
+        v-model="showCalculator"
+        position="bottom"
+        :style="{ height: '80%' }"
+      >
+        <calculator @closeCalculator="closeCalculator" @confirmCalculator="confirmCalculator"></calculator>
+      </van-popup>
+       <!-- <van-field readonly clickable label="Amount" :value="transAmount" @touchstart.native.stop="showNumbKeyboard = true" placeholder="0"/> -->
+       <!-- <van-number-keyboard v-model="transAmount" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/> -->
 
     <!-- Field for Accounts(with Popup Picker)-->
     <div v-if="transItem.type!='Transfer'">
@@ -97,6 +106,9 @@
 </template>
 
 <script>
+//import Calculator
+import Calculator from './Calculator.vue'
+
   export default{
     data(){
       return{
@@ -126,6 +138,7 @@
         showFromAccList:false,
         showToAccList:false,
         suggestListPop:false,
+        showCalculator:false,
 
         //Display Variables
         transDate:this.$moment(new Date()).format('DD MMMM YYYY'), //Default Display Date
@@ -335,6 +348,15 @@
         return validstate;
       }, 
 
+       //Calculator Emit Event Methods
+      closeCalculator(){
+        this.showCalculator=false
+      },
+      confirmCalculator(calcResult){
+        this.transAmount = calcResult;
+        this.showCalculator=false;
+      }
+
     },
     computed:{
       getExpCat(){
@@ -388,5 +410,8 @@
     updated(){
       this.accountSelect = this.getGroupedAccounts;
     },
+    components:{
+      "calculator":Calculator
+    }
   }
 </script>

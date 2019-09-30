@@ -13,6 +13,7 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "dependencies": {
+    "card.io.cordova.mobilesdk": "git+https://github.com/card-io/card.io-Cordova-Plugin.git",
     "cordova-android": "8.1.0",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-splashscreen": "^5.0.3"
@@ -24,7 +25,8 @@
     "plugins": {
       "cordova-plugin-whitelist": {},
       "cordova-plugin-file": {},
-      "cordova-plugin-splashscreen": {}
+      "cordova-plugin-splashscreen": {},
+      "card.io.cordova.mobilesdk": {}
     },
     "platforms": [
       "android"
