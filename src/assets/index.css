@@ -13,7 +13,6 @@ html {
 }
 body {
   margin: 0;
-  background-color: #eeeeee;
 }
 a {
   text-decoration: none;
@@ -1666,7 +1665,7 @@ textarea {
   height: 46px;
   line-height: 46px;
   text-align: center;
-  background-color: #eeeeee;
+  background-color: #fff;
   user-select: none;
 }
 .van-nav-bar .van-icon {
@@ -1794,7 +1793,7 @@ textarea {
   position: fixed;
   max-height: 100%;
   overflow-y: auto;
-  background-color: #f3f3f3;
+  background-color: #fff;
   transition: transform 0.3s ease-out;
   -webkit-overflow-scrolling: touch;
 }
