@@ -1,7 +1,7 @@
 <template>
   <div id="settingmaindiv">
     <!--Top Navbar-->
-    <van-nav-bar :title="title"/>
+    <van-nav-bar :title="title" fixed/>
 
     <!--Accounts Section-->
     <van-cell-group title="Accounts">
@@ -15,6 +15,8 @@
       <van-cell title="Manage Expense Categories" @click="showManageExpCat=true" is-link/>
       <!--Managing Income Categories-->
       <van-cell title="Manage Income Categories" @click="showManageIncCat=true" is-link/>
+      <!--Managing Recuring Transactions-->
+      <van-cell title="Manage Recuring Transactions" @click="showRecuringTrans=true" is-link/>
     </van-cell-group>
 
     <!--Promotions Section-->
@@ -51,6 +53,10 @@
     <van-popup v-model="showManageIncCat" position="bottom" :style="{height:'100%'}">
        <v-inccat @closeManageIncCat="closeManageIncCat"></v-inccat>
     </van-popup>
+    <!--Manage Recuring Transactions Pop-->
+    <van-popup v-model="showRecuringTrans" position="bottom" :style="{height:'100%'}">
+       <v-recuringtrans @closeRecuringTrans="closeRecuringTrans"></v-recuringtrans>
+    </van-popup>
     <!-- Manage Rewards Category Pop-->
     <van-popup v-model="showManageRewards" position="bottom" :style="{height:'100%'}">
        <v-rewardscat @closeManageRewardsCat="closeManageRewardsCat"></v-rewardscat>
@@ -66,6 +72,7 @@
   import ExpCategory from './ExpCategory.vue'
   import IncCategory from './IncCategory.vue'
   import RewardsCategory from './RewardsCategory.vue'
+  import RecuringTrans from './RecuringTrans.vue'
 
   export default{
     data(){
@@ -75,8 +82,7 @@
         showManageExpCat:false,
         showManageIncCat:false,
         showManageRewards:false,
-
-
+        showRecuringTrans:false,
       }
     },
     methods:{
@@ -91,6 +97,10 @@
       //Close Manage Income Categories
       closeManageIncCat(){
         this.showManageIncCat=false;
+      },
+      //Close Recuring Transactions
+      closeRecuringTrans(){
+        this.showRecuringTrans=false;
       },
       //Close Manage Rewards Categories
       closeManageRewardsCat(){
@@ -175,6 +185,7 @@
       'v-expcat':ExpCategory,
       'v-inccat':IncCategory,
       'v-rewardscat':RewardsCategory,
+      'v-recuringtrans':RecuringTrans,
     }
   }
 
@@ -183,5 +194,6 @@
 #settingmaindiv{
   background-color:#f6f6f6;
   margin-bottom:20%;
+  padding-top:13%;
 }
 </style>

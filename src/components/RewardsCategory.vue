@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="padding-top:13%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Add" @click-right="addRewardsCat"/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Add" @click-right="addRewardsCat" fixed/>
 
     <!-- Rewards Categories List -->
     <van-cell-group>

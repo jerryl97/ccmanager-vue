@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="padding-top:13%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Add" @click-right="addAccGroup"/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Add" @click-right="addAccGroup" fixed/>
 
     <!-- Account Groups List-->
       <van-cell-group>

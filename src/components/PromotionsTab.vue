@@ -1,7 +1,7 @@
 <template>
-  <div style="margin-bottom:20%">
+  <div style="padding:13% 0%">
     <!-- Top Nav Bar -->
-    <van-nav-bar :title="title"/>
+    <van-nav-bar :title="title" fixed/>
 
     <!-- Add Promotions Button-->
     <vue-fab :hidden="hideAddPromoFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddPromo"/>
@@ -22,10 +22,12 @@
         </div>
         <div slot="default">
           <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
-          <span>Expense: <span v-for="exp in promo.rltexpense">{{getExpenseName(exp)}}, </span></span><br/>
-          <span v-if="promo.expmemo!=null">{{promo.expmemo}}</br></span>
-          <span>Accounts: <span v-for="acc in promo.rltacc">{{getAccName(acc)}}, </span></span></br>
-          <span>Rewards: <span v-for="reward in promo.rltrewards">{{reward.rewardsCatName}} {{reward.rewardsValue}},</span></span><br/>
+          <span v-if="promo.transcount!=0">Limit: {{promo.transcount}} times <br/></span>
+          <span v-if="promo.rltexpense.length != getExpCat.length">Categories: {{getExpenseName(promo.rltexpense)}}<br/></span>
+          <span v-if="promo.rltexpense.length == getExpCat.length">Categories: All<br/></span>
+          <span v-if="promo.expmemo!=''">{{promo.expmemo}}</br></span>
+          <span>Accounts: {{getAccName(promo.rltacc)}}</span></br>
+          <span>Rewards: {{getRewardsName(promo.rltrewards)}}</span></span><br/>
           <van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
           <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>
         </div>
@@ -70,26 +72,51 @@ export default{
       let temp = this.$moment(value).format('DD MMM YYYY'); 
       return temp;
     },
-    getExpenseName(expid){
-      let temp = this.getExpCat.find(o=>o.expcatid == expid);
-      if(temp)
-        return temp.expCatName; 
-      else
-        return 'Other';
+    getExpenseName(expcat){
+      let tempexpcat = [];
+      for(let i in expcat){
+      let temp = this.getExpCat.find(o=>o.expcatid == expcat[i]);
+        if(temp)
+          tempexpcat.push(temp.expCatName);
+        else
+          tempexpcat.push('Other')
+      }
+      return tempexpcat.join(', ');
     },
-    getAccName(accid){
-      let temp = this.getAccounts.find(o=>o.accid == accid);
-      if(temp)
-        return temp.name;
-      else
-        return 'Deleted Account'; 
+    getAccName(accounts){
+      let tempaccs = [];
+      for(let i in accounts){
+        let temp = this.getAccounts.find(o=>o.accid == accounts[i]); 
+        if(temp)
+          tempaccs.push(temp.name);
+        else
+          tempaccs.push('Deleted Account');
+      }
+      return tempaccs.join(', ');
     },
-    getRewardsName(rewardsid){
-      let temp = this.getRewardsCat.find(o=>o.rewardscatid == rewardsid);
-      if(temp)
-        return temp.rewardsCatName;
-      else
-        return 'Other'; 
+    getRewardsName(rewards){
+      let temprew = [];
+      let tempval = [];
+      for(let i in rewards){
+        let temp = this.getRewardsCat.find(o=>o.rewardscatid == rewards[i].rewardsID);
+        if(temp){
+          temprew.push(temp.rewardsCatName);
+          tempval.push(rewards[i].rewardsValue);
+        }
+        else{
+          temprew.push('Other');
+          tempval.push(0);
+        } 
+      }
+      let result = '';
+      for(let j = 0; j < temprew.length;j++){
+        if(j == temprew.length - 1){
+          result += temprew[j]+' '+tempval[j]; 
+        }else{
+          result += temprew[j]+' '+tempval[j] + ', '; 
+        }
+      }
+      return result;
     },
     deletePromo(promoid){ 
       this.$dialog.confirm({

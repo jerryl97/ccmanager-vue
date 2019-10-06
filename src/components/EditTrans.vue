@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="padding-top:13%">
     <!--Top Navbar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Delete" @click-right="deleteTrans()"/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Delete" @click-right="deleteTrans()" fixed/>
 
     <van-cell-group>
     <!--Field for Transaction Type(with Popup Picker)-->
@@ -26,17 +26,67 @@
       </div>
 
     <!-- Field for Amount -->
-       <van-field readonly clickable label="Amount" :value="transAmount" @touchstart.native.stop="showNumbKeyboard = true" placeholder="0"/>
-       <van-number-keyboard v-model="transAmount" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/>
+     <!-- Calculator Here -->
+       <van-field readonly clickable label="Amount" :value="transAmount" @click="showCalculator = true" placeholder="0"/>
+       <van-popup
+        v-model="showCalculator"
+        position="bottom"
+        :style="{ height: '80%' }"
+      >
+        <calculator @closeCalculator="closeCalculator" @confirmCalculator="confirmCalculator"></calculator>
+      </van-popup>
+       <!-- <van-field readonly clickable label="Amount" :value="transAmount" @touchstart.native.stop="showNumbKeyboard = true" placeholder="0"/> -->
+       <!-- <van-number-keyboard v-model="transAmount" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/> -->
 
     <!-- Field for Accounts(with Popup Picker)-->
-    <div v-if="transItem.type!='Transfer'">
-       <van-field required readonly clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayAccount" @click="showAccList = true">
-         <van-button slot="button" v-if="transItem.type=='Expense'" size="small" type="primary" @click="testSuggest">Suggest</van-button>
+    <div v-if="transItem.type=='Expense'">
+       <van-field required readonly clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayAccount" @click="showAccSelection">
        </van-field>
 
        <van-popup v-model="showAccList" position="bottom">
-         <van-picker show-toolbar :columns="getAccounts" @cancel="showAccList = false" @confirm="accConfirm" value-key="name" />
+
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')"/>
+        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+          <i style="color:#aaaaaa">Please add a new account.</i>
+        </div>
+        <div v-if="getAccounts.length>0">
+        <van-tree-select @click-item="showRelatedPromo" :items="expAccSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+        
+        <!--Suggested Accounts' Promotion-->
+        <van-cell-group v-if="activeAccIndex==0&&activeAccId!=''&&expAccSelect[0].children.length>0" title="Promotions of this account">
+         <van-collapse v-model="activePromoNames" accordion>
+           <van-collapse-item v-for="(promo,index) in relatedPromo" :label="promo.promodesc" :name="promo.promoid">
+           <div slot="title"> 
+            {{promo.promotitle}}
+           </div>
+           <div slot="value"> 
+            Minimum: $ {{promo.minimum}}
+          </div>
+          <div slot="default">
+            <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
+            <span>Expense: <span v-for="exp in promo.rltexpense">{{getExpenseName(exp)}}, </span></span><br/>
+            <span v-if="promo.expmemo!=null">{{promo.expmemo}}</br></span>
+            <span>Accounts: <span v-for="acc in promo.rltacc">{{getAccName(acc)}}, </span></span></br>
+            <span>Rewards: <span v-for="reward in promo.rltrewards">{{reward.rewardsCatName}} {{reward.rewardsValue}},</span></span><br/>
+            </div>
+            </van-collapse-item>
+         </van-collapse>
+        </van-cell-group>
+        </div>
+       </van-popup>
+    </div>
+
+    <!-- Field for Account(Income)-->
+    <div v-if="transItem.type=='Income'">
+       <van-field readonly required clickable :error-message="accountError" label="From" placeholder="Choose an account" :value="displayIncAccount" @click="showIncAccList = true"/>
+       <van-popup v-model="showIncAccList" position="bottom">
+          <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+            <i style="color:#aaaaaa">Please add a new account.</i>
+          </div>
+        <div v-if="getAccounts.length>0">
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'incaccount')" @click-left="cancelAccConfirm('incaccount')"/>
+          <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+        </div>
        </van-popup>
     </div>
 
@@ -44,9 +94,13 @@
     <div v-if="transItem.type=='Transfer'">
        <van-field readonly required clickable :error-message="fromAccountError" label="From" placeholder="Choose an account" :value="displayFromAccount" @click="showFromAccList = true"/>
        <van-popup v-model="showFromAccList" position="bottom">
-
-         <van-picker show-toolbar :columns="getAccounts" @cancel="showFromAccList = false" value-key="name" @confirm="fromAccConfirm" />
-
+          <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+            <i style="color:#aaaaaa">Please add a new account.</i>
+          </div>
+        <div v-if="getAccounts.length>0">
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
+          <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+        </div>
        </van-popup>
     </div>
 
@@ -54,14 +108,21 @@
     <div v-if="transItem.type=='Transfer'">
        <van-field readonly required clickable label="To" :error-message="toAccountError" placeholder="Choose an account" :value="displayToAccount" @click="showToAccList = true"/>
        <van-popup v-model="showToAccList" position="bottom">
-
-         <van-picker show-toolbar :columns="getAccounts" @cancel="showToAccList = false" value-key="name" @confirm="toAccConfirm" />
-
+          <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+            <i style="color:#aaaaaa">Please add a new account.</i>
+          </div>
+        <div v-if="getAccounts.length>0">
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
+          <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+        </div>
        </van-popup>
     </div>
     
     <!-- Field for Contents-->
     <van-field v-model="transItem.contents" label="Contents" type="textarea" rows="1" autosize />
+
+    <!-- Recuring -->
+    <van-switch-cell v-model="transItem.recuring" title="Recuring" active-color="green" inactive-color="red"/>
 
     <!-- Save Button-->
     <van-button type="primary" size="large" style="width:90%;margin:5%;" @click="saveNewTrans">Save</van-button>
@@ -72,6 +133,8 @@
 </template>
 
 <script>
+  //import Calculator
+  import Calculator from './Calculator.vue'
   export default{
     data(){
       return{
@@ -80,6 +143,13 @@
         //Variables Initialize
         transItem:{},
         transOptions:['Expense','Income','Transfer'],
+        expAccSelect:[],
+        accSelect:[],
+        activeAccId:'',
+        activeAccIndex:0,
+        relatedPromo:[],
+        showPromoSec:false,
+        activePromoNames:[],
 
         //Picker Initialize
         showTransOptions:false,
@@ -87,14 +157,18 @@
         showCategoryList:false,
         showNumbKeyboard:false,
         showAccList:false,
+        showIncAccList:false,
         showFromAccList:false,
         showToAccList:false,
+        suggestListPop:false,
+        showCalculator:false,
 
         //Display Variables
         transDate:'', //Default Display Date
         displayCategory:'',
         displayFromAccount:'',
         displayAccount:'',
+        displayIncAccount:'',
         displayToAccount:'',
         transAmount:'',
 
@@ -117,6 +191,7 @@
         this.toAccountError = '';
         this.categoryError = '';
         this.displayAccount = '';
+        this.displayIncAccount = '';
         this.displayCategory = '';
         this.displayFromAccount='';
         this.displayToAccount='';
@@ -133,6 +208,7 @@
         this.displayCategory = '';
         this.transItem.fromaccount = '';
         this.transItem.toaccount = '';
+        this.displayIncAccount = '';
         this.displayFromAccount = '';
         this.displayToAccount = '';
       },
@@ -157,25 +233,116 @@
         this.showCategoryList = false;
       },
 
+      //Show Account List Selection
+      showAccSelection(){
+        let rqm = {};
+        rqm.transdate = this.transItem.date;
+
+        if(this.transItem.category)
+          rqm.transcat = this.transItem.category;
+        else
+          rqm.transcat = '';
+
+        if(this.transAmount == '')
+          rqm.transamount = 0; 
+        else
+          rqm.transamount = parseFloat(this.transAmount); 
+
+        this.$store.commit("genSuggestAcc",rqm); 
+        console.log(this.expAccSelect);
+        if(this.expAccSelect){
+          this.expAccSelect[0].children = this.getSuggestAcc;
+          this.expAccSelect[0].info = this.expAccSelect[0].children.length;
+        }
+        this.showAccList = true; 
+      },
+
+      //Show Related Promotion of Account
+      showRelatedPromo(data){
+        this.relatedPromo = [];
+        for(let i in data.rltpromo){
+          let temp = this.getPromo.find(o => o.promoid == data.rltpromo[i]); 
+          this.relatedPromo.push(temp);
+        }
+      },
+
+      getDateFormatted(value){
+        let temp = this.$moment(value).format('DD MMM YYYY'); 
+        return temp;
+      },
+      getExpenseName(expid){
+        let temp = this.getExpCat.find(o=>o.expcatid == expid);
+        if(temp)
+          return temp.expCatName; 
+        else
+          return 'Other';
+      },
+      getAccName(accid){
+        let temp = this.getAccounts.find(o=>o.accid == accid);
+        if(temp)
+          return temp.name;
+        else
+          return 'Deleted Account'; 
+      },
+
       //Account Confirm
-      accConfirm(value){
-        this.transItem.account = value.accid;
-        this.displayAccount = value.name;
-        this.showAccList = false;
+      accConfirm(value,type){
+        if(value){
+         let temp = this.getAccounts.find(o=>o.accid==value);
+         switch(type){
+           case 'account':
+             this.transItem.account = value;
+             this.displayAccount = temp.name;
+             this.showAccList = false;
+             this.activeAccId = '';
+             break;
+            case 'incaccount':
+             this.transItem.account = value;
+             this.displayIncAccount = temp.name;
+             this.showIncAccList = false;
+             this.activeAccId = '';
+             break;
+            case 'fromaccount':
+             this.transItem.fromaccount = value;
+             this.displayFromAccount = temp.name;
+             this.showFromAccList = false;
+             this.activeAccId = '';
+             break;
+            case 'toaccount':
+             this.transItem.toaccount = value;
+             this.displayToAccount = temp.name;
+             this.showToAccList = false;
+             this.activeAccId = '';
+             break;
+        
+          }
+        }
       },
 
-      //From Account Confirm
-      fromAccConfirm(value){
-        this.transItem.fromaccount = value.accid;
-        this.displayFromAccount = value.name;
-        this.showFromAccList = false;
-      },
-
-      //To Account Confirm
-      toAccConfirm(value){
-        this.transItem.toaccount = value.accid;
-        this.displayToAccount = value.name;
-        this.showToAccList = false;
+      //Cancel Account Confirm
+      cancelAccConfirm(value){
+        switch(value){
+          case 'account':
+            this.displayAccount = '';
+            this.activeAccId = '';
+            this.showAccList = false;
+            break;
+          case 'incaccount':
+            this.displayAccount = '';
+            this.activeAccId = '';
+            this.showIncAccList = false;
+            break;
+          case 'fromaccount': 
+            this.displayFromAccount = '';
+            this.activeAccId = '';
+            this.showFromAccList = false;
+            break;
+          case 'toaccount':
+            this.displayToAccount = '';
+            this.activeAccId = '';
+            this.showToAccList = false;
+            break;
+        }
       },
 
       //Save New Transaction
@@ -193,8 +360,6 @@
             this.transItem.category = '';
           }
           this.$store.commit('editTrans',this.transItem);
-          //this.$store.dispatch('storeTrans');
-          //this.$store.dispatch('storeAccounts');
           this.$store.dispatch('storeAllStateData');
           this.back();
         }       
@@ -237,9 +402,15 @@
               this.$dialog.close();
           });
       },
-      testSuggest(){
-      
+
+       //Calculator Emit Event Methods
+      closeCalculator(){
+        this.showCalculator=false
       },
+      confirmCalculator(calcResult){
+        this.transAmount = calcResult;
+        this.showCalculator=false;
+      }
 
     },
     computed:{
@@ -251,7 +422,72 @@
       },
       getAccounts(){
         return this.$store.state.allAccounts;
-      }
+      },
+      getAccGroups(){
+        return this.$store.state.accGroups;
+      },
+      getPromo(){
+        return this.$store.state.allPromo;
+      },
+      getSuggestedGroupedAccounts(){ 
+        let grouped = [];
+        let suggestAcc = {
+          text:'Suggest',
+          children:[],
+        };
+        suggestAcc.info = suggestAcc.children.length;
+        grouped.push(suggestAcc);
+        let accgrps = this.getAccGroups;
+        let accounts = this.getAccounts;
+        for(let i in accgrps){
+          let temp = {};
+          temp.text=accgrps[i].groupName;
+          temp.children = [];
+          for(let j in accounts){
+            if(accounts[j].accgroup == accgrps[i].grpid){
+              let tempAcc = {
+                text:accounts[j].name,
+                id:accounts[j].accid
+              };
+              temp.children.push(tempAcc); 
+            }
+          }
+          if(temp.children.length>0)
+            temp.info = temp.children.length;
+          grouped.push(temp);
+        }
+        return grouped;
+      },
+      getGroupedAccounts(){ 
+        let grouped = [];
+        let accgrps = this.getAccGroups;
+        let accounts = this.getAccounts;
+        for(let i in accgrps){
+          let temp = {};
+          temp.text=accgrps[i].groupName;
+          temp.children = [];
+          for(let j in accounts){
+            if(accounts[j].accgroup == accgrps[i].grpid){
+              let tempAcc = {
+                text:accounts[j].name,
+                id:accounts[j].accid
+              };
+              temp.children.push(tempAcc); 
+            }
+          }
+          if(temp.children.length>0)
+            temp.info = temp.children.length;
+          grouped.push(temp);
+        }
+        return grouped;
+      },
+      getSuggestAcc(){
+        return this.$store.state.suggestAcc; 
+      },
+    },
+    beforeMount(){
+      this.expAccSelect = this.getSuggestedGroupedAccounts;
+      this.accSelect = this.getGroupedAccounts;
     },
     watch:{
       trans(){ 
@@ -277,9 +513,9 @@
             this.displayCategory = 'Other';
           let tempAcc = this.getAccounts.find(o=>o.accid==this.transItem.account);
           if(tempAcc)
-            this.displayAccount = tempAcc.name;
+            this.displayIncAccount = tempAcc.name;
           else
-            this.displayAccount = '';
+            this.displayIncAccount = '';
         }
         else if(this.transItem.type=='Transfer'){
           let tempFromAcc = this.getAccounts.find(o=>o.accid==this.transItem.fromaccount);
@@ -318,9 +554,9 @@
             this.displayCategory = 'Other';
           let tempAcc = this.getAccounts.find(o=>o.accid==this.transItem.account);
           if(tempAcc)
-            this.displayAccount = tempAcc.name;
+            this.displayIncAccount = tempAcc.name;
           else
-            this.displayAccount = '';
+            this.displayIncAccount = '';
         }
         else if(this.transItem.type=='Transfer'){
           let tempFromAcc = this.getAccounts.find(o=>o.accid==this.transItem.fromaccount);
@@ -334,6 +570,9 @@
         if(this.transItem.amount)
           this.transAmount = this.transItem.amount.toString();
         }
+    },
+    components:{
+      "calculator":Calculator
     },
     props:['trans']
   

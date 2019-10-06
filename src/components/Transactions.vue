@@ -36,13 +36,13 @@
       <van-collapse v-model="activeNames" accordion>
         <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :title="key" :name="key">
          <van-swipe-cell v-for="one in trans" :on-close="transOnClose" :name="one.transid">
-            <van-cell style="background-color:#f9f9f9" size="small" is-link arrow-direction="left" @click="showEditTrans(one)">
+            <van-cell clickable style="background-color:#f9f9f9" size="small" is-link arrow-direction="left" @click="showEditTrans(one)">
               <!--Not Transfer-->
               <template v-if="one.type!='Transfer'" slot="title">
-                <span>{{one.contents}} &nbsp</span>
+                <span style="font-size:13px" v-if="one.contents!=''">{{one.contents}}<br/></span>
                 <van-tag plain type="danger" v-if="one.type=='Expense'">{{getCatName(one.type,one.category)}}</van-tag> 
                 <van-tag plain type="success" v-if="one.type=='Income'">{{getCatName(one.type,one.category)}}</van-tag> 
-                <van-tag plain>{{getAccName(one.account)}}</van-tag> 
+                &nbsp<van-tag plain>{{getAccName(one.account)}}</van-tag> 
               </template>
 
               <!-- Is Transfer-->
@@ -52,14 +52,15 @@
                 <span>{{getAccName(one.toaccount)}}&nbsp</span>
               </template>
               <template v-if="one.type=='Transfer'" slot="title">
-                <span>{{one.contents}} &nbsp</span>
+                <span style="font-size:13px" v-if="one.contents!=''">{{one.contents}}<br/></span>
                 <van-tag plain type="primary">Transfer</van-tag> 
               </template>
 
               <template slot="default">
-                <span style="color:#FF3434" v-if="one.type=='Expense'">$ {{one.amount}}</span>
-                <span style="color:#7acc7a" v-if="one.type=='Income'">$ {{one.amount}}</span>
-                <span style="color:#4da6ff" v-if="one.type=='Transfer'">$ {{one.amount}}</span>
+                <span style="color:#FF3434" v-if="one.type=='Expense'">$ {{one.amount}}<br/></span>
+                <span style="color:#7acc7a" v-if="one.type=='Income'">$ {{one.amount}}<br/></span>
+                <span style="color:#4da6ff" v-if="one.type=='Transfer'">$ {{one.amount}}<br/></span>
+                <van-tag plain v-if="one.recuring == true" type="warning">Recuring</van-tag>
               </template>
             </van-cell>
             <template slot="right">
@@ -355,7 +356,6 @@
           }
           this.dateSummary.push(summary);
         }
-        console.log(this.dateSummary);
         return grouped;
       },
       getAccounts(){

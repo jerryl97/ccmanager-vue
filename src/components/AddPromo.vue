@@ -1,7 +1,7 @@
 <template>
-  <div id="addpromomaindiv">
+  <div style="padding-top:13%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()"/>
+    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()" fixed/>
 
     <!--Add Promotion Steps-->
     <van-steps :active="activeStep">
@@ -23,7 +23,7 @@
       <van-field label="Description" clearable placeholder="Promotion's Description" v-model="promoItem.promodesc"/>
 
       <!--Duration-->
-      <van-switch-cell v-model="promoItem.duration" :title="'Has duration? '+ getDurationStatus()" />
+      <van-switch-cell v-model="promoItem.duration" title="Active Duration" />
       <!-- From Promo Date-->
       <div v-if="promoItem.duration == true">
       <van-field readonly clickable label="From" required :value="fromPromoDate" @click="showFromPromoDate = true" :error-message="fromDateErrorMsg" />
@@ -44,13 +44,14 @@
     </van-cell-group>
 
     <!-- Related Accounts-->
-    <van-cell-group title="Select Related Accounts" v-if="activeStep==1">
+    <van-cell-group title="Select Accounts" v-if="activeStep==1">
       <van-tree-select :items="accountSelect" :active-id.sync="activeAccIds" :main-active-index.sync="activeAccIndex"/>
     </van-cell-group>
 
     <!-- Related Expense Categories-->
     <van-checkbox-group v-model="expcatchecked" v-if="activeStep==2">
-      <van-cell-group title="Select Expense Categories">
+      <van-cell-group title="Select Categories">
+        <van-cell title="Select All" clickable @click="expCatToggleAll()"/>
         <van-cell v-for="(cat,index) in getExpCat" clickable :key="cat.expcatid" :title="cat.expCatName" @click="expCatToggle(index)">
           <van-checkbox :name="cat.expcatid" ref="expcatcheckboxes" slot="right-icon"/>
         </van-cell>
@@ -175,12 +176,12 @@
       },
 
       //Promotion's Duration status
-      getDurationStatus(){
+      /*getDurationStatus(){
         if(this.promoItem.duration == true)
           return 'Yes';
         else
           return 'No';
-      },
+      },*/
       //Promotion Start Date
       fromPromoDateConfirm(){
         this.fromPromoDate = this.$moment(this.promoItem.fromdate).format("DD MMMM YYYY");
@@ -194,6 +195,12 @@
       //Expense Categories Checkboxes toggle
       expCatToggle(index){ 
         this.$refs.expcatcheckboxes[index].toggle(); 
+      },
+      //Expense Categories Checkboxes toggle All
+      expCatToggleAll(){
+        for(let i=0;i<=this.getExpCat.length;i++){
+          this.$refs.expcatcheckboxes[i].toggle();
+        }  
       },
       //Close Add Expense Categories
       closeManageExpCat(){
@@ -215,7 +222,7 @@
           this.rewardsInputs.push({
             rewardsID:temp.rewardscatid,
             rewardsCatName:temp.rewardsCatName,
-            rewardsValue:'',
+            rewardsValue:''
           });
         } 
       },

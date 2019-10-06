@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div style="padding-top:13%">
 
     <!-- Top Nav Bar -->
     <!-- Card IO Scan Button -->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Scan" @click-right="scanCardIO()"/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Scan" @click-right="scanCardIO()" fixed/>
 
     <van-cell-group>
 

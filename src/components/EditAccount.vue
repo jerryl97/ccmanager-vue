@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="padding-top:13%">
     <!-- Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Delete" @click-right="deleteAcc()"/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Delete" @click-right="deleteAcc()" fixed/>
 
     <van-cell-group>
 
@@ -185,8 +185,8 @@
             this.accItem.sattlestatus = 'Not Settled';
             //this.accItem.dueamount = 0;
             //this.accItem.outstdbalance = 0;
-            this.accItem.sdate = this.accItem.sdate + this.$moment(new Date()).format(' MMMM YYYY');
-            this.accItem.pduedate = this.accItem.pduedate + this.$moment(new Date()).format(' MMMM YYYY');
+            this.accItem.sdate = this.displaySDate + this.$moment(new Date()).format(' MMMM YYYY');
+            this.accItem.pduedate = this.displayPDueDate + this.$moment(new Date()).format(' MMMM YYYY');
             this.accItem.cutoffdate = this.$moment(this.accItem.sdate).toDate();
             this.accItem.cutoffdate = this.$moment(this.accItem.cutoffdate).add('1','months').format('D MMMM YYYY');
             this.accItem.nextduedate = this.$moment(this.accItem.pduedate).toDate();

@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="padding-top:13%">
     <!-- Top Nav Bar-->
-    <van-nav-bar :title="getTitle(acc)" left-text="Back" left-arrow @click-left="back()" right-text="Edit" @click-right="showEditAcc"/>
+    <van-nav-bar :title="getTitle(acc)" left-text="Back" left-arrow @click-left="back()" right-text="Edit" @click-right="showEditAcc" fixed/>
 
     <!-- Account Details-->
     <van-cell-group>
@@ -15,8 +15,10 @@
         <template slot="default">
           <span v-if="acc.accgroup!=1">$ {{acc.balance}}</span>
           <span v-if="acc.accgroup==1">
-            Oustd. ${{acc.outstdbalance}}<br/>
-            Due $ {{acc.dueamount}}
+            <van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=false">Settle</van-button> Oustd. ${{acc.outstdbalance}}<br/>
+            <van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=true">Settle</van-button> Due $ {{acc.dueamount}}<br/>
+            <van-tag type="danger" v-if="!acc.settlestatus">Not Settled</van-tag>
+            <van-tag type="success" v-if="acc.settlestatus">Settled</van-tag>
           </span>
         </template>
         <template slot="label">
@@ -70,18 +72,22 @@
       </van-col>
     </van-row>
     </div>
-    <van-switch-cell v-if="acc.accgroup==1" v-model="acc.settlestatus" :title="setSettleTitle(acc.settlestatus)" @change="setSettleStatus" :style="{color:settleTextColor}" active-color="#07c160" inactive-color="#ee0a24"/>
     <v-transactions :acc="acc" :isProfile="isProfile"></v-transactions>
 
   <!-- Edit Account Page(Popup)-->
   <van-popup v-model="editAccPop" position="bottom" :style="{height:'100%'}">
     <v-editaccount @closeEditAcc="closeEditAcc" :acc="acc"></v-editaccount>
   </van-popup>
+
+  <van-popup v-model="settlePop" position="bottom" :style="{height:'100%'}">
+    <v-settlepayment @closeSettlePage="closeSettlePage" :acc="acc" :settleDueOrOutstd="settleDueOrOutstd"/>
+  </van-popup>
   </div>
 </template>
 <script>
   import Transactions from './Transactions.vue'
   import EditAccount from './EditAccount.vue'
+  import SettlePayment from './SettlePayment.vue'
 
   export default{
     data(){
@@ -91,6 +97,8 @@
         editAccPop:false,
         settleTitle:'Not Settled',
         settleTextColor:'red',
+        settlePop:false,
+        settleDueOrOutstd:false,
       }
     },
     methods:{
@@ -125,28 +133,8 @@
         let formatted = this.$moment(expiry).format("MM/YY");
         return formatted; 
       },
-      //Set Settle Title
-      setSettleTitle(settlestatus){
-          switch(settlestatus){
-            case true:
-              this.settleTextColor = 'green';
-              return 'Settled';
-              break;
-            case false:
-              this.settleTextColor = 'red';
-              return 'Not Settled';
-              break;
-            
-          }
-      },
-      //Set Settle Status
-      setSettleStatus(checked){
-         for(let i in this.getAccounts){
-           if(this.getAccounts[i].accid == this.acc.accid){
-             this.getAccounts[i].settlestatus = checked;
-           }
-        }
-       this.$store.dispatch('storeAllStateData');
+      closeSettlePage(){
+        this.settlePop = false;
       }
     },
     computed:{
@@ -161,7 +149,8 @@
     },
     components:{
       'v-transactions':Transactions,
-      'v-editaccount':EditAccount
+      'v-editaccount':EditAccount,
+      'v-settlepayment':SettlePayment
     },
     props:['acc']
   }

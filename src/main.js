@@ -44,7 +44,7 @@ new Vue({
       },3500);
       } 
   },
-  created(){
+  beforeCreate(){
     document.addEventListener("deviceready",this.onDeviceReady(),false); 
     //store.dispatch('getAllStateData');
   },
