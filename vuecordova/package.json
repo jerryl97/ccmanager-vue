@@ -15,6 +15,7 @@
   "dependencies": {
     "card.io.cordova.mobilesdk": "git+https://github.com/card-io/card.io-Cordova-Plugin.git",
     "cordova-android": "8.1.0",
+    "cordova-plugin-email-composer": "^0.9.2",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-splashscreen": "^5.0.3"
   },
@@ -26,7 +27,8 @@
       "cordova-plugin-whitelist": {},
       "cordova-plugin-file": {},
       "cordova-plugin-splashscreen": {},
-      "card.io.cordova.mobilesdk": {}
+      "card.io.cordova.mobilesdk": {},
+      "cordova-plugin-email-composer": {}
     },
     "platforms": [
       "android"

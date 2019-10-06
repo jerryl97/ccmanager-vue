@@ -32,12 +32,20 @@
       <!--Import Data From File-->
       <input type="file" ref="importinput" style="display:none" accept="text/plain" @change="readBackupFile($event)"/>
       <van-cell title="Import Data From File" @click="$refs.importinput.click()" is-link/>
+      <!--Send Backup to Email using Composer Plugin-->
+      <van-cell title="Send Backup To Email" @click="emailComposer" is-link/>
       <!--Reset to Default-->
       <van-cell title="Reset To Default" @click="resetAllData()" is-link/>
     </van-cell-group>
 
     <!--Notification Section-->
     <van-cell-group title="Notification">
+    </van-cell-group>
+
+    <!--Feedback Form-->
+    <van-cell-group title="Google Form Feedback">
+      <!--Google Form Feedback Plugin link button-->
+      <van-cell title="Feedback Form Link" is-link url="https://forms.gle/TBRfbhW6KRT9m9R78"/>
     </van-cell-group>
 
     <!-- Setting Pop Ups-->
@@ -172,7 +180,40 @@
         }).catch(()=>{
           this.$dialog.close();
         });
-      
+      },
+       //Email Composer Plugin
+      emailComposer(){
+        //Get email receipent email address
+        let email = window.prompt("Please enter the Email address you wish to send your backup to:", "example@gmail.com");
+        //Read all backup data entries
+        let fileEntries = new Promise((resolve,reject) => {
+          window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,(fileSystem) => {
+            let reader = fileSystem.createReader();
+            reader.readEntries((entries) => {
+                resolve(entries);
+              },(err) => {
+                console.log(err);
+              }
+            );
+          },(err) => {
+            console.log(err);
+          });
+        }).then((entries) => {
+          //Push nativeURL path into array
+          let entriesArray = [];
+          for(let i in entries){
+            entriesArray.push(entries[i].nativeURL)
+          }
+          //Cordova Email Plugin
+          cordova.plugins.email.open({
+            to:      email,
+            cc:      '',
+            bcc:     '',
+            subject: 'Backup Data from CCManager Application',
+            body:    'Here are all your backups!',
+            attachments: entriesArray
+          });
+        });
       }
     },
     computed:{
