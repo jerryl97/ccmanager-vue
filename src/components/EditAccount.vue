@@ -195,6 +195,7 @@
           this.acc = this.accItem;
           this.$store.commit('editAccount',this.accItem);
           this.$store.dispatch('storeAllStateData');
+          this.$notify({message:'Account Edited',type:'success',duration:3000});
           this.back();
         } 
       },
@@ -205,6 +206,7 @@
             }).then(()=>{
               this.$store.commit('deleteAccount',this.accItem.accid);
               this.$store.dispatch('storeAllStateData');
+              this.$notify({message:'Account Deleted',type:'success',duration:3000});
               this.back();
             }).catch(()=>{
               this.$dialog.close();

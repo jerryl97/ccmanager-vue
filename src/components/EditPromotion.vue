@@ -314,6 +314,7 @@
           this.promoItem.minimum = 0;
         this.$store.commit('editPromo',this.promoItem);
         this.$store.dispatch('storeAllStateData');
+        this.$notify({message:'Promotion Edited',type:'success',duration:3000});
         this.activeStep = 0;
         this.back(); 
       }

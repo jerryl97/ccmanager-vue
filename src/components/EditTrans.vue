@@ -361,6 +361,7 @@
           }
           this.$store.commit('editTrans',this.transItem);
           this.$store.dispatch('storeAllStateData');
+          this.$notify({message:'Transaction Edited',type:'success',duration:3000});
           this.back();
         }       
       },

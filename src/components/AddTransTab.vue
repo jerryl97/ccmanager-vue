@@ -405,6 +405,7 @@ import Calculator from './Calculator.vue'
           }
           this.$store.commit('addTrans',this.transItem);
           this.$store.dispatch('storeAllStateData');
+          this.$notify({message:'Transaction Added',type:'success',duration:3000});
           this.setDefault();
           this.$router.push({path:'/acctrans',query:{activeTab:1}});
         }       
@@ -520,7 +521,7 @@ import Calculator from './Calculator.vue'
         return this.$store.state.rewardsCat;
       }
     },
-    beforeMount(){
+    updated(){
       this.expAccSelect = this.getSuggestedGroupedAccounts;
       this.accSelect = this.getGroupedAccounts;
     },

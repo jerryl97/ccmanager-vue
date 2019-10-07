@@ -40,6 +40,7 @@
 
     <!--Notification Section-->
     <van-cell-group title="Notification">
+      <van-switch-cell v-model="getNotifyStats" :title="getNotifyStatsTitle(getNotifyStats)" @change="notifyTrigger"/>
     </van-cell-group>
 
     <!--Feedback Form-->
@@ -91,6 +92,7 @@
         showManageIncCat:false,
         showManageRewards:false,
         showRecuringTrans:false,
+        notifytitle:'Enabled',
       }
     },
     methods:{
@@ -214,11 +216,34 @@
             attachments: entriesArray
           });
         });
+      },
+      getNotifyStatsTitle(stats){
+        if(stats){
+          return 'Enabled';
+        }else{
+          return 'Disabled';
+        }
+        
+      },
+      notifyTrigger(checked){
+        if(checked){
+          this.$store.commit('setNotifyStats',true);
+          this.$notify({message:'Notification Enabled',type:'primary',duration:3000});
+        }else{
+          this.$store.commit('setNotifyStats',false);
+          this.$notify({message:'Notification Disabled',type:'primary',duration:3000});
+        }
+        this.$store.dispatch("storeAllStateData");
+        this.$emit("notifyDue");
       }
+      
     },
     computed:{
       getStateData(){
         return this.$store.state;
+      },
+      getNotifyStats(){
+        return this.$store.state.notifyStats;
       }
     },
     components:{

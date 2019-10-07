@@ -304,6 +304,7 @@
           this.promoItem.minimum = 0;
         this.$store.commit('addNewPromo',this.promoItem);
         this.$store.dispatch('storeAllStateData');
+        this.$notify({message:'Promotion Added', type:'success', duration:3000});
         this.back(); 
       }
     },

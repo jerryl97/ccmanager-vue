@@ -197,6 +197,7 @@
           }
           this.$store.commit('addAccount',this.accItem);
           this.$store.dispatch('storeAllStateData');
+          this.$notify({message:'Account Added',type:'success',duration:3000});
           this.setDefault();
           this.back();
         } 

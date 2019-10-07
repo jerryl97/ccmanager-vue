@@ -42,9 +42,9 @@ new Vue({
       window.setTimeout(function () {
         navigator.splashscreen.hide();
       },3500);
-      } 
+    },
   },
-  beforeCreate(){
+  beforeMount(){
     document.addEventListener("deviceready",this.onDeviceReady(),false); 
     //store.dispatch('getAllStateData');
   },

@@ -52,6 +52,8 @@ const getDefaultState = ()=>{
 
     suggestAcc:[], 
     suggestAccRltPromo:[],
+
+    notifyStats:true,
   }
 }
 
@@ -419,6 +421,11 @@ export default new Vuex.Store({
           }
         }
       }
+    },
+    //////////////////Notification Feature
+    //Set Notification Status
+    setNotifyStats(state,value){
+      state.notifyStats = value;
     },
     /////////////////////////////////
   },
