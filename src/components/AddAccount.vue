@@ -207,7 +207,7 @@
       saveValidation(value){
         let validstate = value; 
         if(this.accItem.accgroup==1){
-          if(this.accItem.name==null){
+          if(this.accItem.name==null||this.accItem.name==''){
             this.accNameError="Please insert name of the account";
             validstate = true;
           }

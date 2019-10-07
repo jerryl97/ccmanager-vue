@@ -150,11 +150,12 @@
     methods:{
       //Set Default
       setDefault(){
-        this.promoItem = {}; 
-        this.promoItem.duration=false; 
-        this.promoItem.promodesc='';
-        this.promoItem.expmemo='';
-        this.promoItem.transcount=0;
+        this.promoItem={
+          duration:false,
+          promodesc:'',
+          transcount:0,
+          expmemo:'',
+        }
         this.showFromPromoDate=false;
         this.showToPromoDate=false;
         this.fromPromoDate='';

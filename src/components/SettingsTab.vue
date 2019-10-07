@@ -29,9 +29,11 @@
     <van-cell-group title="Data">
       <!--Backup Data-->
       <van-cell title="Backup Data" @click="backupAllData()" is-link/>
+      <!--Local Backup Manager-->
+      <van-cell title="Local Backup Manager" @click="getBackupList" is-link/>
       <!--Import Data From File-->
       <input type="file" ref="importinput" style="display:none" accept="text/plain" @change="readBackupFile($event)"/>
-      <van-cell title="Import Data From File" @click="$refs.importinput.click()" is-link/>
+      <van-cell title="Import Data From Google Drive" @click="$refs.importinput.click()" is-link/>
       <!--Send Backup to Email using Composer Plugin-->
       <van-cell title="Send Backup To Email" @click="emailComposer" is-link/>
       <!--Reset to Default-->
@@ -71,6 +73,22 @@
        <v-rewardscat @closeManageRewardsCat="closeManageRewardsCat"></v-rewardscat>
     </van-popup>
 
+    <!-- Backup Manager Popup -->
+    <van-popup v-model="showBackup" position="bottom" :style="{ height: '100%' }">
+      <van-nav-bar title="Backup Manager" left-text="Back" @click-left="showBackup = false"/>
+      <van-cell-group title="Choose a Backup to import:">
+        <div v-if="backupList.length==0" style="background-color:white;text-align:center;margin-top:10%">
+          <i style="color:#bbbbbb">No local backup found.</i>
+        </div>
+        <van-cell v-for="backup in backupList" :title="backup" :border="true">
+          <template slot="default">
+            <van-button size="small" type="primary" @click="importThisLocalBackup(backup)">Import</van-button>
+            <van-button size="small" type="danger" @click="deleteBackupFile(backup)">Delete</van-button>
+          </template>
+        </van-cell>
+      </van-cell-group>
+    </van-popup>
+
   </div>
 </template>
 
@@ -93,6 +111,10 @@
         showManageRewards:false,
         showRecuringTrans:false,
         notifytitle:'Enabled',
+
+        //Backup list and popup init
+        showBackup:false,
+        backupList:[]
       }
     },
     methods:{
@@ -207,24 +229,30 @@
             entriesArray.push(entries[i].nativeURL)
           }
           //Cordova Email Plugin
-          cordova.plugins.email.open({
-            to:      email,
-            cc:      '',
-            bcc:     '',
-            subject: 'Backup Data from CCManager Application',
-            body:    'Here are all your backups!',
-            attachments: entriesArray
-          });
+          //If no backup is found, alert error instead of continuing with email plugin
+          if(entriesArray.length>0){
+            cordova.plugins.email.open({
+              to:      email,
+              cc:      '',
+              bcc:     '',
+              subject: 'Backup Data from CCManager Application',
+              body:    'Here are all your backups!',
+              attachments: entriesArray
+            });
+          } else {
+            alert('No Backup Found');
+          }
         });
       },
+      //Notification title
       getNotifyStatsTitle(stats){
         if(stats){
           return 'Enabled';
         }else{
           return 'Disabled';
         }
-        
       },
+      //Notification trigger
       notifyTrigger(checked){
         if(checked){
           this.$store.commit('setNotifyStats',true);
@@ -235,7 +263,116 @@
         }
         this.$store.dispatch("storeAllStateData");
         this.$emit("notifyDue");
-      }
+      },
+
+       //Get Backup List
+      getBackupList(){
+        //Initialize backup list
+        this.backupList = [];
+
+         //Read backup entries saved in device external data directory
+        let fileEntries = new Promise((resolve,reject) => {
+          window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,(fileSystem) => {
+            let reader = fileSystem.createReader();
+            reader.readEntries((entries) => {
+                resolve(entries);
+              },(err) => {
+                console.log(err);
+              }
+            );
+          },(err) => {
+            console.log(err);
+          });
+        }).then((entries) => {
+          let entryObj = {
+            name:'',
+            nativeUrl:''
+          }
+          for(let i in entries){
+            this.backupList.push(entries[i].name);
+          }
+          console.log(this.backupList);
+        });
+
+        this.showBackup = true;
+      },
+      //Local Backup Import Function
+      importThisLocalBackup(backup){
+        //Create direct path to selected backup file
+        let pathToFile = cordova.file.externalDataDirectory + backup;
+        
+        //Confirm import backup dialog
+        this.$dialog.confirm({
+          message:'Import this backup? ' + backup
+        }).then(()=>{
+          //Find backup file and read using FileReader to read, then pass result into resolve
+          let localBackupRead = new Promise((resolve,reject) => {
+            window.resolveLocalFileSystemURL(pathToFile,(fileSystem) => {
+
+              fileSystem.file((file) => {
+                  var reader = new FileReader();
+
+                  reader.onloadend = function (e) {
+                    console.log('Read ended');
+                    resolve(reader.result);
+                  };
+
+                  reader.readAsText(file);
+              },() => {
+                console.log("Error: Missing file")
+              });
+
+            },(err)=>{
+              console.log(err);
+            });
+          });
+          //get reader results from resolve, convert data into JavaScript readable data and commit backup to Vuex and database
+          localBackupRead.then((result)=>{
+            console.log(result)
+            let importedData = JSON.parse(result);
+            console.log(importedData)
+            this.$store.commit('setAllStateData',importedData);
+            this.$store.dispatch('storeAllStateData');
+            this.$notify({
+              message:'Data Imported',
+              type:'primary',
+              duration:4000,
+            });
+            this.$router.push('/acctrans/accounts');
+          }); 
+        }).catch(()=>{
+          this.$dialog.close();
+        });
+      },
+      //Delete Backup Function
+      deleteBackupFile(backup){
+        this.$dialog.confirm({
+          message:'Are you sure to delete this backup? ' + backup
+        }).then(()=>{
+          //Find backup file and remove it
+          let deletePromise = new Promise((resolve,reject) => {
+            window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,(fileSystem) => {
+              fileSystem.getFile(backup, {create: false}, (fileEntry) => {
+                fileEntry.remove((file) => {
+                    console.log(fileEntry);
+                    resolve('Successfully removed backup item')
+                }, (error) => {
+                    alert("error occurred: " + error.code);
+                }, () => {
+                    alert("file does not exist");
+                });
+              });
+            });
+          });
+          //After backup file is removed, refresh backup manager list
+          deletePromise.then((message)=>{
+            console.log(message);
+            this.getBackupList();
+          });
+        }).catch(()=>{
+          this.$dialog.close();
+        });
+      },
       
     },
     computed:{
