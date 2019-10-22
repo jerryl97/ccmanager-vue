@@ -42,7 +42,7 @@
                 <span style="font-size:13px" v-if="one.contents!=''">{{one.contents}}<br/></span>
                 <van-tag plain type="danger" v-if="one.type=='Expense'">{{getCatName(one.type,one.category)}}</van-tag> 
                 <van-tag plain type="success" v-if="one.type=='Income'">{{getCatName(one.type,one.category)}}</van-tag> 
-                &nbsp<van-tag plain>{{getAccName(one.account)}}</van-tag> 
+                <van-tag plain>{{getAccName(one.account)}}</van-tag> 
               </template>
 
               <!-- Is Transfer-->
@@ -60,7 +60,8 @@
                 <span style="color:#FF3434" v-if="one.type=='Expense'">$ {{one.amount}}<br/></span>
                 <span style="color:#7acc7a" v-if="one.type=='Income'">$ {{one.amount}}<br/></span>
                 <span style="color:#4da6ff" v-if="one.type=='Transfer'">$ {{one.amount}}<br/></span>
-                <van-tag plain v-if="one.recuring == true" type="warning">Recuring</van-tag>
+                <van-tag plain v-if="one.recurring == true" type="warning">Recurring</van-tag>
+                <van-tag plain v-if="one.recurring == true" type="warning">{{getRecurringTime(one)}}</van-tag>
               </template>
             </van-cell>
             <template slot="right">
@@ -222,6 +223,25 @@
           return result.inctotal; 
       },
 
+      getRecurringTime(trans){
+        let temp = [
+            {text:'Sunday',value:7},
+            {text:'Monday',value:1},
+            {text:'Tuesday',value:2},
+            {text:'Wednesday',value:3},
+            {text:'Thursday',value:4},
+            {text:'Friday',value:5},
+            {text:'Saturday',value:6},
+        ]
+        if(trans.recurringtype == 0){
+          return 'Daily'
+        }else if(trans.recurringtype == 1){
+          let result = temp.find(o=>o.value == trans.recurringtime);
+          return result.text;
+        }else if(trans.recurringtype == 2){
+          return trans.recurringtime;
+        }
+      },
       //Get Monthly Expense & Income
       getMonthly(type){
         let temp = [];

@@ -5,26 +5,26 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter);
 
 //Import the components
+import WelcomePage from '../components/WelcomePage.vue'
+import PinInput from '../components/PinInput.vue'
+import MainContents from '../components/MainContents.vue'
 import AddTransTab from '../components/AddTransTab.vue'
 import AccTransTab from '../components/AccTransTab.vue'
 import PromotionsTab from '../components/PromotionsTab.vue'
 import SettingsTab from '../components/SettingsTab.vue'
-import Accounts from '../components/Accounts.vue'
-import Transactions from '../components/Transactions.vue'
 
 //Configure the routes
 const routes = [
-  {path: '/addtrans', component: AddTransTab},
-  {path: '/acctrans', component: AccTransTab,
+  {path: '/welcome', component: WelcomePage},
+  {path: '/pininput', component: PinInput},
+  {path:'/main',component: MainContents,
     children:[
-      {path:'/acctrans/accounts',component:Accounts},
-      {path:'/acctrans/trans',component:Transactions},
-    ] 
-  },
-  {path: '/promotions', component: PromotionsTab},
-  {path: '/settings', component: SettingsTab},
-
-  {path: '*', redirect:'/addtrans'}
+      {path: '/main/addtrans', component: AddTransTab},
+      {path: '/main/acctrans', component: AccTransTab},
+      {path: '/main/promotions', component: PromotionsTab},
+      {path: '/main/settings', component: SettingsTab},
+    ]},
+  //{path: '*', redirect:'/welcome'}
 ]
 
 //Create the router

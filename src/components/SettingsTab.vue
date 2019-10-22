@@ -15,8 +15,8 @@
       <van-cell title="Manage Expense Categories" @click="showManageExpCat=true" is-link/>
       <!--Managing Income Categories-->
       <van-cell title="Manage Income Categories" @click="showManageIncCat=true" is-link/>
-      <!--Managing Recuring Transactions-->
-      <van-cell title="Manage Recuring Transactions" @click="showRecuringTrans=true" is-link/>
+      <!--Managing Recurring Transactions-->
+      <van-cell title="Manage Recurring Transactions" @click="showRecurringTrans=true" is-link/>
     </van-cell-group>
 
     <!--Promotions Section-->
@@ -44,6 +44,11 @@
     <van-cell-group title="Notification">
       <van-switch-cell v-model="getNotifyStats" :title="getNotifyStatsTitle(getNotifyStats)" @change="notifyTrigger"/>
     </van-cell-group>
+    <!--Security Section-->
+    <van-cell-group title="Security">
+      <van-switch-cell v-model="getPinStat" :title="getPinStatTitle(getPinStat)" @change="pinTrigger"/>
+      <van-cell title="Change Pincode" @click="changePinTrigger" is-link/>
+    </van-cell-group>
 
     <!--Feedback Form-->
     <van-cell-group title="Google Form Feedback">
@@ -64,9 +69,9 @@
     <van-popup v-model="showManageIncCat" position="bottom" :style="{height:'100%'}">
        <v-inccat @closeManageIncCat="closeManageIncCat"></v-inccat>
     </van-popup>
-    <!--Manage Recuring Transactions Pop-->
-    <van-popup v-model="showRecuringTrans" position="bottom" :style="{height:'100%'}">
-       <v-recuringtrans @closeRecuringTrans="closeRecuringTrans"></v-recuringtrans>
+    <!--Manage Recurring Transactions Pop-->
+    <van-popup v-model="showRecurringTrans" position="bottom" :style="{height:'100%'}">
+       <v-recurringtrans @closeRecurringTrans="closeRecurringTrans"></v-recurringtrans>
     </van-popup>
     <!-- Manage Rewards Category Pop-->
     <van-popup v-model="showManageRewards" position="bottom" :style="{height:'100%'}">
@@ -89,6 +94,16 @@
       </van-cell-group>
     </van-popup>
 
+    <van-popup v-model="showSetPin" position="bottom" :style="{height:'100%'}">
+      <v-newpin @closeNewPin="closeNewPin" :fromSetting="fromSetting"/>
+    </van-popup>
+    <van-popup v-model="showPinInput" position="bottom" :style="{height:'100%'}">
+      <v-pininput @closePinInput="closePinInput" :fromSetting="fromSetting"/>
+    </van-popup>
+    <van-popup v-model="showChangePin" position="bottom" :style="{height:'100%'}">
+      <v-changepin @closeChangePin="closeChangePin"/>
+    </van-popup>
+
   </div>
 </template>
 
@@ -99,7 +114,10 @@
   import ExpCategory from './ExpCategory.vue'
   import IncCategory from './IncCategory.vue'
   import RewardsCategory from './RewardsCategory.vue'
-  import RecuringTrans from './RecuringTrans.vue'
+  import RecurringTrans from './RecurringTrans.vue'
+  import NewPin from './NewPin.vue'
+  import PinInput from './PinInput.vue'
+  import ChangePin from './ChangePin.vue'
 
   export default{
     data(){
@@ -109,8 +127,12 @@
         showManageExpCat:false,
         showManageIncCat:false,
         showManageRewards:false,
-        showRecuringTrans:false,
+        showRecurringTrans:false,
         notifytitle:'Enabled',
+        showSetPin:false,
+        fromSetting:true,
+        showPinInput:false,
+        showChangePin:false,
 
         //Backup list and popup init
         showBackup:false,
@@ -130,13 +152,26 @@
       closeManageIncCat(){
         this.showManageIncCat=false;
       },
-      //Close Recuring Transactions
-      closeRecuringTrans(){
-        this.showRecuringTrans=false;
+      //Close Recurring Transactions
+      closeRecurringTrans(){
+        this.showRecurringTrans=false;
       },
       //Close Manage Rewards Categories
       closeManageRewardsCat(){
         this.showManageRewards=false;
+      },
+      //Close set New Pin
+      closeNewPin(){
+        this.showSetPin = false;
+        if(this.getPinCode.length==0){
+          this.getPinStat = false;
+        }
+      },
+      closePinInput(){
+        this.showPinInput = false;
+      },
+      closeChangePin(){
+        this.showChangePin = false;
       },
       //Backup All Data
       backupAllData(){
@@ -262,7 +297,6 @@
           this.$notify({message:'Notification Disabled',type:'primary',duration:3000});
         }
         this.$store.dispatch("storeAllStateData");
-        this.$emit("notifyDue");
       },
 
        //Get Backup List
@@ -373,7 +407,35 @@
           this.$dialog.close();
         });
       },
-      
+      //PIN Title
+      getPinStatTitle(stats){
+        if(stats){
+          return 'Pin Enabled';
+        }else{
+          return 'Pin Disabled';
+
+        }
+      },
+      pinTrigger(checked){
+        if(checked){
+          if(this.getPinCode.length!=0){
+            this.$store.commit('setPinStat',true);
+            this.$store.dispatch('storeAllStateData');
+            this.$notify({message:'Pin Enabled',type:'primary',duration:3000});
+          }else if(this.getPinCode.length==0){
+            this.showSetPin = true;
+          }
+        }else{
+          this.showPinInput = true;
+        }
+      },
+      changePinTrigger(){
+        if(this.getPinCode.length==0){
+          this.showSetPin = true;
+        }else{
+          this.showChangePin = true;
+        }
+      }
     },
     computed:{
       getStateData(){
@@ -381,6 +443,12 @@
       },
       getNotifyStats(){
         return this.$store.state.notifyStats;
+      },
+      getPinStat(){
+        return this.$store.state.PINStat;
+      },
+      getPinCode(){
+        return this.$store.state.PINCode;
       }
     },
     components:{
@@ -388,7 +456,10 @@
       'v-expcat':ExpCategory,
       'v-inccat':IncCategory,
       'v-rewardscat':RewardsCategory,
-      'v-recuringtrans':RecuringTrans,
+      'v-recurringtrans':RecurringTrans,
+      'v-newpin':NewPin,
+      'v-pininput':PinInput,
+      'v-changepin':ChangePin,
     }
   }
 

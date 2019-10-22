@@ -1,15 +1,8 @@
 <template>
   <div id="app">
     <!--A View for Router Pages-->
-    <router-view @notifyDue="notifyDue"></router-view>
+    <router-view @notifyDue="notifyDue" @scheduleRecurringTrans="scheduleRecurringTrans"></router-view>
 
-    <!--Main Tabbar-->
-    <van-tabbar v-model="active" active-color="#07c160" inactive-color="#000" route>
-      <van-tabbar-item replace to="/addtrans" icon="plus">Add Trans</van-tabbar-item>
-      <van-tabbar-item replace to="/acctrans" icon="paid">Acc & Trans</van-tabbar-item>
-      <van-tabbar-item replace to="/promotions" icon="gift-o">Promo</van-tabbar-item>
-      <van-tabbar-item replace to="/settings" icon="setting-o">Settings</van-tabbar-item>
-    </van-tabbar> 
   </div>
 </template>
 
@@ -18,7 +11,6 @@ export default {
   name: 'app',
   data(){
     return{
-      active:0,
       accList:[],
       notifystats:'',
     }
@@ -33,76 +25,80 @@ export default {
         this.$dialog.close();
       })
     },
-
-    notifyDue(){
+    addRecurringTrans(){
       let today = new Date();
-      for(let i in this.getAccounts){
-        if(this.getAccounts[i].accgroup==1){
-        if(this.$moment(today).month() == this.$moment(this.getAccounts[i].pduedate).month()){
-          let id1 = this.getAccounts[i].accid + '' + 1;
-          let id2 = this.getAccounts[i].accid + '' + 2;
-          let id3 = this.getAccounts[i].accid + '' + 3;
-          if(this.getNotifyStats == true){
-          cordova.plugins.notification.local.schedule([
-            {id:id1,
-            title:'5 Days Left to Due',
-            text:this.getAccounts[i].name,
-            trigger:{every:{month:this.$moment(today).month()+1,day:this.$moment(this.getAccounts[i].pduedate).date()-5}}},
-            {id:id2,
-            title:'3 Days Left to Due',
-            text:this.getAccounts[i].name,
-            trigger:{every:{month:this.$moment(today).month()+1,day:this.$moment(this.getAccounts[i].pduedate).date()-3}}},
-            {id:id3,
-            title:'1 Day Left to Due',
-            text:this.getAccounts[i].name,
-            trigger:{every:{month:this.$moment(today).month()+1,day:this.$moment(this.getAccounts[i].pduedate).date()-1}}},
-          ]);
-          }else if(this.getNotifyStats == false){
-            cordova.plugins.notification.local.cancel([id1,id2,id3],function(){
-            })
-          }
-          }
-        }
-      } 
-    },
-    updateAccDates(){
-      let today = new Date();
-      for(let i in this.getAccounts){
-        if(this.$moment(today).date() > this.$moment(this.getAccounts[i].sdate).date()){
-          if(this.$moment(today).month() != this.$moment(this.getAccounts[i].sdate).month()){
-            let tempsdate = this.$moment(this.getAccounts[i].sdate).date() + this.$moment(today).format(' MMMM YYYY');
-            this.getAccounts[i].sdate = tempsdate;
-            let temppdate = this.$moment(this.getAccounts[i].pduedate).date() + this.$moment(today).format(' MMMM YYYY');
-            this.getAccounts[i].pduedate = temppdate;
-            this.getAccounts[i].cutoffdate = this.$moment(this.getAccounts[i].sdate).toDate();
-            this.getAccounts[i].cutoffdate = this.$moment(this.getAccounts[i].cutoffdate).add('1','months').format('D MMMM YYYY');
-            this.getAccounts[i].nextduedate = this.$moment(this.getAccounts[i].pduedate).toDate();
-            this.getAccounts[i].nextduedate = this.$moment(this.getAccounts[i].nextduedate).add('1','months').format('D MMMM YYYY');  
-            if(this.getAccounts[i].outstdbalance != 0){
-              this.getAccounts[i].dueamount += this.getAccounts[i].outstdbalance;
-              this.getAccounts[i].outstdbalance = 0;
-            }
-            this.getAccounts[i].settlestatus = false;
+      let allRecurTrans = this.getRecurringTrans;
+      let todayformatted = this.$moment(new Date()).format('YYYY-MM-DD');
+      if(allRecurTrans.length>0){
+      for(let i in allRecurTrans){
+          let tempdate = this.$moment(allRecurTrans[i].date).format('YYYY-MM-DD');
+          let existed = _.filter(this.getTrans,x=>{
+            return this.$moment(x.date).format('YYYY-MM-DD') == todayformatted && x.recurid == allRecurTrans[i].recurid;
+          }); 
+        if(existed.length == 0){
+        if(allRecurTrans[i].recurringtype == 0){
+          if(this.$moment(todayformatted).isSame(tempdate) == false){
+            let temp = Object.assign({},allRecurTrans[i]);
+            temp.transid = null;
+            temp.date = new Date();
+            this.$store.commit('addTrans',temp);
             this.$store.dispatch('storeAllStateData');
           }
+        }else if(allRecurTrans[i].recurringtype == 1){
+            let tempweekday = allRecurTrans[i].recurringtime;
+            if(tempweekday == 7)
+              tempweekday = 0;
+            if(this.$moment(today).day() == tempweekday){
+              let temp = Object.assign({},allRecurTrans[i]);
+              temp.transid = null;
+              temp.date = new Date();
+              this.$store.commit('addTrans',temp);
+              this.$store.dispatch('storeAllStateData');
+            }
+        }else if(allRecurTrans[i].recurringtype == 2){
+            if(this.$moment(today).date() == allRecurTrans[i].recurringtime){
+              let temp = Object.assign({},allRecurTrans[i]);
+              temp.transid = null;
+              temp.date = new Date();
+              this.$store.commit('addTrans',temp);
+              this.$store.dispatch('storeAllStateData'); 
+              }
+            }
+          }
         }
-      }  
+      }
+    },
+    updateAccDates(){
+      this.$store.commit('updateAccountDates');
+      this.$store.dispatch('')
     },
   },
   computed:{
     getAccounts(){
       return this.$store.state.allAccounts;
     },
+    getTrans(){
+      return this.$store.state.allTrans; 
+    },
     getNotifyStats(){
       return this.$store.state.notifyStats;
+    },
+    getRecurringTrans(){
+      let temp = _.filter(this.getTrans, x=>{
+        return x.recurring == true;
+      });
+      temp = _.orderBy(temp,['date'],['desc']);
+      temp = _.uniqBy(temp,'recurid'); 
+      return temp;
     }
   },
   mounted(){
-    document.addEventListener("backbutton",this.onBackKeyDown,false);
+    this.$store.dispatch('getAllStateData');
+    document.addEventListener("backbutton",this.onBackKeyDown,false); 
   },
-  updated(){
+  beforeUpdate(){
     this.updateAccDates();
-    this.notifyDue();
+    this.addRecurringTrans();
   }
 }
 </script>

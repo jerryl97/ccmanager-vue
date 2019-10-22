@@ -5,6 +5,9 @@ import localForage from '../storage/storage.js'
 Vue.use(Vuex)
 const getDefaultState = ()=>{
   return {
+    //First Time User
+    firstTime:true,
+
     //Accounts
     allAccounts:[],
     maxAccId:0,
@@ -21,6 +24,7 @@ const getDefaultState = ()=>{
     //Transactions
     allTrans:[],
     maxTransId:0,
+    maxRecurTransId:0,
 
     //Expense Category
     expCat:[
@@ -50,14 +54,85 @@ const getDefaultState = ()=>{
     ],
     maxRewardsCatId:0,
 
+    //Suggest Accounts
     suggestAcc:[], 
     suggestAccRltPromo:[],
 
+    //Notification Status
     notifyStats:true,
+
+    //Pincode
+    PINStat:false,
+    PINCode:'',
   }
 }
 
 const state = getDefaultState();
+
+function scheduleNotification(){
+      cordova.plugins.notification.local.cancelAll(function() {}, this);
+      let today = new Date();
+      for(let i in state.allAccounts){
+        if(state.allAccounts[i].accgroup==1){
+          if(Vue.moment(today).month()==Vue.moment(state.allAccounts[i].pduedate).month()){
+            let id1 = 10+''+state.allAccounts[i].accid+''+1;
+            let id2 = 10+''+state.allAccounts[i].accid+''+2;
+            let id3 = 10+''+state.allAccounts[i].accid+''+3;
+            if(state.notifyStats==true){
+              cordova.plugins.notification.local.schedule([
+                {id:id1,
+                title:'5 Days Left to Due',
+                text:state.allAccounts[i].name,
+                trigger:{every:{month:Vue.moment(today).month()+1,day:Vue.moment(state.allAccounts[i].pduedate).date()-5}}},
+                {id:id2,
+                title:'3 Days Left to Due',
+                text:state.allAccounts[i].name,
+                trigger:{every:{month:Vue.moment(today).month()+1,day:Vue.moment(state.allAccounts[i].pduedate).date()-3}}},
+                {id:id3,
+                title:'1 Day Left to Due',
+                text:state.allAccounts[i].name,
+                trigger:{every:{month:Vue.moment(today).month()+1,day:Vue.moment(state.allAccounts[i].pduedate).date()-1}}},
+              ]);
+            }
+          }
+        }
+      }
+
+      let allRecurTrans = _.filter(state.allTrans,x=>{
+        return x.recurring == true;
+      });
+      allRecurTrans = _.orderBy(allRecurTrans,['date'],['desc']);
+      allRecurTrans = _.uniqBy(allRecurTrans,'recurid'); 
+      for(let i in allRecurTrans){
+        if(state.notifyStats == true){
+        if(allRecurTrans[i].recurringtype == 0){
+          let tempid = 11+''+allRecurTrans[i].recurid;
+          cordova.plugins.notification.local.schedule({
+            id:tempid,
+            title:'Recurring Transaction: ' + allRecurTrans[i].contents,
+            text:'Tap to add this recurring transaction.',
+            trigger:{every:'day'},
+          });
+        }else if(allRecurTrans[i].recurringtype == 1){
+          let tempid = 11+''+allRecurTrans[i].recurid;
+          cordova.plugins.notification.local.schedule({
+            id:tempid,
+            title:'Recurring Transaction: ' + allRecurTrans[i].contents,
+            text:'Tap to add this recurring transaction.',
+            trigger:{every:{weekday:allRecurTrans[i].recurringtime}},
+          });
+        }else if(allRecurTrans[i].recurringtype == 2){
+          let tempid = 11+''+allRecurTrans[i].recurid;
+          cordova.plugins.notification.local.schedule({
+            id:tempid,
+            title:'Recurring Transaction: ' + allRecurTrans[i].contents,
+            text:'Tap to add this recurring transaction.',
+            trigger:{every:{day:allRecurTrans[i].recurringtime}},
+            });
+          }
+        }
+      }
+}
 
 export default new Vuex.Store({
   state,
@@ -74,6 +149,12 @@ export default new Vuex.Store({
     //Set the State Data to Default
     setStateToDefault(state){
       Object.assign(state,getDefaultState());
+    },
+
+    //////////////////Welcome
+    //Set the first time usage
+    setFirstTime(state,value){
+      state.firstTime = value;
     },
     //////////////////Account
     //Add Account to Vuex Store
@@ -93,6 +174,7 @@ export default new Vuex.Store({
       } 
       state.maxAccId = value.accid;
       state.allAccounts.push(value);
+      scheduleNotification();
     },
     //Edit Account
     editAccount(state,value){
@@ -101,12 +183,14 @@ export default new Vuex.Store({
           state.allAccounts[i] = value; 
         }
       }
+      scheduleNotification();
     },
     //Delete Account
     deleteAccount(state,value){
       state.allAccounts = _.filter(state.allAccounts,x=>{
         return x.accid != value; 
       });
+      scheduleNotification();
     },
     //Set Accounts to Vuex Store
     setAccounts(state,value){
@@ -115,6 +199,30 @@ export default new Vuex.Store({
     //Set Max Id of Accounts
     setMaxAccId(state,value){
       state.maxAccId = value;
+    },
+    //Update Accounts Dates
+    updateAccountDates(state,value){
+      let today = new Date();
+      for(let i in state.allAccounts){
+        if(Vue.moment(today).date() > Vue.moment(state.allAccounts[i].sdate).date()){
+          if(Vue.moment(today).month() != Vue.moment(state.allAccounts[i].sdate).month()){
+            let tempsdate = Vue.moment(state.allAccounts[i].sdate).date() + Vue.moment(today).format(' MMMM YYYY');
+            state.allAccounts[i].sdate = tempsdate;
+            let temppdate = Vue.moment(state.allAccounts[i].pduedate).date() + Vue.moment(today).format(' MMMM YYYY');
+            state.allAccounts[i].pduedate = temppdate;
+            state.allAccounts[i].cutoffdate = Vue.moment(state.allAccounts[i].sdate).toDate();
+            state.allAccounts[i].cutoffdate = Vue.moment(state.allAccounts[i].cutoffdate).add('1','months').format('D MMMM YYYY');
+            state.allAccounts[i].nextduedate = Vue.moment(state.allAccounts[i].pduedate).toDate();
+            state.allAccounts[i].nextduedate = Vue.moment(state.allAccounts[i].nextduedate).add('1','months').format('D MMMM YYYY');  
+            if(state.allAccounts[i].outstdbalance != 0){
+              state.allAccounts[i].dueamount += state.allAccounts[i].outstdbalance;
+              state.allAccounts[i].outstdbalance = 0;
+            }
+            state.allAccounts[i].settlestatus = false;
+          }
+        }
+      }
+      scheduleNotification();
     },
     /////////////////////////////////
     
@@ -162,8 +270,34 @@ export default new Vuex.Store({
           value.transid = maxId + 2;
         else
           value.transid = maxId + 1; 
-      } 
+        } 
       state.maxTransId = value.transid;
+      }
+      if(!value.recurid&&value.recurring == true){
+        let recurTrans = _.filter(state.allTrans,x=>{
+          return x.recurring == true;
+        })
+        if(recurTrans.length<1&&state.maxRecurTransId==0)
+          value.recurid = 1;
+        else if(recurTrans.length<1)
+          value.recurid = state.maxRecurTransId+1;
+        else{
+        const maxId = recurTrans.reduce(
+        (max, trans) => (trans.recurid>max ? trans.recurid:max),recurTrans[0].recurid);
+        if((maxId+1)==state.maxRecurTransId)
+          value.recurid = maxId + 2;
+        else
+          value.recurid = maxId + 1; 
+        }  
+        state.maxRecurTransId = value.recurid;
+      }else if(value.recurid&&value.recurring==false){
+        for(let i in state.allTrans){
+          if(state.allTrans[i].recurid == value.recurid){
+            state.allTrans[i].recurring = value.recurring;
+            let tempid = 11+''+value.recurid;
+            cordova.plugins.notification.local.cancel(tempid,function(){}); 
+          }
+        }
       }
       state.allTrans.push(value);
       switch(value.type){
@@ -200,11 +334,13 @@ export default new Vuex.Store({
             }
           break;
       }
+      scheduleNotification();
     },
     //Edit Transactions
     editTrans(state,value){
       this.commit('deleteTrans',value.transid);
       this.commit('addTrans',value);
+      scheduleNotification();
     },
     //Set Transactions to Vuex Store
     setTrans(state,value){
@@ -252,6 +388,7 @@ export default new Vuex.Store({
       state.allTrans = _.filter(state.allTrans,x=>{
         return x.transid != value 
       });
+      scheduleNotification();
     },
     //Set Max Id of Accounts
     setMaxTransId(state,value){
@@ -394,7 +531,7 @@ export default new Vuex.Store({
         //Check Minimum
         if(x.minimum <= value.transamount){
           //Check Duration
-          if(x.duration==false || (x.duration==true&&Vue.moment(value.transdate).isBetween(x.fromdate,x.todate))){
+          if(x.duration==false || (x.duration==true&&Vue.Vue.moment(value.transdate).isBetween(x.fromdate,x.todate))){
             //Check Expense Category
             if(x.rltexpense.includes(value.transcat)){
               return x; 
@@ -426,8 +563,21 @@ export default new Vuex.Store({
     //Set Notification Status
     setNotifyStats(state,value){
       state.notifyStats = value;
+      if(value == true){
+        scheduleNotification();
+      }else if(value == false){
+        cordova.plugins.notification.local.cancelAll(function(){},this);
+      }
     },
     /////////////////////////////////
+    //////////////////Security Feature
+    //Set Pin Code
+    setPinCode(state,value){
+      state.PINCode = value;
+    },
+    setPinStat(state,value){
+      state.PINStat = value;
+    }
   },
   /////////////////////////////////
   

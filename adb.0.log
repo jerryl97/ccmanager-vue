@@ -1,0 +1,120 @@
+--- adb starting (pid 818) ---
+adb I 10-16 07:58:19   818   818 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 07:58:19   818   818 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 07:58:19   818   818 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 07:58:19   818   818 main.cpp:60] 
+adb I 10-16 07:58:19   818   818 auth.cpp:436] adb_auth_init...
+adb I 10-16 07:58:19   818   818 auth.cpp:261] User key '/root/.android/adbkey' does not exist...
+adb I 10-16 07:58:19   818   818 auth.cpp:97] generate_key(/root/.android/adbkey)...
+adb I 10-16 07:58:19   818   818 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 07:58:19   818   824 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 07:58:19   818   825 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 07:58:19   818   818 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 07:58:19   818   818 auth.cpp:488] Calling send_auth_response
+adb I 10-16 07:58:19   818   818 auth.cpp:455] Calling send_auth_publickey
+adb I 10-16 07:58:30   818   818 adb.cpp:114] J5AXB762E594C44: offline
+adb I 10-16 07:59:21   818   824 transport.cpp:285] J5AXB762E594C44: read failed: Protocol error
+adb I 10-16 07:59:21   818   824 transport.cpp:694] J5AXB762E594C44: connection terminated: read failed
+adb I 10-16 07:59:21   818   818 adb.cpp:114] J5AXB762E594C44: offline
+adb I 10-16 07:59:21   818   818 transport.cpp:781] destroying transport J5AXB762E594C44
+adb I 10-16 07:59:21   818   818 transport.cpp:357] BlockingConnectionAdapter(J5AXB762E594C44): stopping
+adb I 10-16 07:59:21   818   818 transport.cpp:375] BlockingConnectionAdapter(J5AXB762E594C44): stopped
+adb I 10-16 07:59:21   818   818 transport.cpp:269] BlockingConnectionAdapter(J5AXB762E594C44): destructing
+adb I 10-16 07:59:21   818   818 transport.cpp:349] BlockingConnectionAdapter(J5AXB762E594C44): already stopped
+--- adb starting (pid 266) ---
+adb I 10-16 08:02:37   266   266 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 08:02:37   266   266 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 08:02:37   266   266 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 08:02:37   266   266 main.cpp:60] 
+adb I 10-16 08:02:37   266   266 auth.cpp:436] adb_auth_init...
+adb I 10-16 08:02:37   266   266 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 08:02:37   266   272 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 08:02:37   266   273 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 08:02:37   266   266 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 08:02:37   266   266 auth.cpp:488] Calling send_auth_response
+adb I 10-16 08:02:37   266   266 adb.cpp:114] J5AXB762E594C44: offline
+--- adb starting (pid 270) ---
+adb I 10-16 14:32:27   270   270 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 14:32:27   270   270 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 14:32:27   270   270 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 14:32:27   270   270 main.cpp:60] 
+adb I 10-16 14:32:27   270   270 auth.cpp:436] adb_auth_init...
+adb I 10-16 14:32:27   270   270 auth.cpp:411] adb_auth_inotify_init...
+--- adb starting (pid 265) ---
+adb I 10-16 14:36:36   265   265 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 14:36:36   265   265 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 14:36:36   265   265 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 14:36:36   265   265 main.cpp:60] 
+adb I 10-16 14:36:36   265   265 auth.cpp:436] adb_auth_init...
+adb I 10-16 14:36:36   265   265 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 14:36:36   265   271 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 14:36:36   265   272 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 14:36:36   265   265 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 14:36:36   265   265 auth.cpp:488] Calling send_auth_response
+adb I 10-16 14:36:36   265   265 adb.cpp:114] J5AXB762E594C44: offline
+--- adb starting (pid 264) ---
+adb I 10-16 14:40:49   264   264 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 14:40:49   264   264 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 14:40:49   264   264 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 14:40:49   264   264 main.cpp:60] 
+adb I 10-16 14:40:49   264   264 auth.cpp:436] adb_auth_init...
+adb I 10-16 14:40:49   264   264 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 14:40:49   264   270 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 14:40:49   264   271 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 14:40:49   264   264 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 14:40:49   264   264 auth.cpp:488] Calling send_auth_response
+adb I 10-16 14:40:49   264   264 adb.cpp:114] J5AXB762E594C44: offline
+--- adb starting (pid 259) ---
+adb I 10-16 15:26:21   259   259 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 15:26:21   259   259 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 15:26:21   259   259 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 15:26:21   259   259 main.cpp:60] 
+adb I 10-16 15:26:21   259   259 auth.cpp:436] adb_auth_init...
+adb I 10-16 15:26:21   259   259 auth.cpp:261] User key '/root/.android/adbkey' does not exist...
+adb I 10-16 15:26:21   259   259 auth.cpp:97] generate_key(/root/.android/adbkey)...
+adb I 10-16 15:26:21   259   259 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 15:26:21   259   266 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 15:26:21   259   265 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 15:26:21   259   259 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 15:26:21   259   259 auth.cpp:488] Calling send_auth_response
+adb I 10-16 15:26:21   259   259 auth.cpp:455] Calling send_auth_publickey
+adb I 10-16 15:26:25   259   259 adb.cpp:114] J5AXB762E594C44: offline
+--- adb starting (pid 263) ---
+adb I 10-16 15:28:36   263   263 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 15:28:36   263   263 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 15:28:36   263   263 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 15:28:36   263   263 main.cpp:60] 
+adb I 10-16 15:28:36   263   263 auth.cpp:436] adb_auth_init...
+adb I 10-16 15:28:36   263   263 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 15:28:36   263   269 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 15:28:36   263   270 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 15:28:36   263   263 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 15:28:36   263   263 auth.cpp:488] Calling send_auth_response
+adb I 10-16 15:28:36   263   263 adb.cpp:114] J5AXB762E594C44: offline
+--- adb starting (pid 257) ---
+adb I 10-16 15:42:59   257   257 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 15:42:59   257   257 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 15:42:59   257   257 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 15:42:59   257   257 main.cpp:60] 
+adb I 10-16 15:42:59   257   257 auth.cpp:436] adb_auth_init...
+adb I 10-16 15:42:59   257   257 auth.cpp:261] User key '/root/.android/adbkey' does not exist...
+adb I 10-16 15:42:59   257   257 auth.cpp:97] generate_key(/root/.android/adbkey)...
+adb I 10-16 15:42:59   257   257 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 15:42:59   257   263 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 15:42:59   257   264 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 15:42:59   257   257 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 15:42:59   257   257 auth.cpp:488] Calling send_auth_response
+adb I 10-16 15:42:59   257   257 auth.cpp:455] Calling send_auth_publickey
+--- adb starting (pid 264) ---
+adb I 10-16 15:45:42   264   264 main.cpp:60] Android Debug Bridge version 1.0.41
+adb I 10-16 15:45:42   264   264 main.cpp:60] Version 29.0.4-5871666
+adb I 10-16 15:45:42   264   264 main.cpp:60] Installed as /opt/android-sdk/platform-tools/adb
+adb I 10-16 15:45:42   264   264 main.cpp:60] 
+adb I 10-16 15:45:42   264   264 auth.cpp:436] adb_auth_init...
+adb I 10-16 15:45:42   264   264 auth.cpp:411] adb_auth_inotify_init...
+adb I 10-16 15:45:42   264   270 transport.cpp:281] J5AXB762E594C44: read thread spawning
+adb I 10-16 15:45:42   264   271 transport.cpp:294] J5AXB762E594C44: write thread spawning
+adb I 10-16 15:45:42   264   264 adb.cpp:110] J5AXB762E594C44: already offline
+adb I 10-16 15:45:42   264   264 transport.cpp:1371] fetching keys for transport J5AXB762E594C44
+adb I 10-16 15:45:42   264   264 auth.cpp:488] Calling send_auth_response
+adb I 10-16 15:45:42   264   264 adb.cpp:114] J5AXB762E594C44: offline

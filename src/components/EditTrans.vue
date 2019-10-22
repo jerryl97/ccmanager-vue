@@ -121,8 +121,14 @@
     <!-- Field for Contents-->
     <van-field v-model="transItem.contents" label="Contents" type="textarea" rows="1" autosize />
 
-    <!-- Recuring -->
-    <van-switch-cell v-model="transItem.recuring" title="Recuring" active-color="green" inactive-color="red"/>
+    <!-- Recurring -->
+    <van-switch-cell v-model="transItem.recurring" title="Recurring" active-color="green" inactive-color="red"/>
+
+    <!-- Recurring Options-->
+    <van-dropdown-menu v-if="transItem.recurring == true">
+      <van-dropdown-item v-model="transItem.recurringtype" @change="recurringtypeChange" :options="recurringtypeoptions"/>
+      <van-dropdown-item v-model="transItem.recurringtime" :disabled="recurringTimeDisabled" :options="getRecurringTime()"/>
+    </van-dropdown-menu>
 
     <!-- Save Button-->
     <van-button type="primary" size="large" style="width:90%;margin:5%;" @click="saveNewTrans">Save</van-button>
@@ -162,6 +168,12 @@
         showToAccList:false,
         suggestListPop:false,
         showCalculator:false,
+        recurringtypeoptions:[
+          {text:'Daily',value:0},
+          {text:'Weekly',value:1},
+          {text:'Monthly',value:2},
+        ],
+        recurringTimeDisabled:true,
 
         //Display Variables
         transDate:'', //Default Display Date
@@ -344,6 +356,37 @@
             break;
         }
       },
+      recurringtypeChange(value){
+        if(value == 1){
+          this.transItem.recurringtime = 0;
+          this.recurringTimeDisabled = false;
+        }else if(value == 2){
+          this.transItem.recurringtime = 1;
+          this.recurringTimeDisabled = false;
+        }else{
+          this.transItem.recurringtime = '';
+          this.recurringTimeDisabled = true;
+        }
+      },
+      getRecurringTime(){
+        if(this.transItem.recurringtype==0){
+          let temp = [];
+          return temp; 
+        }else if(this.transItem.recurringtype==1){
+          let temp = [
+            {text:'Sunday',value:7},
+            {text:'Monday',value:1},
+            {text:'Tuesday',value:2},
+            {text:'Wednesday',value:3},
+            {text:'Thursday',value:4},
+            {text:'Friday',value:5},
+            {text:'Saturday',value:6},
+          ]
+          return temp;
+        }else if(this.transItem.recurringtype==2){
+          return this.getDays;
+        }
+      },
 
       //Save New Transaction
       saveNewTrans(){
@@ -415,6 +458,14 @@
 
     },
     computed:{
+      getDays(){
+        var days = [];
+        for(let i=0;i<31;i++) {
+          let tempitem = {text:days.length+1,value:days.length+1};
+          days.push(tempitem);
+        }
+        return days;
+      },
       getExpCat(){
         return this.$store.state.expCat;
       },

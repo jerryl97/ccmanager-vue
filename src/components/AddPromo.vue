@@ -23,7 +23,7 @@
       <van-field label="Description" clearable placeholder="Promotion's Description" v-model="promoItem.promodesc"/>
 
       <!--Duration-->
-      <van-switch-cell v-model="promoItem.duration" title="Active Duration" />
+      <van-switch-cell v-model="promoItem.duration" title="Promotion Period" />
       <!-- From Promo Date-->
       <div v-if="promoItem.duration == true">
       <van-field readonly clickable label="From" required :value="fromPromoDate" @click="showFromPromoDate = true" :error-message="fromDateErrorMsg" />
@@ -38,7 +38,7 @@
       </div>
 
       <!--Transactions Count-->
-      <van-cell title="Limited Usage">
+      <van-cell title="Minimum Swipe">
         <van-stepper v-model="promoItem.transcount" min="0"></van-stepper>
       </van-cell>
     </van-cell-group>
@@ -49,19 +49,21 @@
     </van-cell-group>
 
     <!-- Related Expense Categories-->
-    <van-checkbox-group v-model="expcatchecked" v-if="activeStep==2">
-      <van-cell-group title="Select Categories">
-        <van-cell title="Select All" clickable @click="expCatToggleAll()"/>
-        <van-cell v-for="(cat,index) in getExpCat" clickable :key="cat.expcatid" :title="cat.expCatName" @click="expCatToggle(index)">
-          <van-checkbox :name="cat.expcatid" ref="expcatcheckboxes" slot="right-icon"/>
-        </van-cell>
-        <van-cell title="+Add New Expense Category" style="font-style:italic;color:#555555" @click="showAddExpCat=true"/>
-          <van-popup v-model="showAddExpCat" position="bottom" style="{height:'100%'}">
-            <v-exp-category @closeManageExpCat="closeManageExpCat"/> 
-          </van-popup>
-        <van-field v-model="promoItem.expmemo" label="Memo" type="textarea" placeholder="Expenses' Memo" autosize rows="1"/>
-      </van-cell-group>
-    </van-checkbox-group>
+    <van-cell-group title="Select Categories" v-if="activeStep==2">
+      <van-cell title="Select All" clickable @click="toggleToggleAll()">
+        <van-checkbox ref="selectallcheckbox" v-model="expCatSelectAll" @change="expCatToggleAll" slot="right-icon"/>
+      </van-cell>
+      <van-checkbox-group v-model="expcatchecked" ref="expCatCheckboxesGroup">
+      <van-cell v-for="(cat,index) in getExpCat" clickable :key="cat.expcatid"  :title="cat.expCatName" @click="expCatToggle(index)">
+        <van-checkbox :name="cat.expcatid" slot="right-icon" ref="expcatcheckboxes" :disabled="expCatDisabled"/>
+      </van-cell>
+      </van-checkbox-group>
+      <van-cell title="+Add New Expense Category" style="font-style:italic;color:#555555" @click="showAddExpCat=true"/>
+        <van-popup v-model="showAddExpCat" position="bottom" style="{height:'100%'}">
+          <v-exp-category @closeManageExpCat="closeManageExpCat"/> 
+        </van-popup>
+      <van-field v-model="promoItem.expmemo" label="Memo" type="textarea" placeholder="Expenses' Memo" autosize rows="1"/>
+    </van-cell-group>
 
     <!-- Related Reward-->
     <van-checkbox-group v-model="rewardscatchecked" v-if="activeStep==3">
@@ -78,7 +80,7 @@
 
     <!-- Rewards Inputs-->
     <van-cell-group title="The value for the rewards" v-if="activeStep==4">
-      <van-field v-for="(input,index) in rewardsInputs" :label="input.rewardsCatName" v-model="input.rewardsValue"/>
+      <van-field v-for="(input,index) in rewardsInputs" placeholder="Enter a value" :label="input.rewardsCatName" v-model="input.rewardsValue"/>
     </van-cell-group>
 
     <!-- Next, Prev Button-->
@@ -112,6 +114,8 @@
           expmemo:'',
         },
         nextBtnText:'Next',
+        expCatSelectAll:false,
+        expCatDisabled:false,
 
         //Steps Initialize
         activeStep:0,
@@ -195,13 +199,21 @@
       },
       //Expense Categories Checkboxes toggle
       expCatToggle(index){ 
-        this.$refs.expcatcheckboxes[index].toggle(); 
+        if(this.expCatDisabled == false)
+          this.$refs.expcatcheckboxes[index].toggle(); 
+      },
+      toggleToggleAll(){
+        this.$refs.selectallcheckbox.toggle();
       },
       //Expense Categories Checkboxes toggle All
-      expCatToggleAll(){
-        for(let i=0;i<=this.getExpCat.length;i++){
-          this.$refs.expcatcheckboxes[i].toggle();
-        }  
+      expCatToggleAll(value){
+        if(value == true){
+          this.$refs.expCatCheckboxesGroup.toggleAll(true);
+          this.expCatDisabled = true;
+        }else{
+          this.$refs.expCatCheckboxesGroup.toggleAll(false);
+          this.expCatDisabled = false;
+        }
       },
       //Close Add Expense Categories
       closeManageExpCat(){

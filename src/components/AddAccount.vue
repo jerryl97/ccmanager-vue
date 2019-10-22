@@ -200,9 +200,9 @@
           this.$notify({message:'Account Added',type:'success',duration:3000});
           this.setDefault();
           this.back();
+          this.$emit("notifyDue");
         } 
       },
-
       //Add Account Validation
       saveValidation(value){
         let validstate = value; 
@@ -329,6 +329,9 @@
       },
       getAccGrps(){
         return this.$store.state.accGroups; 
+      },
+      getNotifyStats(){
+        return this.$store.state.getNotifyStats;
       }
     },
     mounted(){
