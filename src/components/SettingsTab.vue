@@ -119,6 +119,9 @@
   import PinInput from './PinInput.vue'
   import ChangePin from './ChangePin.vue'
 
+    //Import crypto-js
+  import CryptoJS from 'crypto-js';
+
   export default{
     data(){
       return{
@@ -197,7 +200,19 @@
               };
               let backupdata = JSON.stringify(this.getStateData);
               console.log(backupdata);
-              var blob = new Blob([backupdata],{type:'text/plain'});
+
+              //Encrypt Backup Data START
+              // Encrypt
+              let ciphertext = CryptoJS.AES.encrypt(backupdata, 'ccmamangerapplicationsecretkey').toString();
+              console.log(ciphertext);
+
+              // Decrypt
+              let bytes  = CryptoJS.AES.decrypt(ciphertext, 'ccmamangerapplicationsecretkey');
+              let originalText = bytes.toString(CryptoJS.enc.Utf8);
+              console.log(originalText); // 'my message'
+              //Encrypt Backup Data END
+
+              var blob = new Blob([ciphertext],{type:'text/plain'});
               fileWriter.write(blob);
             });
           });
@@ -214,7 +229,13 @@
           reader.readAsText(input.files[0]); 
         });
         readingpromise.then((result)=>{
-          let importedData = JSON.parse(result);
+          //Decrypt Backup from Drive START
+          let bytes  = CryptoJS.AES.decrypt(result, 'ccmamangerapplicationsecretkey');
+          let originalData = bytes.toString(CryptoJS.enc.Utf8);
+          console.log(originalText); // 'my message'
+          //Decrypt END
+
+          let importedData = JSON.parse(originalData);
           this.$store.commit('setAllStateData',importedData);
           this.$store.dispatch('storeAllStateData');
           this.$notify({
@@ -362,8 +383,12 @@
           });
           //get reader results from resolve, convert data into JavaScript readable data and commit backup to Vuex and database
           localBackupRead.then((result)=>{
-            console.log(result)
-            let importedData = JSON.parse(result);
+            //Decrypt Local Backup START
+            let bytes  = CryptoJS.AES.decrypt(result, 'ccmamangerapplicationsecretkey');
+            let originalData = bytes.toString(CryptoJS.enc.Utf8);
+            //Decrypt END
+
+            let importedData = JSON.parse(originalData);
             console.log(importedData)
             this.$store.commit('setAllStateData',importedData);
             this.$store.dispatch('storeAllStateData');
@@ -372,7 +397,7 @@
               type:'primary',
               duration:4000,
             });
-            this.$router.push('/acctrans/accounts');
+            this.showBackup=false;
           }); 
         }).catch(()=>{
           this.$dialog.close();

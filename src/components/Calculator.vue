@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-  <van-nav-bar title="Calculator" left-text="Back" left-arrow @click-left="back()" right-text="Confirm" @click-right="confirm()"/>
+  <van-nav-bar title="Calculator" left-text="Back" left-arrow @click-left="back()"/>
 
   <div class="calculator">
       <div id="result">
@@ -25,6 +25,9 @@
     <div id="equal" class="btn" @click="handleOp('=')">=</div>
   </div>
   </div>
+
+  <!-- Confirm Button-->
+  <van-button type="info" size="large" style="width:90%;margin-left:5%;margin-right:5%" @click="confirm()">Confirm</van-button>
 </div>
 </template>
 

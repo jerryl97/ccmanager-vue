@@ -1,7 +1,7 @@
 <template>
   <div style="padding-top:13%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()" fixed/>
+    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()" fixed right-text="SMS" @click-right="getSMS()"/>
 
     <!--Add Promotion Steps-->
     <van-steps :active="activeStep">
@@ -95,11 +95,49 @@
       </van-col>
     </van-row>
 
+    <!-- SMS Promotion Popup List -->
+    <van-popup v-model="showSMSPromos" position="bottom" :style="{ height: '100%' }">
+      <van-nav-bar title="SMS Promotions" left-text="Back" left-arrow @click-left="showSMSPromos = false" right-text="Keywords" @click-right="showKeywordManager=true"/>
+       <van-pull-refresh v-model="isLoading" @refresh="getSMS()">
+        <van-cell-group v-for="bank in bankSMS" :title="bank.bankName">
+          <div v-if="bank.length==0" style="background-color:white;text-align:center;margin-top:10%">
+            <i style="color:#bbbbbb">No promotions found from SMS.</i>
+          </div>
+          <van-cell v-for="SMS in bank.SMSContent" :title="SMS.address" :label="SMS.body" :border="true" clickable @click="selectSMS(SMS.body)"/>
+
+          <!-- Keyword manager popup -->
+          <van-popup v-model="showKeywordManager" position="bottom" style="{height:'100%'}">
+            <van-nav-bar title="SMS Search Keywords" left-text="Back" left-arrow @click-left="showKeywordManager=false" right-text="Add" @click-right="addKeywordPop=true,SMSNewKeyword=''" fixed/>
+
+            <!-- SMS Keyword List -->
+            <van-cell-group>
+              <van-cell v-for="(keyword, index) in SMSKeyword" :border="true" :title="keyword">
+                <template slot="default" v-if="index>=3">
+                  <van-button size="small" type="danger" @click="deleteKeyword(index)">Delete</van-button>
+                </template>
+              </van-cell>
+            </van-cell-group>
+
+            <!-- Add SMS Keyword Pop -->
+            <van-popup v-model="addKeywordPop" closeable position="bottom" :style="{ height: '20%' }">
+                <van-field v-model="SMSNewKeyword" required label="Keyword: " :error-message="errorMessage"/>
+
+                <van-button type="default" @click="addKeywordPop=false,SMSNewKeyword=''">Cancel</van-button>
+                <van-button type="primary" @click="saveNewKeyword">Save</van-button>
+            </van-popup>
+          </van-popup>
+          
+        </van-cell-group>
+      </van-pull-refresh>
+    </van-popup>
   </div>
 </template>
 <script>
   import ExpCategory from './ExpCategory.vue'
   import RewardCategory from './RewardsCategory.vue'
+
+  //Local Forage for saving keywords
+  import localForage from '../storage/storage.js'
 
   export default{
     data(){
@@ -149,6 +187,20 @@
         rewardsCat:[],
         rewardscatchecked:[],
         rewardsInputs:[], 
+
+        //SMS Promotions popup
+        showSMSPromos:false,
+        //Keyword manager popup
+        showKeywordManager:false,
+        //Add Keyword popup
+        addKeywordPop:false,
+
+        bankSMS:[],
+        SMSKeyword:['CIMB', 'HLB', 'PB Card'],
+        SMSNewKeyword:'',
+        errorMessage:'',
+        savedSMSKeyword:[],
+        isLoading:false
       }
     },
     methods:{
@@ -319,7 +371,110 @@
         this.$store.dispatch('storeAllStateData');
         this.$notify({message:'Promotion Added', type:'success', duration:3000});
         this.back(); 
-      }
+      },
+
+      //SMS Promotion START
+      //get Promotions from SMS
+      getSMS(){
+        this.showSMSPromos=true;
+        this.showKeywordManager=false;
+        this.addKeywordPop=false;
+
+        this.bankSMS=[];
+
+        //async requirement, may have to init SMSKeyword with local forage inside promise
+        let populateSMS = new Promise((resolve)=>{
+
+          localForage.getItem('keyword').then(value=>{
+            if(value!=null){
+              console.log('Get saved data called');
+              this.savedSMSKeyword = value;
+
+              //filter duplicates
+              let filter = this.SMSKeyword.concat(value.filter((item) => this.SMSKeyword.indexOf(item) < 0));
+              this.SMSKeyword = filter;
+              console.log(this.SMSKeyword);
+              resolve('Populated SMS');
+            }
+          });
+        }).then((msg)=>{
+          console.log(msg);
+          this.SMSKeyword.forEach(keyword => {
+            this.SMSReader(keyword);
+          });
+
+          console.log(this.bankSMS);
+          this.isLoading=false;
+        });
+      },
+
+      //SMS Plugin Reader call
+      SMSReader(keyword){
+        smsreader.filterBody([keyword]).then((sms)=>{
+          if(sms.length!=0){
+            // Fetches all SMS, with body containing words 'PB Card'.
+            let bankSMSObj={
+              bankName:'',
+              SMSContent:[]
+            };
+
+            bankSMSObj.bankName = keyword;
+            bankSMSObj.SMSContent = bankSMSObj.SMSContent.concat(sms);
+
+            this.bankSMS.push(bankSMSObj);
+          } else {
+            console.log('SMS search by keyword: ' + keyword + ' returns empty result');
+          }
+        },(err)=>{
+            console.error(err);
+        });
+      },
+
+      //Populate add promo description with SMS body content
+      selectSMS(SMSBody){
+        this.promoItem.promodesc = SMSBody;
+        this.showSMSPromos = false;
+      },
+
+      //Add keyword
+      saveNewKeyword(){
+        if(this.SMSNewKeyword=='')
+          this.errorMessage = 'Please input a name';
+        else{
+          this.savedSMSKeyword.push(this.SMSNewKeyword);
+        
+          //localforage set saved keywords
+          let saveKeywordPromise = new Promise((resolve)=>{
+            localForage.setItem('keyword', this.savedSMSKeyword);
+            resolve('Save complete');
+          }).then((msg)=>{
+            console.log(msg);
+            this.SMSNewKeyword=''
+            this.getSMS();
+          });
+        }
+      },
+
+      //Delete keyword
+      deleteKeyword(index){
+        //Confirm Delete dialog
+        this.$dialog.confirm({
+          message:'Delete this keyword? ' + this.SMSKeyword[index]
+        }).then(()=>{
+          //Minus 3 is from the default 3 keywords
+          this.savedSMSKeyword.splice(index-3, 1);
+          this.SMSKeyword.splice(index, 1);
+
+          let deletePromise = new Promise((resolve)=>{
+            localForage.setItem('keyword', this.savedSMSKeyword);
+            resolve('Delete complete');
+          }).then((msg)=>{
+            console.log(msg);
+            this.getSMS();
+          });
+        });
+      },
+      //SMS Promotion END
     },
     computed:{
       getAccounts(){

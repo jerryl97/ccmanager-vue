@@ -2453,14 +2453,14 @@ textarea {
 .van-sidebar-item--select {
   color: #323233;
   font-weight: 500;
-  border-color: #ee0a24;
+  border-color: #50e8aa;
 }
 .van-sidebar-item--select::after {
   border-right-width: 1px;
 }
 .van-sidebar-item--select,
 .van-sidebar-item--select:active {
-  background-color: #FADBD8;
+  background-color: #d8faec;
 }
 .van-sidebar-item--disabled {
   color: #c8c9cc;
@@ -3621,7 +3621,7 @@ textarea {
 .van-tree-select__content {
   flex: 2;
   overflow-y: auto;
-  background-color: #FADBD8;
+  background-color: #d8faec;
   -webkit-overflow-scrolling: touch;
 }
 .van-tree-select__item {
