@@ -155,6 +155,6 @@ export default{
   components:{
     'v-add-promo':AddPromo,
     'v-edit-promo':EditPromo,
-  }
+  },
 }
 </script>

@@ -531,10 +531,13 @@ export default new Vuex.Store({
         //Check Minimum
         if(x.minimum <= value.transamount){
           //Check Duration
-          if(x.duration==false || (x.duration==true&&Vue.Vue.moment(value.transdate).isBetween(x.fromdate,x.todate))){
+          if(x.duration==false || (x.duration==true&&Vue.moment(value.transdate).isBetween(x.fromdate,x.todate))){
             //Check Expense Category
             if(x.rltexpense.includes(value.transcat)){
-              return x; 
+              //Check Limit Usage
+              if(x.transcount>0){
+                return x; 
+                }
               }
             }
           }

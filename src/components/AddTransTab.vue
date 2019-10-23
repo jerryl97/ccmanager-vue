@@ -55,12 +55,13 @@
         <!--Suggested Accounts' Promotion-->
         <van-cell-group v-if="activeAccIndex==0&&activeAccId!=''&&expAccSelect[0].children.length>0" title="Promotions of this account">
           <van-collapse v-model="activePromoNames" accordion>
+            <van-checkbox-group v-model="promochecked">
             <van-collapse-item v-for="(promo,index) in relatedPromo" :label="promo.promodesc" :name="promo.promoid">
               <div slot="title"> 
                 {{promo.promotitle}}
               </div>
               <div slot="value"> 
-                Minimum: $ {{promo.minimum}}
+                Minimum: $ {{promo.minimum}}<br/>
               </div>
               <div slot="default">
                 <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
@@ -69,10 +70,12 @@
                 <span v-if="promo.expmemo!=''">{{promo.expmemo}}<br/></span>
                 <span>Accounts: {{getAccName(promo.rltacc)}}</span><br/>
                 <span>Rewards: {{getRewardsName(promo.rltrewards)}}</span><br/>
-                <van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
-                <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>
+                <van-checkbox :name="promo.promoid">Use for this transaction</van-checkbox>
+                <!--<van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
+                <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>-->
               </div>
             </van-collapse-item>
+            </van-checkbox-group>
           </van-collapse>
         </van-cell-group>
         </div>
@@ -188,6 +191,7 @@ import Calculator from './Calculator.vue'
           {text:'Monthly',value:2},
         ],
         recurringTimeDisabled:true,
+        promochecked:[],
 
         //Display Variables
         transDate:this.$moment(new Date()).format('DD MMMM YYYY'), //Default Display Date
@@ -447,6 +451,12 @@ import Calculator from './Calculator.vue'
           if(this.transItem.type=='Transfer'){
             this.transItem.account = '';
             this.transItem.category = '';
+          }
+
+          for(let i in this.promochecked){
+            let temp = this.getPromo.find(o => o.promoid == this.promochecked[i]); 
+            temp.transcount = temp.transcount - 1;
+            this.$store.commit('editPromo',temp);
           }
           this.$store.commit('addTrans',this.transItem);
           this.$store.dispatch('storeAllStateData');
