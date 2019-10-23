@@ -22,11 +22,11 @@
   },
   "dependencies": {
     "chart.js": "^2.8.0",
-    "core-js": "^2.6.5",
+    "core-js": "^2.6.10",
     "crypto-js": "^3.1.9-1",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
-    "vant": "^2.2.7",
+    "vant": "^2.2.9",
     "vue": "^2.6.10",
     "vue-chartjs": "^3.4.2",
     "vue-float-action-button": "^0.6.4",
@@ -35,9 +35,9 @@
     "vuex": "^3.1.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.11.0",
-    "@vue/cli-plugin-eslint": "^3.11.0",
-    "@vue/cli-service": "^3.11.0",
+    "@vue/cli-plugin-babel": "^3.12.1",
+    "@vue/cli-plugin-eslint": "^3.12.1",
+    "@vue/cli-service": "^3.12.1",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",

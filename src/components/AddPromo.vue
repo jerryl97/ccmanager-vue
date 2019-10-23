@@ -106,8 +106,8 @@
           <van-cell v-for="SMS in bank.SMSContent" :title="SMS.address" :label="SMS.body" :border="true" clickable @click="selectSMS(SMS.body)"/>
 
           <!-- Keyword manager popup -->
-          <van-popup v-model="showKeywordManager" position="bottom" style="{height:'100%'}">
-            <van-nav-bar title="SMS Search Keywords" left-text="Back" left-arrow @click-left="showKeywordManager=false" right-text="Add" @click-right="addKeywordPop=true,SMSNewKeyword=''" fixed/>
+          <van-popup v-model="showKeywordManager" position="bottom" :style="{ height:'100%' }">
+            <van-nav-bar title="SMS Search Keywords" left-text="Back" left-arrow @click-left="showKeywordManager=false" right-text="Add" @click-right="addKeywordPop=true,SMSNewKeyword=''"/>
 
             <!-- SMS Keyword List -->
             <van-cell-group>
@@ -395,6 +395,8 @@
               this.SMSKeyword = filter;
               console.log(this.SMSKeyword);
               resolve('Populated SMS');
+            } else {
+              resolve('No keyword found, get default');
             }
           });
         }).then((msg)=>{

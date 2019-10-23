@@ -31,7 +31,7 @@
        <van-popup
         v-model="showCalculator"
         position="bottom"
-        :style="{ height: '90%' }"
+        :style="{ height: '100%' }"
       >
         <calculator @closeCalculator="closeCalculator" @confirmCalculator="confirmCalculator"></calculator>
       </van-popup>
