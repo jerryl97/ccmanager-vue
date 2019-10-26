@@ -1,55 +1,71 @@
 <template>
   <div style="margin-bottom:20%">
-    <van-tabs type="card" v-model="transtab" style="padding-top:5%">
+    <div style="background-color:#f6f6f6;color:#333333;padding-bottom:5px">
+     <van-row style="text-align:center;padding:10px" type="flex" align="center">
+       <van-col span="3">
+         <van-icon name="arrow-left" @click="changeMonth('prev')"/>
+       </van-col>
+       <van-col span="18">
+         <strong>{{getDateFormatted(currentMonth)}}</strong>
+       </van-col>
+       <van-col span="3">
+         <van-icon name="arrow" @click="changeMonth('next')"/>
+       </van-col>
+     </van-row>
+
+     <van-row style="text-align:center" type="flex" align="center">
+       <van-col span="8">
+         <span style="font-size:15px;color:#7acc7a"><strong>Income $</strong><br/>{{monthTotalInc}}</span>
+       </van-col>
+       <van-col span="8">
+         <span style="font-size:15px;color:#FF3434"><strong>Expense $</strong><br/>{{monthTotalExp}}</span>
+       </van-col>
+       <van-col span="8">
+         <span style="font-size:15px"><strong>Total $</strong><br/>{{monthTotal}}</span>
+       </van-col>
+     </van-row>
+    </div>
+ 
+    <van-tabs background="#f6f6f6" title-active-color="#07c160" title-inactive-color="#333333" color="#07c160" v-model="transtab">
 
     <!--Summary-->
-    <van-tab title="Summary">
+    <van-tab>
+      <template slot="title">
+        <van-icon name="orders-o"/>
+        Summary
+      </template>
     
     <!-- Add Transaction Float Action Button-->
-    <vue-fab v-if="!isProfile" :hidden="hideAddTransFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
+    <vue-fab v-if="!isProfile" :hidden="hideAddTransFab" icon="icon-plus" size="big" shadow="false" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
 
-    <!-- Transaction Summary-->
-    <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">
-      {{getDateFormatted(currentMonth)}}
-    </van-divider>
-    
-    <van-row style="text-align:center" type="flex" align="center">
-      <van-col span="3">
-        <van-icon name="arrow-left" @click="changeMonth('prev')"/>
-      </van-col>
-      <van-col span="6" style="background-color:#f1f9f1">
-        <span style="font-size:13px;color:#7acc7a">Income<br/>$ {{monthTotalInc}}</span>
-      </van-col>
-      <van-col span="6" style="background-color:#ffeaea">
-        <span style="font-size:13px;color:#FF3434">Expense<br/>$ {{monthTotalExp}}</span>
-      </van-col>
-      <van-col span="6" style="background-color:#eaeaea">
-        <span style="font-size:13px">Total<br/>$ {{monthTotal}}</span>
-      </van-col>
-      <van-col span="3">
-        <van-icon name="arrow" @click="changeMonth('next')"/>
-      </van-col>
-    </van-row>
     
     <!-- Transaction List-->
     <div style="margin-bottom:40px;">
       <van-collapse v-model="activeNames" accordion>
-        <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :title="key" :name="key">
+        <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :name="key">
+           <template slot="title">
+             <strong>{{key}}</strong>
+           </template>
+           <template slot="value">
+             <span style="color:#7acc7a">Inc: {{getDateSummary(key,'Income')}}</span>
+             &nbsp &nbsp
+             <span style="color:#FF3434">Exp: {{getDateSummary(key,'Expense')}}</span>
+           </template>
          <van-swipe-cell v-for="one in trans" :on-close="transOnClose" :name="one.transid">
-            <van-cell clickable style="background-color:#f9f9f9" size="small" is-link arrow-direction="left" @click="showEditTrans(one)">
+            <van-cell id="transcell" clickable size="small" is-link arrow-direction="left" @click="showEditTrans(one)">
               <!--Not Transfer-->
               <template v-if="one.type!='Transfer'" slot="title">
                 <span style="font-size:13px" v-if="one.contents!=''">{{one.contents}}<br/></span>
                 <van-tag plain type="danger" v-if="one.type=='Expense'">{{getCatName(one.type,one.category)}}</van-tag> 
                 <van-tag plain type="success" v-if="one.type=='Income'">{{getCatName(one.type,one.category)}}</van-tag> 
-                <van-tag plain>{{getAccName(one.account)}}</van-tag> 
+                <van-tag plain>{{getAccName(one.account)}}</van-tag><br/>
               </template>
 
               <!-- Is Transfer-->
               <template slot="label" v-if="one.type=='Transfer'">
-                <span>{{getAccName(one.fromaccount)}}&nbsp</span>
+                <van-tag plain>{{getAccName(one.fromaccount)}}&nbsp</van-tag>
                 <van-icon name="arrow"/>
-                <span>{{getAccName(one.toaccount)}}&nbsp</span>
+                <van-tag plain>{{getAccName(one.toaccount)}}&nbsp</van-tag>
               </template>
               <template v-if="one.type=='Transfer'" slot="title">
                 <span style="font-size:13px" v-if="one.contents!=''">{{one.contents}}<br/></span>
@@ -57,9 +73,9 @@
               </template>
 
               <template slot="default">
-                <span style="color:#FF3434" v-if="one.type=='Expense'">$ {{one.amount}}<br/></span>
-                <span style="color:#7acc7a" v-if="one.type=='Income'">$ {{one.amount}}<br/></span>
-                <span style="color:#4da6ff" v-if="one.type=='Transfer'">$ {{one.amount}}<br/></span>
+                <span style="color:#FF3434;font-size:17px" v-if="one.type=='Expense'">- {{one.amount}}<br/></span>
+                <span style="color:#7acc7a;font-size:17px" v-if="one.type=='Income'">+ {{one.amount}}<br/></span>
+                <span style="color:#4da6ff;font-size:17px" v-if="one.type=='Transfer'">{{one.amount}}<br/></span>
                 <van-tag plain v-if="one.recurring == true" type="warning">Recurring</van-tag>
                 <van-tag plain v-if="one.recurring == true" type="warning">{{getRecurringTime(one)}}</van-tag>
               </template>
@@ -68,34 +84,28 @@
               <van-button type="danger" text="Delete"/>
             </template>
          </van-swipe-cell>
-         <div slot="value">
-           <span style="color:#7acc7a">$ {{getDateSummary(key,'Income')}}</span>
-           &nbsp &nbsp
-           <span style="color:#FF3434">$ {{getDateSummary(key,'Expense')}}</span>
-         </div>
         </van-collapse-item>
       </van-collapse>
       </div>
       </van-tab>
 
       <!-- Statistics -->
-      <van-tab title="Statistics">
-        <van-row style="text-align:center;margin-top:15px" type="flex" align="center">
-          <van-col span="3">
-            <van-icon name="arrow-left" @click="changeMonth('prev')"/>
-          </van-col>
-          <van-col span="18">
-            {{getDateFormatted(currentMonth)}}
-          </van-col>
-          <van-col span="3">
-            <van-icon name="arrow" @click="changeMonth('next')"/>
-          </van-col>
-        </van-row>
+      <van-tab>
+        <template slot="title">
+          <van-icon name="bar-chart-o"/>
+          Statistics
+        </template>
         <van-dropdown-menu>
           <van-dropdown-item v-model="statsmode" :options="statsmodeoptions"/>   
         </van-dropdown-menu>
+
         <v-expense-chart v-if="statsmode==0" :expdata="setChartData(getMonthly('Expense'),'Expense')"></v-expense-chart>
+
         <v-income-chart v-if="statsmode==1" :incdata="setChartData(getMonthly('Income'),'Income')"></v-income-chart>
+
+        <v-totalstats-chart v-if="statsmode==2" :totaldata="setChartData(getTotalStatsData('Expense'),'ExpTotalStats')"/>
+        <v-totalstats-chart v-if="statsmode==2" :totaldata="setChartData(getTotalStatsData('Income'),'IncTotalStats')"/>
+
         <van-cell-group v-if="statsmode==0">
           <van-cell v-for="cat in getMonthly('Expense')" :title="getCatName('Expense',cat.category)" :value="'$' + cat.expensesum"/>
         </van-cell-group>
@@ -115,6 +125,7 @@
   import EditTrans from './EditTrans.vue'
   import ExpenseChart from './ExpenseChart.vue'
   import IncomeChart from './IncomeChart.vue'
+  import TotalStatsChart from './TotalStatsChart.vue'
 
   export default{
     data(){
@@ -133,13 +144,14 @@
         statsmodeoptions:[
           {text:'Expense',value:0},
           {text:'Income',value:1},
+          {text:'Total Stats',value:2},
         ],
       }
     },
     methods:{
       //Add Transaction Button
       addTransButton(){
-        this.$router.push("/addtrans");
+        this.$router.push("/main/addtrans");
       },
 
       //Show Edit Account
@@ -176,10 +188,14 @@
         let temp = this.getAccounts.find(o=>o.accid==value);
         if(temp == null || temp==undefined)
           return "Deleted Account";
-        else
-          return temp.name;
-      },
-
+        else{
+          if(temp.accgroup == 1 || temp.accgroup == 2)
+            return temp.name+'('+temp.last4digits+')';
+          else
+            return temp.name
+        }
+      },      
+              
       //Get Category Name
       getCatName(type,value){
         switch(type){
@@ -242,12 +258,13 @@
           return trans.recurringtime;
         }
       },
+
       //Get Monthly Expense & Income
       getMonthly(type){
         let temp = [];
         if(this.isProfile)
            temp = _.filter(this.getTrans, x=>{
-            return x.account == this.acc.accid || x.fromaccount == this.acc.accid || x.toaccount == this.acc.accid;
+            return x.account == this.selectedAccid || x.fromaccount == this.selectedAccid || x.toaccount == this.selectedAccid;
           }); 
         else
           temp = this.getTrans;
@@ -283,11 +300,55 @@
         return tempList; 
       },
 
+      getTotalStatsData(type){
+        let resultdata = [];
+        let temp = [];
+        if(this.isProfile)
+           temp = _.filter(this.getTrans, x=>{
+            return x.account == this.selectedAccid || x.fromaccount == this.selectedAccid || x.toaccount == this.selectedAccid;
+          }); 
+        else
+          temp = this.getTrans;
+        switch(type){
+          case 'Expense':
+            let expfiltered = _.filter(temp,x=>{
+              return x.type == "Expense";
+            });
+            let expsorted = expfiltered.sort((a,b)=>{
+              return a.date - b.date;
+            });
+            let expgrouped = _.groupBy(expsorted,group=>{
+              return this.$moment(group.date).format('MMM YYYY');
+            });
+            resultdata = _.map(expgrouped,(obj,keys)=>({
+              'month':keys,
+              'sum':_.sumBy(obj,'amount')
+            }));
+            break;
+          case 'Income':
+            let incfiltered = _.filter(temp,x=>{
+              return x.type == "Income";
+            });
+            let incsorted = incfiltered.sort((a,b)=>{
+              return a.date - b.date;
+            });
+            let incgrouped = _.groupBy(incsorted,group=>{
+              return this.$moment(group.date).format('MMM YYYY');
+            });
+            resultdata = _.map(incgrouped,(obj,keys)=>({
+              'month':keys,
+              'sum':_.sumBy(obj,'amount')
+            }));
+            break;
+        }
+        return resultdata;
+      },
       //Set Data for Charts
       setChartData(data,type){
         let forchartdata = {
           labels:[],
           data:[],
+          label:'',
         }
         switch(type){
           case 'Expense':
@@ -304,6 +365,21 @@
             forchartdata.data.push(data[j].incomesum);
             }  
             break;
+          case 'ExpTotalStats':
+            for(let j in data){
+              forchartdata.labels.push(data[j].month);
+              forchartdata.data.push(data[j].sum);
+            }
+            forchartdata.label = 'Expense';
+            break;
+          case 'IncTotalStats':
+            for(let j in data){
+              forchartdata.labels.push(data[j].month);
+              forchartdata.data.push(data[j].sum);
+            }
+            forchartdata.label = 'Income';
+            break;
+
         }
         return forchartdata;
       },
@@ -341,7 +417,7 @@
         let temp = [];
         if(this.isProfile)
            temp = _.filter(this.getTrans, x=>{
-            return x.account == this.acc.accid || x.fromaccount == this.acc.accid || x.toaccount == this.acc.accid;
+            return x.account == this.selectedAccid || x.fromaccount == this.selectedAccid || x.toaccount == this.selectedAccid;
           }); 
         else
           temp = this.getTrans;
@@ -357,7 +433,7 @@
           return b.date - a.date;
         });
         let grouped = _.groupBy(tempList,group=>{
-          return this.$moment(group.date).format('DD MMMM YYYY');
+          return this.$moment(group.date).format('DD MMM YYYY');
         });
         this.dateSummary = [];
         for(let i in grouped){
@@ -370,7 +446,7 @@
               incTotal += grouped[i][j].amount;          
           }
           let summary = {
-            date:this.$moment(grouped[i][0].date).format('DD MMMM YYYY'),
+            date:this.$moment(grouped[i][0].date).format('DD MMM YYYY'),
             exptotal:expTotal,
             inctotal:incTotal
           }
@@ -393,8 +469,9 @@
     components:{
       'v-edit-trans':EditTrans,
       'v-expense-chart':ExpenseChart,
-      'v-income-chart':IncomeChart
+      'v-income-chart':IncomeChart,
+      'v-totalstats-chart':TotalStatsChart,
     },
-    props:['acc','isProfile']
+    props:['selectedAccid','isProfile']
   }
 </script>

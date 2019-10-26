@@ -7,8 +7,8 @@
     <van-cell-group>
       <van-cell v-for="(cat,key) in getIncCat" :border="true" :title="cat.incCatName">
         <template slot="default" v-if="cat.inccatid!=3">
-          <van-button size="small" type="primary" plain @click="editIncCat(key)">Edit</van-button>
-          <van-button size="small" type="danger" @click="deleteIncCat(key)">Delete</van-button>
+          <van-button size="small" type="primary" @click="editIncCat(key)" icon="edit">Edit</van-button>
+          <van-button size="small" type="danger" @click="deleteIncCat(key)" icon="delete">Delete</van-button>
         </template>
       </van-cell>
     </van-cell-group>
@@ -59,6 +59,7 @@
       },
       //Add Income Category Pop
       addIncCat(){
+        this.setDefault();
         this.addIncCatPop=true;
         this.isEdit=false;
       },

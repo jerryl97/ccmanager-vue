@@ -4,23 +4,31 @@
       <i style="color:#bbbbbb">Please add a new account.</i>
     </div>
     <!--Add Account Float Action Button-->
-    <vue-fab :hidden="hideAddAccFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
+    <vue-fab :hidden="hideAddAccFab" icon="icon-plus" shadow="false" size="big" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
 
     <!--Accounts List-->
     <div>
       <van-cell-group v-for="(group,key) in getGroupedAccounts" >
-        <van-cell :title="getGroupName(key)" style="background-color:#f9f9f9" size="large" :value="getGroupSummary(key)" />
+        <van-cell style="background-color:#f9f9f9">
+          <template slot="title">
+            <strong>{{getGroupName(key)}}</strong>
+          </template>
+          <template slot="default">
+            <span v-if="key == 1">Due: <span :style="{color:getOutstdColor(getTotalDue(key))}">{{getTotalDue(key)}}</span></span>&nbsp
+            <span v-if="key == 1">Outstd: <span :style="{color:getOutstdColor(getTotalOutstd(key))}">{{getTotalOutstd(key)}}</span></span>
+            <span v-if="key != 1">Total: <span :style="{color:getBalanceColor(getTotalBalace(key))}">{{getTotalBalace(key)}}</span></span>
+          </template>
         </van-cell>
         <van-swipe-cell v-for="acc in group" :on-close="accOnClose" :name="acc.accid">
-          <van-cell v-if="key!=1&&key!=2" is-link arrow-direction="left" @click="showAccProfile(acc)">
+          <van-cell v-if="key!=1&&key!=2" is-link arrow-direction="left" @click="showAccProfile(acc.accid)">
           <template slot="title">
             <span>{{acc.name}}</span>
           </template>
           <template slot="default">
-            <span :style="{color:getBalanceColor(acc.balance)}">$ {{acc.balance}}</span>
+            <span :style="{color:getBalanceColor(acc.balance)}">{{acc.balance}}</span>
           </template>
           </van-cell>
-          <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccProfile(acc)">
+          <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccProfile(acc.accid)">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
@@ -30,20 +38,20 @@
           </template>
           <template slot="default">
             <span>
-              Outstd. <span :style="{color:getOutstdColor(acc.outstdbalance)}">${{acc.outstdbalance}}</span>
+              Outstd: <span :style="{color:getOutstdColor(acc.outstdbalance)}">{{acc.outstdbalance}}</span>
               <br/>
-              Due <span :style="{color:getOutstdColor(acc.dueamount)}">${{acc.dueamount}}</span>
+              Due: <span :style="{color:getOutstdColor(acc.dueamount)}">{{acc.dueamount}}</span>
             </span>
           </template>
         </van-cell>
-        <van-cell v-if="key==2" is-link arrow-direction="left" @click="showAccProfile(acc)">
+        <van-cell v-if="key==2" is-link arrow-direction="left" @click="showAccProfile(acc.accid)">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
           <template slot="label">
           </template>
           <template slot="default">
-            <span :style="{color:getBalanceColor(acc.balance)}">${{acc.balance}}</span>
+            <span :style="{color:getBalanceColor(acc.balance)}">{{acc.balance}}</span>
           </template>
         </van-cell>
         <template slot="right">
@@ -59,7 +67,7 @@
     </van-popup>
     <!--Edit Account Page(Popup)-->
     <van-popup v-model="accProfilePop" position="bottom" :style="{height:'100%'}">
-      <v-account-profile @closeAccProfile="closeAccProfile" :acc="selectedAcc"></v-account-profile>
+      <v-account-profile @closeAccProfile="closeAccProfile" :selectedAccid="selectedAccid"></v-account-profile>
     </van-popup>
   </div>
 </template>
@@ -79,7 +87,7 @@
         hideAddAccFab:false,
         accGroupSummary:[],
         accProfilePop:false,
-        selectedAcc:'',
+        selectedAccid:'',
       }
     },
 
@@ -96,10 +104,10 @@
         this.addAccPop = false; 
       },
       //Show Account Profile
-      showAccProfile(acc){
+      showAccProfile(accid){
           this.accProfilePop = true;
           this.hideAddAccFab = true;
-          this.selectedAcc = acc;
+          this.selectedAccid = accid;
       },
       //Close Account Profile
       closeAccProfile(){
@@ -114,13 +122,20 @@
         else
           return temp.groupName; 
       },
-      //Get Each Group Balance Summary
-      getGroupSummary(group){
+      getTotalDue(group){
+        let result = this.accGroupSummary.find(item => item.group == group);
+        if(group == 1)
+          return result.duetotal;
+      },
+      getTotalOutstd(group){
+        let result = this.accGroupSummary.find(item => item.group == group);
+        if(group == 1)
+          return result.outstdtotal;
+      },
+      getTotalBalace(group){
         let result = this.accGroupSummary.find(item => item.group == group);
         if(group != 1)
-          return '$ '+ result.balancetotal;
-        else
-          return  '$ '+ result.duetotal +'  $ '+ result.outstdtotal; 
+          return result.balancetotal; 
       },
       getBalanceColor(value){
         if(value > 0)
@@ -128,7 +143,7 @@
         else if(value<0)
           return '#FF3434';
         else if(value == 0)
-          return '#33333';
+          return '#333333';
       },
       getOutstdColor(value){
         if(value < 0)
@@ -136,7 +151,7 @@
         else if(value > 0)
           return '#FF3434';
         else if(value == 0)
-          return '#33333'; 
+          return '#333333'; 
       },
 
       //SwipeCell onClose Account Delete

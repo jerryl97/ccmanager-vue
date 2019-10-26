@@ -535,7 +535,7 @@ export default new Vuex.Store({
             //Check Expense Category
             if(x.rltexpense.includes(value.transcat)){
               //Check Limit Usage
-              if(x.transcount>0){
+              if(x.maxtranscount==0 || (x.maxtranscount!=0&&x.transcount>0)){
                 return x; 
                 }
               }

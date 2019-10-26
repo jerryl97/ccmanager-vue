@@ -1203,6 +1203,9 @@ textarea {
   border-bottom: 1px solid #ebedf0;
   transform: scaleY(0.5);
 }
+#transcell{
+  border: 1px solid #eee;
+}
 .van-cell--borderless::after {
   display: none;
 }
@@ -1665,7 +1668,7 @@ textarea {
   height: 46px;
   line-height: 46px;
   text-align: center;
-  background-color: #fff;
+  background-color: #f6f6f6;
   user-select: none;
 }
 .van-nav-bar .van-icon {
@@ -2262,7 +2265,7 @@ textarea {
 .van-tabs__nav {
   position: relative;
   display: flex;
-  background-color: #fff;
+  background-color: #f6f6f6;
   user-select: none;
 }
 .van-tabs__nav--line {
@@ -3412,6 +3415,8 @@ textarea {
   padding: 0 16px;
   color: #1989fa;
   font-size: 14px;
+  background-color:transparent;
+  border:0;
 }
 .van-picker__cancel:active,
 .van-picker__confirm:active {

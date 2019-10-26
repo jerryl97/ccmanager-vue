@@ -7,8 +7,8 @@
     <van-cell-group>
       <van-cell v-for="(cat,key) in getExpCat" :border="true" :title="cat.expCatName">
         <template slot="default" v-if="cat.expcatid!=3">
-          <van-button size="small" type="primary" plain @click="editExpCat(key)">Edit</van-button>
-          <van-button size="small" type="danger" @click="deleteExpCat(key)">Delete</van-button>
+          <van-button size="small" type="primary" @click="editExpCat(key)" icon="edit">Edit</van-button>
+          <van-button size="small" type="danger" @click="deleteExpCat(key)" icon="delete">Delete</van-button>
         </template>
       </van-cell>
     </van-cell-group>
@@ -59,6 +59,7 @@
       },
       //Add Expense Category Pop
       addExpCat(){
+        this.setDefault();
         this.addExpCatPop=true;
         this.isEdit=false;
       },

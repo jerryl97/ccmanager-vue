@@ -1,10 +1,15 @@
 <template>
   <div style="padding:13% 0%">
     <!-- Top Nav Bar -->
-    <van-nav-bar :title="title" fixed/>
+    <van-nav-bar :title="title" fixed>
+      <template slot="title">
+        <van-icon color="#333333" name="point-gift-o"/>&nbsp
+        <strong>{{title}}</strong>
+      </template>
+    </van-nav-bar>
 
     <!-- Add Promotions Button-->
-    <vue-fab :hidden="hideAddPromoFab" icon="icon-plus" size="normal" style="margin-bottom:20%" @clickMainBtn="showAddPromo"/>
+    <vue-fab :hidden="hideAddPromoFab" icon="icon-plus" size="big" style="margin-bottom:20%" @clickMainBtn="showAddPromo"/>
 
     <!--Add Promotions Page(Popup)-->
     <van-popup v-model="addPromoPop" position="bottom" :style="{height:'100%'}">
@@ -15,21 +20,21 @@
     <van-collapse v-model="activePromoNames" accordion>
       <van-collapse-item v-for="(promo,index) in getPromo" :label="promo.promodesc" :name="promo.promoid">
         <div slot="title"> 
-          {{promo.promotitle}}
+          <strong>{{promo.promotitle}}</strong>
         </div>
         <div slot="value"> 
           Minimum: $ {{promo.minimum}}
         </div>
         <div slot="default">
           <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
-          <span v-if="promo.transcount!=0">Limit: {{promo.transcount}} times <br/></span>
+          <span v-if="promo.transcount!=0">Minimum Swipe: {{promo.transcount}}/{{promo.maxtranscount}} times <br/></span>
           <span v-if="promo.rltexpense.length != getExpCat.length">Categories: {{getExpenseName(promo.rltexpense)}}<br/></span>
           <span v-if="promo.rltexpense.length == getExpCat.length">Categories: All<br/></span>
           <span v-if="promo.expmemo!=''">{{promo.expmemo}}</br></span>
           <span>Accounts: {{getAccName(promo.rltacc)}}</span></br>
           <span>Rewards: {{getRewardsName(promo.rltrewards)}}</span></span><br/>
-          <van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
-          <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>
+          <van-button type="info" size="mini" @click="showEditPromo(promo)" icon="edit">Edit</van-button>
+          <van-button type="danger" icon="delete" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>
         </div>
       </van-collapse-item>
     </van-collapse>

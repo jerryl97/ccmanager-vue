@@ -7,8 +7,8 @@
     <van-cell-group>
       <van-cell v-for="(cat,key) in getRewardsCat" :border="true" :title="cat.rewardsCatName">
         <template slot="default" v-if="cat.rewardscatid!=3">
-          <van-button size="small" type="primary" plain @click="editRewardsCat(key)">Edit</van-button>
-          <van-button size="small" type="danger" @click="deleteRewardsCat(key)">Delete</van-button>
+          <van-button size="small" type="primary" @click="editRewardsCat(key)" icon="edit">Edit</van-button>
+          <van-button size="small" type="danger" @click="deleteRewardsCat(key)" icon="delete">Delete</van-button>
         </template>
       </van-cell>
     </van-cell-group>
@@ -59,6 +59,7 @@
       },
       //Add Rewards Category Pop
       addRewardsCat(){
+        this.setDefault();
         this.addRewardsCatPop=true;
         this.isEdit=false;
       },

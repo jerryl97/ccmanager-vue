@@ -7,8 +7,8 @@
       <van-cell-group>
         <van-cell v-for="(group,key) in getAccGrps" :border="true" :title="group.groupName">
           <template slot="default" v-if="group.grpid!=1&&group.grpid!=2&&group.grpid!=3&&group.grpid!=4">
-            <van-button size="small" type="primary" plain @click="editAccGroup(key)">Edit</van-button>
-            <van-button size="small" type="danger" @click="deleteAccGroup(key)">Delete</van-button>
+            <van-button size="small" type="primary" @click="editAccGroup(key)" icon="edit">Edit</van-button>
+            <van-button size="small" type="danger" @click="deleteAccGroup(key)" icon="delete">Delete</van-button>
           </template>
         </van-cell>
       </van-cell-group>

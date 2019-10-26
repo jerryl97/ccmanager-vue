@@ -1,16 +1,29 @@
 <template>
   <div id="settingmaindiv">
     <!--Top Navbar-->
-    <van-nav-bar :title="title" fixed/>
+    <van-nav-bar fixed>
+      <template slot="title">
+        <van-icon color="#333333" name="setting-o"/>&nbsp
+        <strong>{{title}}</strong>
+      </template>
+    </van-nav-bar>
 
     <!--Accounts Section-->
-    <van-cell-group title="Accounts">
+    <van-cell-group>
+      <template slot="title">
+        <van-icon name="credit-pay"/>&nbsp
+        <span>Accounts</span>
+      </template>
       <!--Managing Account Groups-->
       <van-cell title="Manage Account Groups" @click="showManageAccGroups=true" is-link/>
     </van-cell-group>
 
     <!--Tranactions Section-->
-    <van-cell-group title="Transactions">
+    <van-cell-group>
+      <template slot="title">
+        <van-icon name="bars"/>&nbsp
+        <span>Transactions</span>
+      </template>
       <!--Managing Expense Categories-->
       <van-cell title="Manage Expense Categories" @click="showManageExpCat=true" is-link/>
       <!--Managing Income Categories-->
@@ -20,13 +33,21 @@
     </van-cell-group>
 
     <!--Promotions Section-->
-    <van-cell-group title="Promotions">
+    <van-cell-group>
+      <template slot="title">
+        <van-icon name="point-gift-o"/>&nbsp
+        <span>Promotions</span>
+      </template>
       <!--Managing Rewards Categories-->
       <van-cell title="Manage Rewards Categories" @click="showManageRewards=true" is-link/>
     </van-cell-group>
 
     <!--Data Section-->
-    <van-cell-group title="Data">
+    <van-cell-group>
+      <template slot="title">
+        <van-icon name="points"/>&nbsp
+        <span>Data</span>
+      </template>
       <!--Backup Data-->
       <van-cell title="Backup Data" @click="backupAllData()" is-link/>
       <!--Local Backup Manager-->
@@ -41,17 +62,30 @@
     </van-cell-group>
 
     <!--Notification Section-->
-    <van-cell-group title="Notification">
+    <van-cell-group>
+      <template slot="title">
+        <van-icon name="comment-o"/>&nbsp
+        <span>Notification</span>
+      </template>
       <van-switch-cell v-model="getNotifyStats" :title="getNotifyStatsTitle(getNotifyStats)" @change="notifyTrigger"/>
     </van-cell-group>
+
     <!--Security Section-->
-    <van-cell-group title="Security">
+    <van-cell-group>
+      <template slot="title">
+        <van-icon name="warn-o"/>&nbsp
+        <span>Security</span>
+      </template>
       <van-switch-cell v-model="getPinStat" :title="getPinStatTitle(getPinStat)" @change="pinTrigger"/>
       <van-cell title="Change Pincode" @click="changePinTrigger" is-link/>
     </van-cell-group>
 
     <!--Feedback Form-->
-    <van-cell-group title="Google Form Feedback">
+    <van-cell-group>
+      <template slot="title">
+        <van-icon name="records"/>&nbsp
+        <span>Feedback</span>
+      </template>
       <!--Google Form Feedback Plugin link button-->
       <van-cell title="Feedback Form Link" is-link url="https://forms.gle/TBRfbhW6KRT9m9R78"/>
     </van-cell-group>
@@ -232,7 +266,7 @@
           //Decrypt Backup from Drive START
           let bytes  = CryptoJS.AES.decrypt(result, 'ccmamangerapplicationsecretkey');
           let originalData = bytes.toString(CryptoJS.enc.Utf8);
-          console.log(originalText); // 'my message'
+          //console.log(originalText); // 'my message'
           //Decrypt END
 
           let importedData = JSON.parse(originalData);

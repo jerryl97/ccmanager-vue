@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Tabs -->
-    <van-tabs v-model="active" sticky>
+    <van-tabs color="#07c160" title-active-color="#07c160" v-model="active" sticky>
       <!--Accounts Tab-->
       <van-tab>
         <div slot="title">
@@ -14,7 +14,7 @@
       <!-- Transactions Tab-->
       <van-tab>
         <div slot="title">
-          <van-icon name="orders-o"/>
+          <van-icon name="bars"/>
             Transactions
         </div>
         <v-transactions :acc="acc" :isProfile="isProfile" />

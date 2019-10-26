@@ -236,6 +236,11 @@
             this.pduedateError="Please insert payment due date";
             validstate = true;
           }
+          if(this.accItem.sdate>this.accItem.pduedate){
+            this.sdateError="Payment due date must later than statement date";
+            this.pduedateError="Payment due date must later than statement date"; 
+            validstate = true;
+          }
         }else if(this.accItem.accgroup=='Debit Card'){
           if(this.accItem.name==null){
             this.accNameError="Please insert name of the account";
@@ -269,10 +274,13 @@
       getAccGrps(){
         return this.$store.state.accGroups; 
       },
+      getAccounts(){
+        return this.$store.state.allAccounts;
+      }
     },
     watch:{
-      acc(){
-        this.accItem = this.acc;
+      selectedAccid(){
+        this.accItem = Object.assign({},this.getAccounts.find(o=>o.accid == this.selectedAccid));  
         if(this.accItem){
         let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
         this.displayAccGroup = temp.groupName;
@@ -285,12 +293,14 @@
         if(this.accItem.accgroup == 1){
             this.displaySDate = this.accItem.sdate.substring(0,2);
             this.displayPDueDate = this.accItem.pduedate.substring(0,2);
+            this.accItem.sdate = parseInt(this.displaySDate);
+            this.accItem.pduedate = parseInt(this.displayPDueDate);
           }
         }
       }
     },
     mounted(){
-       this.accItem = this.acc;
+        this.accItem = Object.assign({},this.getAccounts.find(o=>o.accid == this.selectedAccid));  
        if(this.accItem){
         let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
         this.displayAccGroup = temp.groupName;
@@ -303,9 +313,11 @@
         if(this.accItem.accgroup == 1){
             this.displaySDate = this.accItem.sdate.substring(0,2);
             this.displayPDueDate = this.accItem.pduedate.substring(0,2);
+            this.accItem.sdate = parseInt(this.displaySDate);
+            this.accItem.pduedate = parseInt(this.displayPDueDate);
         }
       }
     },
-    props:['acc']
+    props:['selectedAccid']
   }
 </script> 

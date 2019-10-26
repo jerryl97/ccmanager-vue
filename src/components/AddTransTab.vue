@@ -1,7 +1,12 @@
 <template>
   <div style="padding-top:13%">
     <!--Top Navbar-->
-    <van-nav-bar :title="title" fixed/>
+    <van-nav-bar :title="title" fixed>
+      <template slot="title">
+        <van-icon color="#333333" name="add-o"/>&nbsp
+        <strong>{{title}}</strong>
+      </template>
+    </van-nav-bar>
 
     <van-cell-group>
     <!--Field for Transaction Type(with Popup Picker)-->
@@ -84,7 +89,7 @@
 
     <!-- Field for Account(Income)-->
     <div v-if="transItem.type=='Income'">
-       <van-field readonly required clickable :error-message="accountError" label="From" placeholder="Choose an account" :value="displayIncAccount" @click="showIncAccList = true"/>
+       <van-field readonly required clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayIncAccount" @click="showIncAccList = true"/>
        <van-popup v-model="showIncAccList" position="bottom">
           <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
             <i style="color:#aaaaaa">Please add a new account.</i>
@@ -128,7 +133,7 @@
     <van-field v-model="transItem.contents" label="Contents" type="textarea" rows="1" autosize />
 
     <!-- Recurring -->
-    <van-switch-cell v-model="transItem.recurring" title="Recurring" active-color="green" inactive-color="red"/>
+    <van-switch-cell v-model="transItem.recurring" title="Recurring" active-color="#07c160" inactive-color="#f6f6f6"/>
 
     <!-- Recurring Options-->
     <van-dropdown-menu v-if="transItem.recurring == true">
@@ -356,25 +361,37 @@ import Calculator from './Calculator.vue'
          switch(type){
            case 'account':
              this.transItem.account = value;
-             this.displayAccount = temp.name;
+             if(temp.accgroup!=1&&temp.accgroup!=2)
+              this.displayAccount = temp.name;
+             else
+              this.displayAccount = temp.name+'('+temp.last4digits+')';
              this.showAccList = false;
              this.activeAccId = '';
              break;
             case 'incaccount':
              this.transItem.account = value;
-             this.displayIncAccount = temp.name;
+             if(temp.accgroup!=1&&temp.accgroup!=2)
+              this.displayIncAccount = temp.name;
+             else
+              this.displayIncAccount = temp.name+'('+temp.last4digits+')';
              this.showIncAccList = false;
              this.activeAccId = '';
              break;
             case 'fromaccount':
              this.transItem.fromaccount = value;
-             this.displayFromAccount = temp.name;
+             if(temp.accgroup!=1&&temp.accgroup!=2)
+              this.displayFromAccount = temp.name;
+             else
+              this.displayFromAccount = temp.name+'('+temp.last4digits+')';
              this.showFromAccList = false;
              this.activeAccId = '';
              break;
             case 'toaccount':
              this.transItem.toaccount = value;
-             this.displayToAccount = temp.name;
+             if(temp.accgroup!=1&&temp.accgroup!=2)
+              this.displayToAccount = temp.name;
+             else
+              this.displayToAccount = temp.name+'('+temp.last4digits+')';
              this.showToAccList = false;
              this.activeAccId = '';
              break;
@@ -455,8 +472,10 @@ import Calculator from './Calculator.vue'
 
           for(let i in this.promochecked){
             let temp = this.getPromo.find(o => o.promoid == this.promochecked[i]); 
-            temp.transcount = temp.transcount - 1;
-            this.$store.commit('editPromo',temp);
+            if(temp.maxtranscount!=0){
+              temp.transcount = temp.transcount - 1;
+              this.$store.commit('editPromo',temp);
+            }
           }
           this.$store.commit('addTrans',this.transItem);
           this.$store.dispatch('storeAllStateData');
@@ -470,7 +489,7 @@ import Calculator from './Calculator.vue'
       addTransValidation(value){
         let validstate = value;
         if(this.transItem.type != 'Transfer'){
-          if(this.transItem.category==null){
+          if(this.transItem.category==''){
             this.categoryError = "Please choose a category";
             validstate=true;
           }
@@ -541,11 +560,27 @@ import Calculator from './Calculator.vue'
           temp.children = [];
           for(let j in accounts){
             if(accounts[j].accgroup == accgrps[i].grpid){
-              let tempAcc = {
-                text:accounts[j].name,
-                id:accounts[j].accid
-              };
-              temp.children.push(tempAcc); 
+              if(accounts[j].accgroup!=1&&accounts[j].accgroup!=2){
+                let tempAcc = {
+                  text:accounts[j].name+' ($'+accounts[j].balance+')',
+                  id:accounts[j].accid
+                };
+                temp.children.push(tempAcc); 
+              }else{
+                if(accounts[j].accgroup==2){
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')'+'($'+accounts[j].balance+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }else{
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }
+              }
             }
           }
           if(temp.children.length>0)
@@ -563,14 +598,30 @@ import Calculator from './Calculator.vue'
           temp.text=accgrps[i].groupName;
           temp.children = [];
           for(let j in accounts){
-            if(accounts[j].accgroup == accgrps[i].grpid){
-              let tempAcc = {
-                text:accounts[j].name,
-                id:accounts[j].accid
-              };
-              temp.children.push(tempAcc); 
-            }
-          }
+            if(accounts[j].accgroup == accgrps[i].grpid){        
+              if(accounts[j].accgroup!=1&&accounts[j].accgroup!=2){
+                let tempAcc = {
+                  text:accounts[j].name+' ($'+accounts[j].balance+')',
+                  id:accounts[j].accid
+                };
+                temp.children.push(tempAcc); 
+              }else{
+                if(accounts[j].accgroup==2){
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')'+'($'+accounts[j].balance+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }else{
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }
+              }
+              }
+            }       
           if(temp.children.length>0)
             temp.info = temp.children.length;
           grouped.push(temp);

@@ -34,7 +34,13 @@
 
        <van-field v-model="transItem.contents" label="Contents" type="textarea" rows="1" autosize />
 
-       <van-switch-cell v-model="transItem.recuring" title="Recuring" active-color="green" inactive-color="red"/>
+       <van-switch-cell v-model="transItem.recurring" title="Recurring" active-color="green" inactive-color="red"/>
+
+    <!-- Recurring Options-->
+    <van-dropdown-menu v-if="transItem.recurring == true">
+      <van-dropdown-item v-model="transItem.recurringtype" @change="recurringtypeChange" :options="recurringtypeoptions"/>
+      <van-dropdown-item v-model="transItem.recurringtime" :disabled="recurringTimeDisabled" :options="getRecurringTime()"/>
+    </van-dropdown-menu>
 
        <van-button type="primary" size="large" style="width:90%;margin:5%;" @click="saveNewTrans">Save</van-button>
     </van-cell-group>
@@ -55,12 +61,20 @@
           date:new Date(),
           amount:0,
           contents:'',
+          recurringtype:0,
+          recurringtime:'',
         },
         transDate:this.$moment(new Date()).format('DD MMMM YYYY'), //Default Display Date
         showTransDate:false,
 
         transAmount:'',
         showCalculator:false,
+        recurringtypeoptions:[
+          {text:'Daily',value:0},
+          {text:'Weekly',value:1},
+          {text:'Monthly',value:2},
+        ],
+        recurringTimeDisabled:true,
 
         showFromAccList:false,
         displayFromAccount:'',
@@ -141,6 +155,38 @@
         }
       },
 
+      recurringtypeChange(value){
+        if(value == 1){
+          this.transItem.recurringtime = 0;
+          this.recurringTimeDisabled = false;
+        }else if(value == 2){
+          this.transItem.recurringtime = 7;
+          this.recurringTimeDisabled = false;
+        }else{
+          this.transItem.recurringtime = '';
+          this.recurringTimeDisabled = true;
+        }
+      },
+      getRecurringTime(){
+        if(this.transItem.recurringtype==0){
+          let temp = [];
+          return temp; 
+        }else if(this.transItem.recurringtype==1){
+          let temp = [
+            {text:'Sunday',value:7},
+            {text:'Monday',value:1},
+            {text:'Tuesday',value:2},
+            {text:'Wednesday',value:3},
+            {text:'Thursday',value:4},
+            {text:'Friday',value:5},
+            {text:'Saturday',value:6},
+          ]
+          return temp;
+        }else if(this.transItem.recurringtype==2){
+          return this.getDays;
+        }
+      },
+
       //Save New Transaction
       saveNewTrans(){
         let hasError = false;
@@ -189,11 +235,27 @@
           temp.children = [];
           for(let j in accounts){
             if(accounts[j].accgroup == accgrps[i].grpid){
-              let tempAcc = {
-                text:accounts[j].name,
-                id:accounts[j].accid
-              };
-              temp.children.push(tempAcc); 
+              if(accounts[j].accgroup!=1&&accounts[j].accgroup!=2){
+                let tempAcc = {
+                  text:accounts[j].name+' ($'+accounts[j].balance+')',
+                  id:accounts[j].accid
+                };
+                temp.children.push(tempAcc); 
+              }else{
+                if(accounts[j].accgroup==2){
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')'+'($'+accounts[j].balance+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }else{
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }
+              }
             }
           }
           if(temp.children.length>0)
@@ -205,26 +267,30 @@
     },
     watch:{
       settleDueOrOutstd(){
+        this.transItem.toaccount = this.selectedAccid;
+        let tempAcc = this.getAccounts.find(o=>o.accid==this.selectedAccid);
+        this.displayToAccount = tempAcc.name+'('+tempAcc.last4digits+')';
         if(this.settleDueOrOutstd==false){
-          this.transAmount = this.acc.outstdbalance.toString();
+          this.transAmount = tempAcc.outstdbalance.toString();
           this.transItem.contents = 'Settle Outstanding Amount';
         } 
         else if(this.settleDueOrOutstd==true){
-          this.transAmount = this.acc.dueamount.toString();
+          this.transAmount = tempAcc.dueamount.toString();
           this.transItem.contents = 'Settle Due Amount';
         }
       }
     },
     mounted(){
       this.accSelect = this.getGroupedAccounts;
-      this.transItem.toaccount = this.acc.accid;
-      this.displayToAccount = this.acc.name;
+      this.transItem.toaccount = this.selectedAccid;
+      let tempAcc = this.getAccounts.find(o=>o.accid==this.selectedAccid);
+      this.displayToAccount = tempAcc.name;
       if(this.settleDueOrOutstd==false){
-        this.transAmount = this.acc.outstdbalance.toString();
+        this.transAmount = tempAcc.outstdbalance.toString();
         this.transItem.contents = 'Settle Outstanding Amount';
       }
       else if(this.settleDueOrOutstd==true){
-        this.transAmount = this.acc.dueamount.toString();
+        this.transAmount = tempAcc.dueamount.toString();
         this.transItem.contents = 'Settle Due Amount';
       }
       
@@ -232,7 +298,7 @@
     components:{
       "calculator":Calculator
     },
-    props:['acc','settleDueOrOutstd']
+    props:['selectedAccid','settleDueOrOutstd']
   
   }
 </script>

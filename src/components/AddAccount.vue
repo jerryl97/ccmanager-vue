@@ -138,6 +138,7 @@
 
       //Back to Account Page
       back(){
+        this.setDefault();
         this.$emit("closeAddAcc") ;
       },
 
@@ -198,7 +199,6 @@
           this.$store.commit('addAccount',this.accItem);
           this.$store.dispatch('storeAllStateData');
           this.$notify({message:'Account Added',type:'success',duration:3000});
-          this.setDefault();
           this.back();
           this.$emit("notifyDue");
         } 
@@ -225,6 +225,11 @@
           }
           if(this.accItem.pduedate==null){
             this.pduedateError="Please insert payment due date";
+            validstate = true;
+          }
+          if(this.accItem.sdate>this.accItem.pduedate){
+            this.sdateError="Payment due date must later than statement date";
+            this.pduedateError="Payment due date must later than statement date"; 
             validstate = true;
           }
         }else if(this.accItem.accgroup=='Debit Card'){

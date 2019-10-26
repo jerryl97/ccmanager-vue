@@ -59,7 +59,7 @@
       </van-cell>
       </van-checkbox-group>
       <van-cell title="+Add New Expense Category" style="font-style:italic;color:#555555" @click="showAddExpCat=true"/>
-        <van-popup v-model="showAddExpCat" position="bottom" style="{height:'100%'}">
+        <van-popup v-model="showAddExpCat" position="bottom" :style="{height:'100%'}">
           <v-exp-category @closeManageExpCat="closeManageExpCat"/> 
         </van-popup>
       <van-field v-model="promoItem.expmemo" label="Memo" type="textarea" placeholder="Expenses' Memo" autosize rows="1"/>
@@ -72,7 +72,7 @@
           <van-checkbox :name="cat.rewardscatid" ref="rewardscatcheckboxes" slot="right-icon"/>
         </van-cell>
         <van-cell title="+Add New Reward Category" style="font-style:italic;color:#555555" @click="showAddRewardCat=true"/>
-          <van-popup v-model="showAddRewardCat" position="bottom" style="{height:'100%'}">
+          <van-popup v-model="showAddRewardCat" position="bottom" :style="{height:'100%'}">
             <v-rewards-category @closeManageRewardsCat="closeManageRewardsCat"/> 
           </van-popup>
       </van-cell-group>
@@ -149,6 +149,7 @@
           duration:false,
           promodesc:'',
           transcount:0,
+          maxtranscount:0,
           expmemo:'',
         },
         nextBtnText:'Next',
@@ -359,6 +360,7 @@
       },
       //Save New Promotion
       saveNewPromo(){
+        this.promoItem.maxtranscount = this.promoItem.transcount;
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
         this.promoItem.rltrewards = this.rewardsInputs;
@@ -492,11 +494,19 @@
           temp.children = [];
           for(let j in accounts){
             if(accounts[j].accgroup == accgrps[i].grpid){
-              let tempAcc = {
-                text:accounts[j].name,
-                id:accounts[j].accid
-              };
-              temp.children.push(tempAcc); 
+              if(accounts[j].accgroup!=1&&accounts[j].accgroup!=2){
+                let tempAcc = {
+                  text:accounts[j].name,
+                  id:accounts[j].accid
+                };
+                temp.children.push(tempAcc); 
+              }else{
+                let tempAcc = {
+                  text:accounts[j].name+'('+accounts[j].last4digits+')',
+                  id:accounts[j].accid
+                };
+                temp.children.push(tempAcc); 
+              }
             }
           }
           if(temp.children.length>0)

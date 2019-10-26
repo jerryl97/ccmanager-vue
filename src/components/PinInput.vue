@@ -1,16 +1,18 @@
 <template>
   <div style="height:100%;width:100%;position:absolute;background-color:#f3f3f9;"> 
     <van-nav-bar v-if="fromSetting == true" title="Enter Pincode" left-text="Back" left-arrow @click-left="back()"/>
-    <p style="text-align:center">Enter your 4-digit Pincode</p>
-    <!--Pin Password Input -->
-    <van-password-input
-      :value="value"
-      :length="4"
-      :gutter="15"
-      :focused="showKeyboard"
-      @focus="showKeyboard = true"
-      :error-info="pinErrorMSg"
-    />
+    <div style="position:relative;top:30px">
+      <p style="text-align:center">Enter your 4-digit Pincode</p>
+      <!--Pin Password Input -->
+      <van-password-input
+        :value="value"
+        :length="4"
+        :gutter="15"
+        :focused="showKeyboard"
+        @focus="showKeyboard = true"
+        :error-info="pinErrorMSg"
+      />
+    </div>
     <!-- NumberKeyboard -->
     <van-number-keyboard
       :show="showKeyboard"
