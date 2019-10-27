@@ -515,7 +515,7 @@ import Calculator from './Calculator.vue'
         this.showCalculator=false
       },
       confirmCalculator(calcResult){
-        this.transAmount = calcResult;
+        this.transAmount = parseFloat(calcResult);
         this.showCalculator=false;
       }
 

@@ -21,6 +21,7 @@
     <div class="btn" @click="handleDigit(2)">2</div>
     <div class="btn" @click="handleDigit(3)">3</div>
     <div class="btn" @click="handleOp('+')">+</div>
+    <div id="dot" class="btn" @click="handleDot()">.</div>
     <div id="zero" class="btn" @click="handleDigit(0)">0</div>
     <div id="equal" class="btn" @click="handleOp('=')">=</div>
   </div>
@@ -35,14 +36,14 @@
 export default {
   data() {
     return {
-      currentValue: 0,
+      currentValue: '0',
       savedValue: false,
       currentOp: false
     }
   },
   methods: {
     clear () {
-      this.currentValue = 0
+      this.currentValue = '0'
       this.savedValue = false
       this.currentOp = false
     },
@@ -50,7 +51,19 @@ export default {
       if (this.currentOp === '=') {
         this.savedValue = false
       }
-      this.currentValue = this.currentValue * 10 + digit
+
+      if (this.currentValue === '0') {
+        this.currentValue = ''
+        this.currentValue += digit
+      } 
+      else {
+        this.currentValue += digit
+      }
+    },
+    handleDot () {
+      if(this.currentValue.indexOf(".") === -1){
+        this.currentValue = this.currentValue.concat('.');
+      }
     },
     handleOp (op){
       if (this.currentOp) {
@@ -59,10 +72,14 @@ export default {
       else {
         this.savedValue = this.currentValue
       }
-      this.currentValue = 0
+      this.currentValue = ''
       this.currentOp = op      
     },
     process() {
+      //parse to float before running any calculations
+      this.currentValue = parseFloat(this.currentValue);
+      this.savedValue = parseFloat(this.savedValue);
+
       if (this.currentOp === '+') {
         this.savedValue += this.currentValue
       }
@@ -78,8 +95,11 @@ export default {
       else if (this.currentOp === '=' && this.currentValue) {
         this.savedValue = this.currentValue
       }
-      this.currentValue = 0
+      this.currentValue = ''
       this.currentOp = false
+
+      //round of to 2 decimal place
+      this.savedValue = Number(Math.round(this.savedValue+'e'+2)+'e-'+2)
     },
     back(){
       this.$emit('closeCalculator');
@@ -153,7 +173,7 @@ body{
   grid-column: 1/4;
 }
 #zero{
-  grid-column: 1/4;
+  grid-column: 2/4;
 }
 #equal{
   background: seagreen;
