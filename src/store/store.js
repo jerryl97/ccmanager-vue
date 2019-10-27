@@ -17,7 +17,11 @@ const getDefaultState = ()=>{
       {groupName:'Credit Card',grpid:1},
       {groupName:'Debit Card',grpid:2},
       {groupName:'Cash',grpid:3},
+      {groupName:'Savings',grpid:5},
+      {groupName:'Top-Up/Prepaid',grpid:6},
+      {groupName:'Investments',grpid:7},
       {groupName:'Other',grpid:4},
+
     ],
     maxAccGrpId:0,
 
@@ -30,6 +34,11 @@ const getDefaultState = ()=>{
     expCat:[
       {expCatName:'Food',expcatid:1},
       {expCatName:'Movies',expcatid:2},
+      {expCatName:'Transportation',expcatid:4},
+      {expCatName:'Entertainment',expcatid:5},
+      {expCatName:'Health',expcatid:6},
+      {expCatName:'Petrol',expcatid:7},
+      {expCatName:'Household',expcatid:8},
       {expCatName:'Other',expcatid:3}, 
     ],
     maxExpCatId:0,
@@ -38,6 +47,9 @@ const getDefaultState = ()=>{
     incCat:[
       {incCatName:'Bonus',inccatid:1},
       {incCatName:'Salary',inccatid:2},
+      {incCatName:'Allowance',inccatid:4},
+      {incCatName:'Petty Cash',inccatid:5},
+      {incCatName:'Dividends',inccatid:6},
       {incCatName:'Other',inccatid:3}, 
     ],
     maxIncCatId:0,
@@ -50,6 +62,7 @@ const getDefaultState = ()=>{
     rewardsCat:[
       {rewardsCatName:'Discount',rewardscatid:1},
       {rewardsCatName:'Cashback',rewardscatid:2},
+      {rewardsCatName:'Lucky Draw',rewardscatid:4},
       {rewardsCatName:'Other',rewardscatid:3}, 
     ],
     maxRewardsCatId:0,
