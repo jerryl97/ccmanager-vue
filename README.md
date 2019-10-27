@@ -2,6 +2,11 @@
 
 <br>
 
+<p>GitHub Webpage: <a src="https://github.com/jerryl97/ccmanager-vue">HERE</a></p>
+<p>Download the Android APK: <a src="https://github.com/jerryl97/ccmanager-vue/releases/download/1.0/ccmanager.apk">HERE</a></p>
+
+<br>
+
 <p align="center">
   <img src="https://user-images.githubusercontent.com/23553138/65384809-60f4e200-dd59-11e9-9f34-5024639c9888.PNG">
 </p>
