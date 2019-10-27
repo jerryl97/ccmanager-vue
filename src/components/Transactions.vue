@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-bottom:20%">
+  <div>
     <div style="background-color:#f6f6f6;color:#333333;padding-bottom:5px">
      <van-row style="text-align:center;padding:10px" type="flex" align="center">
        <van-col span="3">
@@ -29,18 +29,16 @@
     <van-tabs background="#f6f6f6" title-active-color="#07c160" title-inactive-color="#333333" color="#07c160" v-model="transtab">
 
     <!--Summary-->
-    <van-tab>
+    <van-tab> 
       <template slot="title">
         <van-icon name="orders-o"/>
         Summary
       </template>
-    
     <!-- Add Transaction Float Action Button-->
-    <vue-fab v-if="!isProfile" :hidden="hideAddTransFab" icon="icon-plus" size="big" shadow="false" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
-
+    <vue-fab v-if="!isProfile" :hidden="hideAddTransFab" icon="icon-plus" size="big" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
     
     <!-- Transaction List-->
-    <div style="margin-bottom:40px;">
+    <div>
       <van-collapse v-model="activeNames" accordion>
         <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :name="key">
            <template slot="title">

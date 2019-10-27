@@ -1,6 +1,11 @@
 <template>
   <div style="padding-top:13%">
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" fixed/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="addRecurTrans" fixed>
+      <template slot="right">
+        <van-icon name="plus" size="15px"/>
+        <span style="color:#1989fa;font-size:15px">Add</span>
+      </template>
+    </van-nav-bar>
 
     <div style="margin-bottom:40px;">
       <van-collapse v-model="activeNames" accordion>
@@ -66,6 +71,10 @@
     methods:{
       back(){
         this.$emit("closeRecurringTrans");
+      },
+      addRecurTrans(){
+        this.$emit("closeRecurringTrans");
+        this.$router.push({path:'/main/addtrans'});
       },
       //Get Accounts Name
       getAccName(value){

@@ -1,7 +1,13 @@
 <template>
   <div style="padding-top:13%">
     <!-- Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Delete" @click-right="deleteAcc()" fixed/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="deleteAcc()" fixed>
+      <template slot="right">
+        <van-icon name="delete" size="15px"/>
+        <span style="color:#1989fa;font-size:15px">Delete</span>
+      </template>
+    </van-nav-bar>
+
 
     <van-cell-group>
 

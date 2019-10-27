@@ -3,8 +3,8 @@
     <!-- Top Nav Bar-->
     <van-nav-bar :title="getTitle(selectedAccount)" left-text="Back" left-arrow @click-left="back()" @click-right="showEditAcc" fixed>
       <template slot="right">
-        <van-icon name="edit" size="18px"/>&nbsp
-        <span style="color:#1989fa;font-size:14px">Edit</span>
+        <van-icon name="edit" size="15px"/>
+        <span style="color:#1989fa;font-size:15px">Edit</span>
       </template>
     </van-nav-bar>
 
