@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!--A View for Router Pages-->
-    <router-view @notifyDue="notifyDue" @scheduleRecurringTrans="scheduleRecurringTrans"></router-view>
+    <router-view></router-view>
 
   </div>
 </template>

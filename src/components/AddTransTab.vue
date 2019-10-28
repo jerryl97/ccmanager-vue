@@ -130,7 +130,7 @@
     </div>
     
     <!-- Field for Contents-->
-    <van-field v-model="transItem.contents" label="Contents" type="textarea" rows="1" autosize />
+    <van-field v-model="transItem.contents" clearable label="Contents" type="textarea" rows="1" autosize />
 
     <!-- Recurring -->
     <van-switch-cell v-model="transItem.recurring" title="Recurring" active-color="#07c160" inactive-color="#f6f6f6"/>
@@ -167,7 +167,7 @@ import Calculator from './Calculator.vue'
           contents:'',
           amount:0,
           recurringtype:0,
-          recurringtime:'',
+          recurringtime:0,
 
         },
         transOptions:['Expense','Income','Transfer'],
@@ -426,10 +426,10 @@ import Calculator from './Calculator.vue'
       },
       recurringtypeChange(value){
         if(value == 1){
-          this.transItem.recurringtime = 0;
+          this.transItem.recurringtime = 7;
           this.recurringTimeDisabled = false;
         }else if(value == 2){
-          this.transItem.recurringtime = 7;
+          this.transItem.recurringtime = 1;
           this.recurringTimeDisabled = false;
         }else{
           this.transItem.recurringtime = '';

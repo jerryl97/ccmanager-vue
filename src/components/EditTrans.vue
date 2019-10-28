@@ -502,11 +502,27 @@
           temp.children = [];
           for(let j in accounts){
             if(accounts[j].accgroup == accgrps[i].grpid){
-              let tempAcc = {
-                text:accounts[j].name,
-                id:accounts[j].accid
-              };
-              temp.children.push(tempAcc); 
+              if(accounts[j].accgroup!=1&&accounts[j].accgroup!=2){
+                let tempAcc = {
+                  text:accounts[j].name+' ($'+accounts[j].balance+')',
+                  id:accounts[j].accid
+                };
+                temp.children.push(tempAcc); 
+              }else{
+                if(accounts[j].accgroup==2){
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')'+'($'+accounts[j].balance+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }else{
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }
+              }
             }
           }
           if(temp.children.length>0)
@@ -525,11 +541,27 @@
           temp.children = [];
           for(let j in accounts){
             if(accounts[j].accgroup == accgrps[i].grpid){
-              let tempAcc = {
-                text:accounts[j].name,
-                id:accounts[j].accid
-              };
-              temp.children.push(tempAcc); 
+              if(accounts[j].accgroup!=1&&accounts[j].accgroup!=2){
+                let tempAcc = {
+                  text:accounts[j].name+' ($'+accounts[j].balance+')',
+                  id:accounts[j].accid
+                };
+                temp.children.push(tempAcc); 
+              }else{
+                if(accounts[j].accgroup==2){
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')'+'($'+accounts[j].balance+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }else{
+                  let tempAcc = {
+                    text:accounts[j].name+'('+accounts[j].last4digits+')',
+                    id:accounts[j].accid
+                  };
+                  temp.children.push(tempAcc); 
+                }
+              }
             }
           }
           if(temp.children.length>0)

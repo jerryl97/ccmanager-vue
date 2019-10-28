@@ -4,11 +4,11 @@
       <i style="color:#bbbbbb">Please add a new account.</i>
     </div>
     <!--Add Account Float Action Button-->
-    <vue-fab :hidden="hideAddAccFab" icon="icon-plus" shadow="false" size="big" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
+    <vue-fab :hidden="hideAddAccFab" icon="icon-plus"  size="big" style="margin-bottom:20%" @clickMainBtn="showAddAcc"/>
 
     <!--Accounts List-->
     <div>
-      <van-cell-group v-for="(group,key) in getGroupedAccounts" >
+      <van-cell-group v-for="(group,key) in getGroupedAccounts">
         <van-cell style="background-color:#f9f9f9">
           <template slot="title">
             <strong>{{getGroupName(key)}}</strong>
@@ -20,7 +20,7 @@
           </template>
         </van-cell>
         <van-swipe-cell v-for="acc in group" :on-close="accOnClose" :name="acc.accid">
-          <van-cell v-if="key!=1&&key!=2" is-link arrow-direction="left" @click="showAccProfile(acc.accid)">
+          <van-cell v-if="key!=1&&key!=2" is-link arrow-direction="left" @click="showAccProfile(acc)">
           <template slot="title">
             <span>{{acc.name}}</span>
           </template>
@@ -28,7 +28,7 @@
             <span :style="{color:getBalanceColor(acc.balance)}">{{acc.balance}}</span>
           </template>
           </van-cell>
-          <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccProfile(acc.accid)">
+          <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccProfile(acc)">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
@@ -44,7 +44,7 @@
             </span>
           </template>
         </van-cell>
-        <van-cell v-if="key==2" is-link arrow-direction="left" @click="showAccProfile(acc.accid)">
+        <van-cell v-if="key==2" is-link arrow-direction="left" @click="showAccProfile(acc)">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
@@ -67,7 +67,7 @@
     </van-popup>
     <!--Edit Account Page(Popup)-->
     <van-popup v-model="accProfilePop" position="bottom" :style="{height:'100%'}">
-      <v-account-profile @closeAccProfile="closeAccProfile" :selectedAccid="selectedAccid"></v-account-profile>
+      <v-account-profile @closeAccProfile="closeAccProfile" :acc="selectedAcc"></v-account-profile>
     </van-popup>
   </div>
 </template>
@@ -87,12 +87,12 @@
         hideAddAccFab:false,
         accGroupSummary:[],
         accProfilePop:false,
-        selectedAccid:'',
+        selectedAcc:'',
+        groupedAccList:[],
       }
     },
 
     methods:{
- 
       //Show Add Account Pop Up
       showAddAcc(){
         this.hideAddAccFab = true;
@@ -104,10 +104,10 @@
         this.addAccPop = false; 
       },
       //Show Account Profile
-      showAccProfile(accid){
+      showAccProfile(acc){
           this.accProfilePop = true;
           this.hideAddAccFab = true;
-          this.selectedAccid = accid;
+          this.selectedAcc = acc;
       },
       //Close Account Profile
       closeAccProfile(){
@@ -180,8 +180,12 @@
       getAccounts(){
         return this.$store.state.allAccounts;
       },
+      getAccGroups(){
+        return this.$store.state.accGroups;
+      },  
       getGroupedAccounts(){
-        let grouped = _.groupBy(this.getAccounts,'accgroup'); 
+        let temp = this.getAccounts;
+        let grouped = _.groupBy(temp,'accgroup'); 
 
         this.accGroupSummary = [];
         for(let i in grouped){
@@ -206,14 +210,8 @@
           this.accGroupSummary.push(summary);
         }
         return grouped 
-      },
-      getAccGroups(){
-        return this.$store.state.accGroups;
-      },  
+      }, 
     },
-    mounted(){
-    },
-
     components:{
       'v-add-account':AddAccount,
       'v-account-profile':AccProfile,

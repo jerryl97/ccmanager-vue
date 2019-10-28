@@ -125,6 +125,7 @@ function scheduleNotification(){
             title:'Recurring Transaction: ' + allRecurTrans[i].contents,
             text:'Tap to add this recurring transaction.',
             trigger:{every:'day'},
+            data:{trans:allRecurTrans[i]}
           });
         }else if(allRecurTrans[i].recurringtype == 1){
           let tempid = 11+''+allRecurTrans[i].recurid;
@@ -133,6 +134,7 @@ function scheduleNotification(){
             title:'Recurring Transaction: ' + allRecurTrans[i].contents,
             text:'Tap to add this recurring transaction.',
             trigger:{every:{weekday:allRecurTrans[i].recurringtime}},
+            data:{trans:allRecurTrans[i]}
           });
         }else if(allRecurTrans[i].recurringtype == 2){
           let tempid = 11+''+allRecurTrans[i].recurid;
@@ -141,6 +143,7 @@ function scheduleNotification(){
             title:'Recurring Transaction: ' + allRecurTrans[i].contents,
             text:'Tap to add this recurring transaction.',
             trigger:{every:{day:allRecurTrans[i].recurringtime}},
+            data:{trans:allRecurTrans[i]}
             });
           }
         }
@@ -554,13 +557,35 @@ export default new Vuex.Store({
               }
             }
           }
-        }); 
+        });
         for(let i in state.allAccounts){
-          let tempacc = {
-            text: state.allAccounts[i].name,
-            id: state.allAccounts[i].accid,
-            rltpromo:[],
-          };
+          let tempacc = {};
+          if(state.allAccounts[i].accgroup!=1&&state.allAccounts[i].accgroup!=2){
+            tempacc = {
+              text:state.allAccounts[i].name+' ($'+state.allAccounts[i].balance+')',
+              id:state.allAccounts[i].accid,
+              rltpromo:[],
+            };
+          }else{
+            if(state.allAccounts[i].accgroup==2){
+              tempacc = {
+                text:state.allAccounts[i].name+'('+state.allAccounts[i].last4digits+')'+'($'+state.allAccounts[i].balance+')',
+                id:state.allAccounts[i].accid,
+                rltpromo:[],
+              };
+            }else{
+              tempacc = {
+                text:state.allAccounts[i].name+'('+state.allAccounts[i].last4digits+')',
+                id:state.allAccounts[i].accid,
+                rltpromo:[],
+              };
+            }
+          }
+          //let tempacc = {
+          //  text: state.allAccounts[i].name+'('+'',
+          //  id: state.allAccounts[i].accid,
+          //  rltpromo:[],
+          //};
           for(let j in filteredPromo){
             if(filteredPromo[j]){
               if(filteredPromo[j].rltacc.includes(state.allAccounts[i].accid)){

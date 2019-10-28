@@ -62,7 +62,7 @@
         <van-popup v-model="showAddExpCat" position="bottom" :style="{height:'100%'}">
           <v-exp-category @closeManageExpCat="closeManageExpCat"/> 
         </van-popup>
-      <van-field v-model="promoItem.expmemo" label="Memo" type="textarea" placeholder="Expenses' Memo" autosize rows="1"/>
+      <van-field v-model="promoItem.expmemo" clearable label="Memo" type="textarea" placeholder="Expenses' Memo" autosize rows="1"/>
     </van-cell-group>
 
     <!-- Related Reward-->
@@ -80,7 +80,7 @@
 
     <!-- Rewards Inputs-->
     <van-cell-group title="The value for the rewards" v-if="activeStep==4">
-      <van-field v-for="(input,index) in rewardsInputs" placeholder="Enter a value" :label="input.rewardsCatName" v-model="input.rewardsValue"/>
+      <van-field v-for="(input,index) in rewardsInputs" clearable placeholder="Enter a value" :label="input.rewardsCatName" v-model="input.rewardsValue"/>
     </van-cell-group>
 
     <!-- Next, Prev Button-->

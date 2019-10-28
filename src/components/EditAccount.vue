@@ -285,8 +285,8 @@
       }
     },
     watch:{
-      selectedAccid(){
-        this.accItem = Object.assign({},this.getAccounts.find(o=>o.accid == this.selectedAccid));  
+      acc(){
+        this.accItem = this.acc;  
         if(this.accItem){
         let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
         this.displayAccGroup = temp.groupName;
@@ -306,7 +306,7 @@
       }
     },
     mounted(){
-        this.accItem = Object.assign({},this.getAccounts.find(o=>o.accid == this.selectedAccid));  
+       this.accItem = this.acc;  
        if(this.accItem){
         let temp = this.getAccGrps.find(o=>o.grpid == this.accItem.accgroup);
         this.displayAccGroup = temp.groupName;
@@ -324,6 +324,6 @@
         }
       }
     },
-    props:['selectedAccid']
+    props:['acc']
   }
 </script> 

@@ -46,7 +46,7 @@
 
         </div>
 
-      <van-field v-model="accItem.contents" label="Contents" type="textarea" placeholder="Insert contents" rows="1" autosize/>
+      <van-field v-model="accItem.contents" clearable label="Contents" type="textarea" placeholder="Insert contents" rows="1" autosize/>
 
       <van-button type="primary" size="large" style="width:90%;margin:5%;" @click="saveNewAcc">Save</van-button>
       </div>

@@ -36,8 +36,7 @@
                 <span style="color:#7acc7a" v-if="one.type=='Income'">$ {{one.amount}}<br/></span>
                 <span style="color:#4da6ff" v-if="one.type=='Transfer'">$ {{one.amount}}<br/></span>
                 <van-tag plain v-if="one.recurring == true" type="warning">Recurring</van-tag>
-                <van-tag plain v-if="one.recurring == true" type="warning">{{key}}</van-tag>
-                <van-tag plain v-if="one.recurring == true && one.recurringtype != 0" type="warning">{{getRecurringTime(one)}}</van-tag>
+                <van-tag plain v-if="one.recurring == true && one.recurringtype" type="warning">{{getRecurringTime(one)}}</van-tag>
               </template>
               
           </van-cell>
@@ -116,9 +115,9 @@
           return 'Daily'
         }else if(trans.recurringtype == 1){
           let result = temp.find(o=>o.value == trans.recurringtime);
-          return result.text;
+          return 'Weekly '+result.text;
         }else if(trans.recurringtype == 2){
-          return trans.recurringtime;
+          return 'Monthly ' + trans.recurringtime;
         }
       },
       //Show Edit Account

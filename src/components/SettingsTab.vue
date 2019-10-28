@@ -286,6 +286,7 @@
         }).then(()=>{
           this.$store.commit('setStateToDefault');
           this.$store.dispatch('storeAllStateData');
+          cordova.plugins.notification.local.cancelAll(function() {}, this);
           this.$notify({
             message:'Reset Completed.',
             type:'primary',

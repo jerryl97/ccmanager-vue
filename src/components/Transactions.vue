@@ -251,9 +251,9 @@
           return 'Daily'
         }else if(trans.recurringtype == 1){
           let result = temp.find(o=>o.value == trans.recurringtime);
-          return result.text;
+          return 'Weekly '+result.text;
         }else if(trans.recurringtype == 2){
-          return trans.recurringtime;
+          return 'Monthly ' + trans.recurringtime;
         }
       },
 

@@ -1,7 +1,7 @@
 <template>
   <div style="padding-top:13%">
     <!-- Top Nav Bar-->
-    <van-nav-bar :title="getTitle(selectedAccount)" left-text="Back" left-arrow @click-left="back()" @click-right="showEditAcc" fixed>
+    <van-nav-bar :title="getTitle(acc)" left-text="Back" left-arrow @click-left="back()" @click-right="showEditAcc" fixed>
       <template slot="right">
         <van-icon name="edit" size="15px"/>
         <span style="color:#1989fa;font-size:15px">Edit</span>
@@ -13,31 +13,31 @@
       <van-cell style="background-color:#f6f6f6">
         <template slot="title">
           <span>
-            {{getAccGroupName(selectedAccount.accgroup)}}
-            <van-tag type="default" size="medium" v-if="selectedAccount.accgroup==1||selectedAccount.accgroup==2">{{selectedAccount.cardtype}}</van-tag>
+            {{getAccGroupName(acc.accgroup)}}
+            <van-tag type="default" size="medium" v-if="acc.accgroup==1||acc.accgroup==2">{{acc.cardtype}}</van-tag>
           </span>
         </template>
         <template slot="default">
-          <span v-if="selectedAccount.accgroup!=1"><strong :style="{color:getBalanceColor(selectedAccount.balance)}">$ {{selectedAccount.balance}}</strong></span>
-          <span v-if="selectedAccount.accgroup==1">
+          <span v-if="acc.accgroup!=1"><strong :style="{color:getBalanceColor(acc.balance)}">$ {{acc.balance}}</strong></span>
+          <span v-if="acc.accgroup==1">
             <van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=false">Settle</van-button>
-            Oustd: <span :style="{color:getOutstdColor(selectedAccount.outstdbalance)}">{{selectedAccount.outstdbalance}}</span><br/>
+            Oustd: <span :style="{color:getOutstdColor(acc.outstdbalance)}">{{acc.outstdbalance}}</span><br/>
             <van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=true">Settle</van-button>
-            Due: <span :style="{color:getOutstdColor(selectedAccount.dueamount)}">{{selectedAccount.dueamount}}</span><br/>
-            <van-tag type="danger" v-if="!selectedAccount.settlestatus">Not Settled</van-tag>
-            <van-tag type="success" v-if="selectedAccount.settlestatus">Settled</van-tag>
+            Due: <span :style="{color:getOutstdColor(acc.dueamount)}">{{acc.dueamount}}</span><br/>
+            <van-tag type="danger" v-if="!acc.settlestatus">Not Settled</van-tag>
+            <van-tag type="success" v-if="acc.settlestatus">Settled</van-tag>
           </span>
         </template>
         <template slot="label">
-          <span v-if="selectedAccount.accgroup==1||selectedAccount.accgroup==2">{{selectedAccount.bank}}<br/></span>
-          <span v-if="selectedAccount.accgroup==1||selectedAccount.accgroup==2">Expiry:{{getExpiryFormatted(selectedAccount.expiry)}}<br/></span>
+          <span v-if="acc.accgroup==1||acc.accgroup==2">{{acc.bank}}<br/></span>
+          <span v-if="acc.accgroup==1||acc.accgroup==2">Expiry:{{getExpiryFormatted(acc.expiry)}}<br/></span>
           <span>
-            {{selectedAccount.contents}}
+            {{acc.contents}}
           </span>
         </template>
       </van-cell>
     </van-cell-group>
-    <div v-if="selectedAccount.accgroup==1" style="text-align:center;background-color:#f6f6f6;padding:10px 0px;border-bottom:1px solid #dddddd">
+    <div v-if="acc.accgroup==1" style="text-align:center;background-color:#f6f6f6;padding:10px 0px;border-bottom:1px solid #dddddd">
     <van-row type="flex">
       <van-col span="12">
         <span style="font-size:11px">
@@ -45,7 +45,7 @@
         </span> 
         <br/>
         <span style="font-size:13px">
-          {{selectedAccount.sdate}}
+          {{acc.sdate}}
         </span>
       </van-col>
       <van-col span="12">
@@ -54,7 +54,7 @@
         </span> 
         <br/>
         <span style="font-size:13px">
-          {{selectedAccount.pduedate}}
+          {{acc.pduedate}}
         </span>
       </van-col>
     </van-row>
@@ -65,7 +65,7 @@
         </span> 
         <br/>
         <span style="font-size:13px">
-          {{selectedAccount.cutoffdate}}
+          {{acc.cutoffdate}}
         </span>
       </van-col>
       <van-col span="12">
@@ -74,20 +74,20 @@
         </span> 
         <br/>
         <span style="font-size:13px">
-          {{selectedAccount.nextduedate}}
+          {{acc.nextduedate}}
         </span>
       </van-col>
     </van-row>
     </div>
-    <v-transactions :selectedAccid="selectedAccid" :isProfile="isProfile"></v-transactions>
+    <v-transactions :acc="acc" :isProfile="isProfile"></v-transactions>
 
   <!-- Edit Account Page(Popup)-->
   <van-popup v-model="editAccPop" position="bottom" :style="{height:'100%'}">
-    <v-editaccount @closeEditAcc="closeEditAcc" :selectedAccid="selectedAccid"></v-editaccount>
+    <v-editaccount @closeEditAcc="closeEditAcc" :acc="acc"></v-editaccount>
   </van-popup>
 
   <van-popup v-model="settlePop" position="bottom" :style="{height:'100%'}">
-    <v-settlepayment @closeSettlePage="closeSettlePage" :settleDueOrOutstd="settleDueOrOutstd" :selectedAccid="selectedAccid"/>
+    <v-settlepayment @closeSettlePage="closeSettlePage" :settleDueOrOutstd="settleDueOrOutstd" :acc="acc"/>
   </van-popup>
   </div>
 </template>
@@ -99,8 +99,7 @@
   export default{
     data(){
       return{
-        title:'',      
-        selectedAccount:{},
+        title:'',
         isProfile:true,
         editAccPop:false,
         settleTitle:'Not Settled',
@@ -123,10 +122,13 @@
       },
       //Get Title of Account
       getTitle(acc){
-        if(acc.last4digits==''||acc.last4digits==undefined)
-          return acc.name; 
+        if(acc.accgroup==1||acc.accgroup==2)
+          if(acc.last4digits==''||acc.last4digits==undefined)
+            return acc.name;
+          else
+            return acc.name + ' (' + acc.last4digits + ')';  
         else
-          return acc.name + ' (' + acc.last4digits + ')';  
+          return acc.name;
       },
       getBalanceColor(value){
         if(value > 0)
@@ -169,22 +171,11 @@
         return this.$store.state.allAccounts;
       }
     },
-    mounted(){
-        this.selectedAccount = this.getAccounts.find(o=>o.accid == this.selectedAccid);  
-    },
-    updated(){
-        this.selectedAccount = this.getAccounts.find(o=>o.accid == this.selectedAccid);  
-    },
-    watch:{
-      selectedAccid(){
-        this.selectedAccount = this.getAccounts.find(o=>o.accid == this.selectedAccid);  
-      }
-    },
     components:{
       'v-transactions':Transactions,
       'v-editaccount':EditAccount,
       'v-settlepayment':SettlePayment
     },
-    props:['selectedAccid']
+    props:['acc']
   }
 </script>
