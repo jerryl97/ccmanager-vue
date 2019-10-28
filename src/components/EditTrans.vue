@@ -36,7 +36,7 @@
        <van-popup
         v-model="showCalculator"
         position="bottom"
-        :style="{ height: '80%' }"
+        :style="{ height: '100%' }"
       >
         <calculator @closeCalculator="closeCalculator" @confirmCalculator="confirmCalculator"></calculator>
       </van-popup>
@@ -457,7 +457,7 @@
         this.showCalculator=false
       },
       confirmCalculator(calcResult){
-        this.transAmount = calcResult;
+        this.transAmount = parseFloat(calcResult);
         this.showCalculator=false;
       }
 

@@ -310,9 +310,9 @@
 
               console.log(cardIOlast4digits);
               console.log(formatExpiry);
-              this.accItem.last4digits = Number(cardIOlast4digits);
+              this.accItem.last4digits = cardIOlast4digits;
               this.displayExpiry = this.$moment(formatExpiry).format('MM/YY');
-              this.accItem.expiry = this.displayExpiry;
+              this.accItem.expiry = this.formatExpiry;
             });
           });
         } else if(this.accItem.accgroup==null) {

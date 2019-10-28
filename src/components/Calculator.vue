@@ -73,7 +73,12 @@ export default {
         this.savedValue = this.currentValue
       }
       this.currentValue = ''
-      this.currentOp = op      
+      this.currentOp = op
+
+      if(Number.isNaN(this.savedValue)){
+        this.currentValue = '0'
+        this.savedValue = '0';
+      }      
     },
     process() {
       //parse to float before running any calculations
