@@ -3,7 +3,12 @@
 
     <!-- Top Nav Bar -->
     <!-- Card IO Scan Button -->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" right-text="Scan" @click-right="scanCardIO()" fixed/>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="scanCardIO()" fixed>
+      <template slot="right">
+        <van-icon name="scan" size="15px"/>
+        <span style="color:#1989fa;font-size:15px">Scan</span>
+      </template>
+    </van-nav-bar>
 
     <van-cell-group>
 

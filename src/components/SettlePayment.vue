@@ -267,30 +267,28 @@
     },
     watch:{
       settleDueOrOutstd(){
-        this.transItem.toaccount = this.selectedAccid;
-        let tempAcc = this.getAccounts.find(o=>o.accid==this.selectedAccid);
-        this.displayToAccount = tempAcc.name+'('+tempAcc.last4digits+')';
+        this.transItem.toaccount = this.acc.accid;
+        this.displayToAccount = this.acc.name+'('+this.acc.last4digits+')';
         if(this.settleDueOrOutstd==false){
-          this.transAmount = tempAcc.outstdbalance.toString();
+          this.transAmount = this.acc.outstdbalance.toString();
           this.transItem.contents = 'Settle Outstanding Amount';
         } 
         else if(this.settleDueOrOutstd==true){
-          this.transAmount = tempAcc.dueamount.toString();
+          this.transAmount = this.acc.dueamount.toString();
           this.transItem.contents = 'Settle Due Amount';
         }
       }
     },
     mounted(){
       this.accSelect = this.getGroupedAccounts;
-      this.transItem.toaccount = this.selectedAccid;
-      let tempAcc = this.getAccounts.find(o=>o.accid==this.selectedAccid);
-      this.displayToAccount = tempAcc.name;
+      this.transItem.toaccount = this.acc.accid;
+      this.displayToAccount = this.acc.name;
       if(this.settleDueOrOutstd==false){
-        this.transAmount = tempAcc.outstdbalance.toString();
+        this.transAmount = this.acc.outstdbalance.toString();
         this.transItem.contents = 'Settle Outstanding Amount';
       }
       else if(this.settleDueOrOutstd==true){
-        this.transAmount = tempAcc.dueamount.toString();
+        this.transAmount = this.acc.dueamount.toString();
         this.transItem.contents = 'Settle Due Amount';
       }
       
@@ -298,7 +296,7 @@
     components:{
       "calculator":Calculator
     },
-    props:['selectedAccid','settleDueOrOutstd']
+    props:['acc','settleDueOrOutstd']
   
   }
 </script>
