@@ -384,31 +384,40 @@
 
         this.bankSMS=[];
 
-        //async requirement, may have to init SMSKeyword with local forage inside promise
-        let populateSMS = new Promise((resolve)=>{
-
-          localForage.getItem('keyword').then(value=>{
-            if(value!=null){
-              console.log('Get saved data called');
-              this.savedSMSKeyword = value;
-
-              //filter duplicates
-              let filter = this.SMSKeyword.concat(value.filter((item) => this.SMSKeyword.indexOf(item) < 0));
-              this.SMSKeyword = filter;
-              console.log(this.SMSKeyword);
-              resolve('Populated SMS');
-            } else {
-              resolve('No keyword found, get default');
-            }
+        let getPermission = new Promise((resolve)=>{
+          smsreader.filterSenders(['Get Permission Only']).then((sms)=>{
+            //This filterSenders is only used for getting permission and prevent crash
+            resolve('Permission obtained');
           });
-        }).then((msg)=>{
-          console.log(msg);
-          this.SMSKeyword.forEach(keyword => {
-            this.SMSReader(keyword);
-          });
+        });
 
-          console.log(this.bankSMS);
-          this.isLoading=false;
+        getPermission.then((msg)=>{
+          //async requirement, may have to init SMSKeyword with local forage inside promise
+          let populateSMS = new Promise((resolve)=>{
+
+            localForage.getItem('keyword').then(value=>{
+              if(value!=null){
+                console.log('Get saved data called');
+                this.savedSMSKeyword = value;
+
+                //filter duplicates
+                let filter = this.SMSKeyword.concat(value.filter((item) => this.SMSKeyword.indexOf(item) < 0));
+                this.SMSKeyword = filter;
+                console.log(this.SMSKeyword);
+                resolve('Populated SMS');
+              } else {
+                resolve('No keyword found, get default');
+              }
+            });
+          }).then((msg)=>{
+            console.log(msg);
+            this.SMSKeyword.forEach(keyword => {
+              this.SMSReader(keyword);
+            });
+
+            console.log(this.bankSMS);
+            this.isLoading=false;
+          });
         });
       },
 

@@ -294,7 +294,7 @@
                 (response) => {
                   console.log("Scan completed");
 
-                  var redactedCardNumber = response["redactedCardNumber"];
+                  var redactedCardNumber = String(response["redactedCardNumber"]);
                   var expiryMonth = String(response["expiryMonth"]);
                   var expiryYear = String(response["expiryYear"]);
 
@@ -309,7 +309,7 @@
                 }
               );
             }).then(({cardIOlast4digits, formatExpiry}) =>{
-              this.accItem.last4digits = 0;
+              this.accItem.last4digits = '';
               this.displayExpiry = '';
               this.accItem.expiry = '';
 
@@ -317,7 +317,7 @@
               console.log(formatExpiry);
               this.accItem.last4digits = cardIOlast4digits;
               this.displayExpiry = this.$moment(formatExpiry).format('MM/YY');
-              this.accItem.expiry = this.formatExpiry;
+              this.accItem.expiry = formatExpiry;
             });
           });
         } else if(this.accItem.accgroup==null) {
