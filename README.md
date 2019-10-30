@@ -3,7 +3,7 @@
 <br>
 
 <p>GitHub Webpage: <a href="https://jerryl97.github.io/ccmanager-vue/">HERE</a></p>
-<p>Download the Lastest Version of the Android APK: <a href="https://github.com/jerryl97/ccmanager-vue/releases/download/1.1/ccmanagerv1.1.apk">HERE</a></p>
+<p>Download the Lastest Version of the Android APK: <a href="https://github.com/jerryl97/ccmanager-vue/releases/download/1.2/ccmanagerv1.2.apk">HERE</a></p>
 
 <br>
 
