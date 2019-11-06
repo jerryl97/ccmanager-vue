@@ -17,8 +17,11 @@
       <!--Promotion's Title-->
       <van-field label="Title" clearable placeholder="Promotion's Title" v-model="promoItem.promotitle" required :error-message="titleErrorMsg"/>
       <!--Minimum Spend-->
-      <van-field readonly clickable label="Minimum" :value="displayMinimum" @touchstart.native.stop="showNumbKeyboard = true" placeholder="$ 0"/>
-      <van-number-keyboard v-model="displayMinimum" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/>
+      <van-field readonly clickable label="Minimum" :value="displayMinimum" @touchstart.native.stop="showMaxNumbKeyboard = false,showMinNumbKeyboard = true" placeholder="$ 0"/>
+      <!--Maximum Spend-->
+      <van-field readonly clickable label="Maximum" :value="displayMaximum" @touchstart.native.stop="showMaxNumbKeyboard = true, showMinNumbKeyboard = false" placeholder="$ 0"/>
+      <van-number-keyboard v-model="displayMinimum" :show="showMinNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMinNumbKeyboard = false"/>
+      <van-number-keyboard v-model="displayMaximum" :show="showMaxNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMaxNumbKeyboard = false"/>
       <!--Promotion's Desc-->
       <van-field label="Description" clearable placeholder="Promotion's Description" v-model="promoItem.promodesc"/>
 
@@ -33,11 +36,14 @@
 
       <!-- To Promo Date-->
       <van-field  readonly clickable label="To" required :value="toPromoDate" @click="showToPromoDate = true" :error-message="toDateErrorMsg" />
+      <van-popup v-model="showToPromoDate" position="bottom">
+        <van-datetime-picker v-model="promoItem.todate" type="date" @cancel="showToPromoDate=false" @confirm="toPromoDateConfirm" />
+      </van-popup>
       </div>
 
       <!--Transactions Count-->
       <van-cell title="Minimum Swipe">
-        <van-stepper v-model="promoItem.transcount" min="0"></van-stepper>
+        <van-stepper v-model="promoItem.maxtranscount" min="0"></van-stepper>
       </van-cell>
     </van-cell-group>
 
@@ -109,6 +115,8 @@
           promodesc:'',
           transcount:0,
           maxtranscount:0,
+          transspend:0,
+          maxtransspend:0,
           expmemo:'',
         },
         nextBtnText:'Next',
@@ -125,11 +133,13 @@
  
         //Display Variables
         displayMinimum:'',
+        displayMaximum:'',
         fromPromoDate:'',
         toPromoDate:'',
 
         //Picker Initialize
-        showNumbKeyboard:false,
+        showMinNumbKeyboard:false,
+        showMaxNumbKeyboard:false,
         showFromPromoDate:false,
         showToPromoDate:false,
         showAddExpCat:false,
@@ -379,8 +389,11 @@
         this.promoItem = Object.assign({},this.promo);
         if(this.promoItem){
           this.displayMinimum = this.promoItem.minimum.toString(); 
-          this.fromPromoDate = this.$moment(this.promoItem.fromdate).format('DD MMMM YYYY');
-          this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
+          this.displayMaximum = this.promoItem.maxtransspend.toString();
+          if(this.promoItem.duration==true){
+            this.fromPromoDate = this.$moment(this.promoItem.fromdate).format('DD MMMM YYYY');
+            this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
+          }
           this.activeAccIds = this.promoItem.rltacc;
           this.expcatchecked = this.promoItem.rltexpense;
           this.rewardscatchecked = [];
@@ -397,8 +410,11 @@
       this.promoItem = Object.assign({},this.promo);
       if(this.promoItem){
         this.displayMinimum = this.promoItem.minimum.toString(); 
-        this.fromPromoDate = this.$moment(this.promoItem.fromdate).format('DD MMMM YYYY');
-        this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
+        this.displayMaximum = this.promoItem.maxtransspend.toString();
+        if(this.promoItem.duration==true){
+          this.fromPromoDate = this.$moment(this.promoItem.fromdate).format('DD MMMM YYYY');
+          this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
+        }
         this.activeAccIds = this.promoItem.rltacc;
         this.expcatchecked = this.promoItem.rltexpense;
         for(let i in this.promoItem.rltrewards){

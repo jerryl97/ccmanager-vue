@@ -297,10 +297,10 @@
             this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
         }
         if(this.accItem.accgroup == 1){
-            this.displaySDate = this.accItem.sdate.substring(0,2);
-            this.displayPDueDate = this.accItem.pduedate.substring(0,2);
-            this.accItem.sdate = parseInt(this.displaySDate);
-            this.accItem.pduedate = parseInt(this.displayPDueDate);
+            this.displaySDate = this.$moment(this.accItem.sdate).date();
+            this.displayPDueDate = this.$moment(this.accItem.pduedate).date();
+            //this.accItem.sdate = parseInt(this.displaySDate);
+            //this.accItem.pduedate = parseInt(this.displayPDueDate);
           }
         }
       }
@@ -317,10 +317,10 @@
             this.displayExpiry = this.$moment(this.accItem.expiry).format('MM/YY');
         }
         if(this.accItem.accgroup == 1){
-            this.displaySDate = this.accItem.sdate.substring(0,2);
-            this.displayPDueDate = this.accItem.pduedate.substring(0,2);
-            this.accItem.sdate = parseInt(this.displaySDate);
-            this.accItem.pduedate = parseInt(this.displayPDueDate);
+            this.displaySDate = this.$moment(this.accItem.sdate).date();
+            this.displayPDueDate = this.$moment(this.accItem.pduedate).date();
+            //this.accItem.sdate = parseInt(this.displaySDate);
+            //this.accItem.pduedate = parseInt(this.displayPDueDate);
         }
       }
     },

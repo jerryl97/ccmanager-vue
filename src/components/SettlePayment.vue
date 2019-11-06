@@ -63,6 +63,7 @@
           contents:'',
           recurringtype:0,
           recurringtime:'',
+          forSettle:true,
         },
         transDate:this.$moment(new Date()).format('DD MMMM YYYY'), //Default Display Date
         showTransDate:false,
@@ -80,7 +81,7 @@
         displayFromAccount:'',
         fromAccountError:'',
         activeAccId:'',
-        activeAccIndex:0,
+        activeAccIndex:1,
         showToAccList:false,
         displayToAccount:'',
         accSelect:[],
@@ -99,7 +100,7 @@
         this.displayFromAccount='';
         this.fromAccountError='';
         this.activeAccId='';
-        this.activeAccIndex=0;
+        this.activeAccIndex=1;
       
       },
       back(){
@@ -280,7 +281,6 @@
       }
     },
     mounted(){
-      this.accSelect = this.getGroupedAccounts;
       this.transItem.toaccount = this.acc.accid;
       this.displayToAccount = this.acc.name;
       if(this.settleDueOrOutstd==false){
@@ -290,8 +290,10 @@
       else if(this.settleDueOrOutstd==true){
         this.transAmount = this.acc.dueamount.toString();
         this.transItem.contents = 'Settle Due Amount';
-      }
-      
+      } 
+    },
+    updated(){
+      this.accSelect = this.getGroupedAccounts;
     },
     components:{
       "calculator":Calculator

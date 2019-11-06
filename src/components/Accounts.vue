@@ -20,7 +20,7 @@
           </template>
         </van-cell>
         <van-swipe-cell v-for="acc in group" :on-close="accOnClose" :name="acc.accid">
-          <van-cell v-if="key!=1&&key!=2" is-link arrow-direction="left" @click="showAccProfile(acc)">
+          <van-cell v-if="key!=1&&key!=2" is-link arrow-direction="left" @click="showAccActionSheet(acc)">
           <template slot="title">
             <span>{{acc.name}}</span>
           </template>
@@ -28,7 +28,7 @@
             <span :style="{color:getBalanceColor(acc.balance)}">{{acc.balance}}</span>
           </template>
           </van-cell>
-          <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccProfile(acc)">
+          <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccActionSheet(acc)">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
@@ -44,7 +44,7 @@
             </span>
           </template>
         </van-cell>
-        <van-cell v-if="key==2" is-link arrow-direction="left" @click="showAccProfile(acc)">
+        <van-cell v-if="key==2" is-link arrow-direction="left" @click="showAccActionSheet(acc)">
           <template slot="title">
             <span>{{acc.name}} ({{acc.last4digits}})</span>
           </template>
@@ -61,11 +61,12 @@
       </van-cell-group>
     </div>
 
+    <van-action-sheet v-model="accActionSheetShow" :actions="accActionSheetActions" :description="accActionSheetDesc" @select="onAccActionSheetSelect"/>
     <!--Add Account Page(Popup)-->
     <van-popup v-model="addAccPop" position="bottom" :style="{height:'100%'}">
       <v-add-account @closeAddAcc="closeAddAcc"></v-add-account>
     </van-popup>
-    <!--Edit Account Page(Popup)-->
+    <!--Account Profile Page(Popup)-->
     <van-popup v-model="accProfilePop" position="bottom" :style="{height:'100%'}">
       <v-account-profile @closeAccProfile="closeAccProfile" :acc="selectedAcc"></v-account-profile>
     </van-popup>
@@ -89,6 +90,12 @@
         accProfilePop:false,
         selectedAcc:'',
         groupedAccList:[],
+        accActionSheetShow:false,
+        accActionSheetDesc:'',
+        accActionSheetActions:[
+          {name:'View account'},
+          {name:'Delete account'}
+        ]
       }
     },
 
@@ -103,11 +110,35 @@
         this.hideAddAccFab = false;
         this.addAccPop = false; 
       },
+      //Show Account Action Sheet
+      showAccActionSheet(acc){
+        this.accActionSheetShow = true;
+        this.accActionSheetDesc = acc.name;
+        this.selectedAcc = acc;
+      },
+      onAccActionSheetSelect(item,index){
+        this.accActionSheetShow = false;
+        switch(index){
+          case 0:
+            this.showAccProfile();
+            break;
+          case 1:
+            this.$dialog.confirm({
+              message:'Are you sure to delete?'
+            }).then(()=>{
+              this.$store.commit('deleteAccount',this.selectedAcc.accid);
+              this.$store.dispatch('storeAllStateData');
+            }).catch(()=>{
+              this.$dialog.close();
+            });
+            break;
+        }
+      }, 
       //Show Account Profile
-      showAccProfile(acc){
+      showAccProfile(){
           this.accProfilePop = true;
           this.hideAddAccFab = true;
-          this.selectedAcc = acc;
+          //this.selectedAcc = acc;
       },
       //Close Account Profile
       closeAccProfile(){
@@ -211,6 +242,16 @@
         }
         return grouped 
       }, 
+    },
+    watch:{
+      accActionSheetShow(){
+        if(this.accActionSheetShow == false && this.accProfilePop == false)
+          this.hideAddAccFab = false;
+        else if(this.accActionSheetShow == true && this.accProfilePop == false)
+          this.hideAddAccFab = true;
+        else if(this.accActionSheetShow == false && this.accProfilePop == true)
+          this.hideAddAccFab = true;
+      }
     },
     components:{
       'v-add-account':AddAccount,

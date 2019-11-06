@@ -1,13 +1,10 @@
 <template>
-  <div style="padding-top:13%">
+  <div style="padding-top:13%;margin-bottom:25%">
     <!--Top Nav Bar-->
     <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="addExpCat" fixed>
-      <template slot="right">
-        <van-icon name="plus" size="15px"/>
-        <span style="color:#1989fa;font-size:15px">Add</span>
-      </template>
     </van-nav-bar>
 
+    <vue-fab :hidden="hideAddExpCatFab" icon="icon-plus"  size="big" style="margin-bottom:10%" @clickMainBtn="addExpCat"/>
     <!-- Expense Categories List -->
     <van-cell-group>
       <van-cell v-for="(cat,key) in getExpCat" :border="true" :title="cat.expCatName">
@@ -39,6 +36,7 @@
         //Variable Initialize
         expCat:[],
         cat:{},
+        hideAddExpCatFab:false,
 
         //Popup Initialize
         isEdit:false,
@@ -118,6 +116,15 @@
     computed:{
       getExpCat(){
         return this.$store.state.expCat; 
+      }
+    },
+    watch:{
+      addExpCatPop(){
+        if(this.addExpCatPop == true){
+          this.hideAddExpCatFab = true;
+        }else{
+          this.hideAddExpCatFab = false;
+        }
       }
     },
     mounted(){

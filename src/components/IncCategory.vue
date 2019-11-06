@@ -1,13 +1,9 @@
 <template>
-  <div style="padding-top:13%">
+  <div style="padding-top:13%;margin-bottom:25%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="addIncCat" fixed>
-      <template slot="right">
-        <van-icon name="plus" size="15px"/>
-        <span style="color:#1989fa;font-size:15px">Add</span>
-      </template>
-    </van-nav-bar>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" fixed/>
 
+    <vue-fab :hidden="hideAddIncCatFab" icon="icon-plus"  size="big" style="margin-bottom:10%" @clickMainBtn="addIncCat"/>
     <!-- Income Categories List -->
     <van-cell-group>
       <van-cell v-for="(cat,key) in getIncCat" :border="true" :title="cat.incCatName">
@@ -39,6 +35,7 @@
         //Variable Initialize
         incCat:[],
         cat:{},
+        hideAddIncCatFab:false,
 
         //Popup Initialize
         isEdit:false,
@@ -118,6 +115,15 @@
     computed:{
       getIncCat(){
         return this.$store.state.incCat; 
+      }
+    },
+    watch:{
+      addIncCatPop(){
+        if(this.addIncCatPop == true){
+          this.hideAddIncCatFab = true;
+        }else{
+          this.hideAddIncCatFab = false;
+        }
       }
     },
     mounted(){

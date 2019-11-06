@@ -20,12 +20,10 @@
         <template slot="default">
           <span v-if="acc.accgroup!=1"><strong :style="{color:getBalanceColor(acc.balance)}">$ {{acc.balance}}</strong></span>
           <span v-if="acc.accgroup==1">
-            <van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=false">Settle</van-button>
+            <!--<van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=false">Settle</van-button>-->
             Oustd: <span :style="{color:getOutstdColor(acc.outstdbalance)}">{{acc.outstdbalance}}</span><br/>
             <van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=true">Settle</van-button>
             Due: <span :style="{color:getOutstdColor(acc.dueamount)}">{{acc.dueamount}}</span><br/>
-            <van-tag type="danger" v-if="!acc.settlestatus">Not Settled</van-tag>
-            <van-tag type="success" v-if="acc.settlestatus">Settled</van-tag>
           </span>
         </template>
         <template slot="label">
@@ -36,6 +34,7 @@
           </span>
         </template>
       </van-cell>
+      <van-switch-cell @change="changeSettleStatus" v-if="acc.accgroup==1" :style="{backgroundColor:'#f6f6f6',color:getSettleColor(acc.settlestatus)}" active-color="green" inactive-color="red" v-model="acc.settlestatus" :title="getSettleStatus(acc.settlestatus)"/>
     </van-cell-group>
     <div v-if="acc.accgroup==1" style="text-align:center;background-color:#f6f6f6;padding:10px 0px;border-bottom:1px solid #dddddd">
     <van-row type="flex">
@@ -45,7 +44,7 @@
         </span> 
         <br/>
         <span style="font-size:13px">
-          {{acc.sdate}}
+          {{getDateFormatted(acc.sdate)}}
         </span>
       </van-col>
       <van-col span="12">
@@ -54,11 +53,11 @@
         </span> 
         <br/>
         <span style="font-size:13px">
-          {{acc.pduedate}}
+          {{getDateFormatted(acc.pduedate)}}
         </span>
       </van-col>
     </van-row>
-    <van-row type="flex">
+    <!--<van-row type="flex">
       <van-col span="12">
         <span style="font-size:11px">
           Cut off date:
@@ -77,9 +76,11 @@
           {{acc.nextduedate}}
         </span>
       </van-col>
-    </van-row>
+    </van-row>-->
     </div>
-    <v-transactions :acc="acc" :isProfile="isProfile"></v-transactions>
+    
+    <v-transactions v-if="acc.accgroup!=1" :acc="acc" :isProfile="isProfile"></v-transactions>
+    <v-cctrans v-if="acc.accgroup==1" :acc="acc" :isProfile="isProfile"></v-cctrans>
 
   <!-- Edit Account Page(Popup)-->
   <van-popup v-model="editAccPop" position="bottom" :style="{height:'100%'}">
@@ -95,6 +96,7 @@
   import Transactions from './Transactions.vue'
   import EditAccount from './EditAccount.vue'
   import SettlePayment from './SettlePayment.vue'
+  import CreditCardTrans from './CreditCardTrans.vue'
 
   export default{
     data(){
@@ -102,8 +104,6 @@
         title:'',
         isProfile:true,
         editAccPop:false,
-        settleTitle:'Not Settled',
-        settleTextColor:'red',
         settlePop:false,
         settleDueOrOutstd:false,
       }
@@ -159,9 +159,30 @@
         let formatted = this.$moment(expiry).format("MM/YY");
         return formatted; 
       },
+      getDateFormatted(date){
+        let formatted = this.$moment(date).format("DD MMMM YYYY");
+        return formatted;
+      },
       closeSettlePage(){
         this.settlePop = false;
-      }
+      },
+      getSettleStatus(stats){
+        if(stats==true)
+          return 'Settled'
+        else
+          return 'Not Settled'
+      },
+      getSettleColor(stats){
+        if(stats){
+          return 'green'
+        }else{
+          return 'red'
+        } 
+      },
+      changeSettleStatus(checked){
+        this.$store.commit('editAccount',this.acc);
+        this.$store.dispatch('storeAllStateData');
+      },
     },
     computed:{
       getAccGroups(){
@@ -174,7 +195,8 @@
     components:{
       'v-transactions':Transactions,
       'v-editaccount':EditAccount,
-      'v-settlepayment':SettlePayment
+      'v-settlepayment':SettlePayment,
+      'v-cctrans':CreditCardTrans,
     },
     props:['acc']
   }

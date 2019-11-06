@@ -25,6 +25,7 @@ export default {
         this.$dialog.close();
       })
     },
+
     addRecurringTrans(){
       let today = new Date();
       let allRecurTrans = this.getRecurringTrans;
@@ -37,7 +38,7 @@ export default {
           }); 
         if(existed.length == 0){
         if(allRecurTrans[i].recurringtype == 0){
-          if(this.$moment(todayformatted).isSame(tempdate) == false){
+          if(todayformatted != tempdate){
             let temp = Object.assign({},allRecurTrans[i]);
             temp.transid = null;
             temp.date = new Date();
@@ -70,7 +71,7 @@ export default {
     },
     updateAccDates(){
       this.$store.commit('updateAccountDates');
-      this.$store.dispatch('')
+      this.$store.dispatch('storeAllStateData')
     },
   },
   computed:{

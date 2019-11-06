@@ -3,44 +3,38 @@
     <div style="background-color:#f6f6f6;color:#333333;padding-bottom:5px">
      <van-row style="text-align:center;padding:10px" type="flex" align="center">
        <van-col span="3">
-         <van-icon name="arrow-left" @click="changeMonth('prev')"/>
+         <van-icon name="arrow-left" @click="changeStatementRange('prev')"/>
        </van-col>
        <van-col span="18">
-         <strong>{{getDateFormatted(currentMonth)}}</strong>
+         <strong>{{getStatementRange()}}</strong>
        </van-col>
        <van-col span="3">
-         <van-icon name="arrow" @click="changeMonth('next')"/>
+         <van-icon name="arrow" @click="changeStatementRange('next')"/>
        </van-col>
      </van-row>
 
      <van-row style="text-align:center" type="flex" align="center">
        <van-col span="8">
-         <span style="font-size:15px;color:#7acc7a"><strong>Income $</strong><br/>{{monthTotalInc}}</span>
+         <span style="font-size:15px;color:#7acc7a"><strong>Income $</strong><br/>{{stateTotalInc}}</span>
        </van-col>
        <van-col span="8">
-         <span style="font-size:15px;color:#FF3434"><strong>Expense $</strong><br/>{{monthTotalExp}}</span>
+         <span style="font-size:15px;color:#FF3434"><strong>Expense $</strong><br/>{{stateTotalExp}}</span>
        </van-col>
        <van-col span="8">
-         <span style="font-size:15px"><strong>Total $</strong><br/>{{monthTotal}}</span>
+         <span style="font-size:15px"><strong>Total $</strong><br/>{{stateTotal}}</span>
        </van-col>
      </van-row>
     </div>
- 
-    <van-tabs background="#f6f6f6" title-active-color="#07c160" title-inactive-color="#333333" color="#07c160" v-model="transtab">
 
-    <!--Summary-->
-    <van-tab> 
-      <template slot="title">
-        <van-icon name="orders-o"/>
-        Summary
-      </template>
-    <!-- Add Transaction Float Action Button-->
-    <vue-fab v-if="!isProfile" :hidden="hideAddTransFab" icon="icon-plus" size="big" style="margin-bottom:20%" @clickMainBtn="addTransButton"/>
-    
-    <!-- Transaction List-->
-    <div>
-      <van-collapse v-model="activeNames" accordion>
-        <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :name="key">
+    <van-tabs background="#f6f6f6" title-active-color="#07c160" title-inactive-color="#333333" color="#07c160" v-model="transtab">
+      <van-tab>
+        <template slot="title">
+          <van-icon name="orders-o"/>
+          Summary
+        </template>
+         <div>
+          <van-collapse v-model="activeNames" accordion>
+          <van-collapse-item v-for="(trans,key) in getDateGroupedTrans" :name="key">
            <template slot="title">
              <strong>{{key}}</strong>
            </template>
@@ -125,17 +119,16 @@
   import ExpenseChart from './ExpenseChart.vue'
   import IncomeChart from './IncomeChart.vue'
   import TotalStatsChart from './TotalStatsChart.vue'
-
   export default{
     data(){
       return{
-        hideAddTransFab:false,
-        activeNames:'1',
-        currentMonth:new Date(),
+        startdate:0,
+        enddate:0,
+        stateTotalExp:0,
+        stateTotalInc:0,
+        stateTotal:0,
         dateSummary:[],
-        monthTotalExp:0,
-        monthTotalInc:0,
-        monthTotal:0,
+        activeNames:'1',        
         editTransPop:false,
         selectedTrans:'',
         transtab:0,
@@ -154,10 +147,6 @@
       }
     },
     methods:{
-      //Add Transaction Button
-      addTransButton(){
-        this.$router.push("/main/addtrans");
-      },
       //Show Transaction Action Sheet
       showTransActionSheet(trans){
         this.selectedTrans = trans;
@@ -185,8 +174,8 @@
       },
       //Show Edit Account
       showEditTrans(){
-        this.hideAddTransFab = true;
         this.editTransPop = true;
+        this.hideAddTransFab = true;
         //this.selectedTrans = trans;
       }, 
       //Close Edit Trans
@@ -195,23 +184,43 @@
         this.hideAddTransFab = false; 
         this.selectedTrans = '';
       },
-      //Formatting the date
-      getDateFormatted(date){
-        return this.$moment(date).format('MMMM YYYY');
+      getStatementRange(){
+        let displaystartdate = this.$moment(this.startdate).format("DD MMM YYYY");
+        let displayenddate = this.$moment(this.enddate).format("DD MMM YYYY");
+        return displaystartdate + ' - ' + displayenddate;
       },
-
-      //Arrow Button to change Month
-      changeMonth(value){
-        switch(value){
+      changeStatementRange(type){
+        switch(type){
           case 'prev':
-            this.currentMonth = this.$moment(this.currentMonth).subtract(1,'month');
+            this.startdate = this.$moment(this.startdate).subtract(1,'month').toDate();
+            this.enddate = this.$moment(this.enddate).subtract(1,'month').toDate();
             break;
           case 'next':
-            this.currentMonth = this.$moment(this.currentMonth).add(1,'month');
+            this.startdate = this.$moment(this.startdate).add(1,'month').toDate();
+            this.enddate = this.$moment(this.enddate).add(1,'month').toDate();
             break;
-        } 
+        }
       },
-
+      getTotalSummary(list){
+        this.stateTotalInc = 0;
+        this.stateTotalExp = 0;
+        this.stateTotal = 0;
+        for(let i in list){
+          if(list[i].type=='Expense')
+            this.stateTotalExp += list[i].amount;
+          else if(list[i].type=='Income')
+            this.stateTotalInc += list[i].amount;  
+        }
+        this.stateTotal = this.stateTotalInc - this.stateTotalExp;   
+      },
+      //Get Date Summary
+      getDateSummary(date,type){
+        let result = this.dateSummary.find(item => item.date == date);
+        if(type=='Expense')
+          return result.exptotal;
+        else if(type=='Income')
+          return result.inctotal; 
+      },
       //Get Accounts Name
       getAccName(value){
         let temp = this.getAccounts.find(o=>o.accid==value);
@@ -224,7 +233,6 @@
             return temp.name
         }
       },      
-              
       //Get Category Name
       getCatName(type,value){
         switch(type){
@@ -244,30 +252,6 @@
           break; 
         }
       },
-
-      //Get Month's Summary
-      getTotalSummary(list){
-        this.monthTotalInc = 0;
-        this.monthTotalExp = 0;
-        this.monthTotal = 0;
-        for(let i in list){
-          if(list[i].type=='Expense')
-            this.monthTotalExp += list[i].amount;
-          else if(list[i].type=='Income')
-            this.monthTotalInc += list[i].amount;  
-        }
-        this.monthTotal = this.monthTotalInc - this.monthTotalExp;   
-      },
-
-      //Get Date Summary
-      getDateSummary(date,type){
-        let result = this.dateSummary.find(item => item.date == date);
-        if(type=='Expense')
-          return result.exptotal;
-        else if(type=='Income')
-          return result.inctotal; 
-      },
-
       getRecurringTime(trans){
         let temp = [
             {text:'Sunday',value:7},
@@ -287,6 +271,26 @@
           return 'Monthly ' + trans.recurringtime;
         }
       },
+      //SwipeCell onClose Transaction Delete
+      transOnClose(clickPosition, instance,detail){
+        switch(clickPosition){
+          case 'left':
+          case 'cell':
+          case 'outside':
+            instance.close();
+            break;
+          case 'right':
+            this.$dialog.confirm({
+              message:'Are you sure to delete?'
+            }).then(()=>{
+              this.$store.commit('deleteTrans',detail.name);
+              this.$store.dispatch('storeAllStateData');
+            }).catch(()=>{
+              this.$dialog.close();
+            });
+            break;
+        }
+      },
 
       //Get Monthly Expense & Income
       getMonthly(type){
@@ -301,9 +305,10 @@
         switch(type){
           case 'Expense':
             for(let i in temp){
-              let tempDate = this.$moment(temp[i].date);
-              let tempCurrentDate = this.$moment(this.currentMonth);
-              if(tempDate.month()==tempCurrentDate.month()&&tempDate.year()==tempCurrentDate.year()&&temp[i].type=="Expense")
+               let tempDate = this.$moment(temp[i].date);
+               let tempStart = this.$moment(this.startdate);
+               let tempEnd = this.$moment(this.enddate);
+               if(tempDate.isBetween(tempStart,tempEnd)&&temp[i].type=="Expense")
                 tempList.push(temp[i]);
               } 
             tempList = _.groupBy(tempList,'category');
@@ -314,9 +319,10 @@
             break;
           case 'Income':
             for(let i in temp){
-              let tempDate = this.$moment(temp[i].date);
-              let tempCurrentDate = this.$moment(this.currentMonth);
-              if(tempDate.month()==tempCurrentDate.month()&&tempDate.year()==tempCurrentDate.year()&&temp[i].type=="Income")
+               let tempDate = this.$moment(temp[i].date);
+               let tempStart = this.$moment(this.startdate);
+               let tempEnd = this.$moment(this.enddate);
+               if(tempDate.isBetween(tempStart,tempEnd)&&temp[i].type=="Income")
                 tempList.push(temp[i]);
             } 
             tempList = _.groupBy(tempList,'category');
@@ -328,7 +334,6 @@
         }
         return tempList; 
       },
-
       getTotalStatsData(type){
         let resultdata = [];
         let temp = [];
@@ -372,7 +377,6 @@
         }
         return resultdata;
       },
-      //Set Data for Charts
       setChartData(data,type){
         let forchartdata = {
           labels:[],
@@ -412,28 +416,6 @@
         }
         return forchartdata;
       },
-
-      //SwipeCell onClose Transaction Delete
-      transOnClose(clickPosition, instance,detail){
-        switch(clickPosition){
-          case 'left':
-          case 'cell':
-          case 'outside':
-            instance.close();
-            break;
-          case 'right':
-            this.$dialog.confirm({
-              message:'Are you sure to delete?'
-            }).then(()=>{
-              this.$store.commit('deleteTrans',detail.name);
-              this.$store.dispatch('storeAllStateData');
-            }).catch(()=>{
-              this.$dialog.close();
-            });
-            break;
-        }
-      },
-      
     },
     computed:{
       getTrans(){
@@ -448,13 +430,12 @@
            temp = _.filter(this.getTrans, x=>{
             return x.account == this.acc.accid || x.fromaccount == this.acc.accid || x.toaccount == this.acc.accid;
           }); 
-        else
-          temp = this.getTrans;
         let tempList = [];
         for(let i in temp){
           let tempDate = this.$moment(temp[i].date);
-          let tempCurrentDate = this.$moment(this.currentMonth);
-          if(tempDate.month()==tempCurrentDate.month()&&tempDate.year()==tempCurrentDate.year())
+          let tempStart = this.$moment(this.startdate);
+          let tempEnd = this.$moment(this.enddate);
+          if(tempDate.isBetween(tempStart,tempEnd))
             tempList.push(temp[i]);
         }
         this.getTotalSummary(tempList);
@@ -493,18 +474,39 @@
         return this.$store.state.incCat;
       }
     },
-    mounted(){
-    },
     watch:{
-      transActionSheetShow(){
-        if(this.transActionSheetShow == false && this.editTransPop == false)
-          this.hideAddTransFab = false;
-        else if(this.transActionSheetShow == true && this.editTransPop == false)
-          this.hideAddTransFab = true;
-        else if(this.transActionSheetShow == false && this.editTransPop == true)
-          this.hideAddTransFab = true;
-
+      acc(){
+        let temptoday = this.$moment(new Date());
+        this.startdate = this.acc.sdate;
+        this.enddate = this.$moment(this.startdate).add(1,'months').subtract(1,'days').toDate();
+        let tempStart = this.$moment(this.startdate);
+        let tempEnd = this.$moment(this.enddate);
+        if(!temptoday.isBetween(tempStart,tempEnd)){
+          if(temptoday.isBefore(tempStart)){
+            this.startdate = this.$moment(this.acc.sdate).subtract(1,'months').toDate();
+            this.enddate = this.$moment(this.startdate).add(1,'months').subtract(1,'days').toDate();
+          }else if(temptoday.isAfter(tempEnd)){
+            this.startdate = this.$moment(this.acc.sdate).add(1,'months').toDate();
+            this.enddate = this.$moment(this.startdate).add(1,'months').subtract(1,'days').toDate();
+          }
+        } 
       }
+    },
+    mounted(){
+        let temptoday = this.$moment(new Date());
+        this.startdate = this.acc.sdate;
+        this.enddate = this.$moment(this.startdate).add(1,'months').subtract(1,'days').toDate();
+        let tempStart = this.$moment(this.startdate);
+        let tempEnd = this.$moment(this.enddate);
+        if(!temptoday.isBetween(tempStart,tempEnd)){
+          if(temptoday.isBefore(tempStart)){
+            this.startdate = this.$moment(this.acc.sdate).subtract(1,'months').toDate();
+            this.enddate = this.$moment(this.startdate).add(1,'months').subtract(1,'days').toDate();
+          }else if(temptoday.isAfter(tempEnd)){
+            this.startdate = this.$moment(this.acc.sdate).add(1,'months').toDate();
+            this.enddate = this.$moment(this.startdate).add(1,'months').subtract(1,'days').toDate();
+          }
+        } 
     },
     components:{
       'v-edit-trans':EditTrans,

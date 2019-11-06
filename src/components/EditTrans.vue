@@ -48,7 +48,7 @@
        <van-field required readonly clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayAccount" @click="showAccSelection">
        </van-field>
 
-       <van-popup v-model="showAccList" position="bottom">
+       <van-popup v-model="showAccList" position="bottom" :style="{height:'100%'}">
 
         <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')"/>
         <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
@@ -69,10 +69,17 @@
           </div>
           <div slot="default">
             <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
-            <span>Expense: <span v-for="exp in promo.rltexpense">{{getExpenseName(exp)}}, </span></span><br/>
+          <span v-if="promo.maxtranscount!=0">Minimum Swipe:<br/>
+            <van-progress :percentage="getSwipePercent(promo)" :pivot-text="promo.transcount" color="#7232dd" text-color="#fff" stroke-width="5"/><br/>
+          </span>
+          <span v-if="promo.maxtransspend!=0">Available Spend:<br/>
+            <van-progress :percentage="getTransSpendPercent(promo)" :pivot-text="promo.transspend" color="red" text-color="#fff" stroke-width="5"/><br/>
+          </span>
+                <span>Categories: {{getExpenseName(promo.rltexpense)}} </span><br/>
             <span v-if="promo.expmemo!=null">{{promo.expmemo}}</br></span>
             <span>Accounts: <span v-for="acc in promo.rltacc">{{getAccName(acc)}}, </span></span></br>
             <span>Rewards: <span v-for="reward in promo.rltrewards">{{reward.rewardsCatName}} {{reward.rewardsValue}},</span></span><br/>
+            <van-checkbox :name="promo.promoid">Use for this transaction</van-checkbox>
             </div>
             </van-collapse-item>
          </van-collapse>
@@ -103,8 +110,8 @@
             <i style="color:#aaaaaa">Please add a new account.</i>
           </div>
         <div v-if="getAccounts.length>0">
-          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
-          <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeFromAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
+          <van-tree-select :items="accSelect" :active-id.sync="activeFromAccId" :main-active-index.sync="activeAccIndex"/>
         </div>
        </van-popup>
     </div>
@@ -117,8 +124,8 @@
             <i style="color:#aaaaaa">Please add a new account.</i>
           </div>
         <div v-if="getAccounts.length>0">
-          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
-          <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeToAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
+          <van-tree-select :items="accSelect" :active-id.sync="activeToAccId" :main-active-index.sync="activeAccIndex"/>
         </div>
        </van-popup>
     </div>
@@ -157,10 +164,13 @@
         expAccSelect:[],
         accSelect:[],
         activeAccId:'',
+        activeFromAccId:'',
+        activeToAccId:'',
         activeAccIndex:0,
         relatedPromo:[],
         showPromoSec:false,
         activePromoNames:[],
+        promochecked:[],
 
         //Picker Initialize
         showTransOptions:false,
@@ -311,25 +321,21 @@
              this.transItem.account = value;
              this.displayAccount = temp.name;
              this.showAccList = false;
-             this.activeAccId = '';
              break;
             case 'incaccount':
              this.transItem.account = value;
              this.displayIncAccount = temp.name;
              this.showIncAccList = false;
-             this.activeAccId = '';
              break;
             case 'fromaccount':
              this.transItem.fromaccount = value;
              this.displayFromAccount = temp.name;
              this.showFromAccList = false;
-             this.activeAccId = '';
              break;
             case 'toaccount':
              this.transItem.toaccount = value;
              this.displayToAccount = temp.name;
              this.showToAccList = false;
-             this.activeAccId = '';
              break;
         
           }
@@ -407,7 +413,11 @@
             this.transItem.account = '';
             this.transItem.category = '';
           }
+          if(this.transItem.type=="Expense"){
+            this.transItem.usedpromo = this.promochecked;
+          }
           this.$store.commit('editTrans',this.transItem);
+          this.$store.commit('updatePromoSwipeSpend');
           this.$store.dispatch('storeAllStateData');
           this.$notify({message:'Transaction Edited',type:'success',duration:3000});
           this.back();
@@ -593,6 +603,8 @@
             this.displayAccount = tempAcc.name;
           else
             this.displayAccount = '';
+          this.promochecked = this.transItem.usedpromo;
+          this.activeAccId = this.transItem.account;
         }
         else if(this.transItem.type == 'Income'){
           let tempCat = this.getIncCat.find(o=>o.inccatid==this.transItem.category);
@@ -605,6 +617,7 @@
             this.displayIncAccount = tempAcc.name;
           else
             this.displayIncAccount = '';
+          this.activeAccId = this.transItem.account;
         }
         else if(this.transItem.type=='Transfer'){
           let tempFromAcc = this.getAccounts.find(o=>o.accid==this.transItem.fromaccount);
@@ -613,6 +626,8 @@
           let tempToAcc = this.getAccounts.find(o=>o.accid==this.transItem.toaccount);
           if(tempToAcc)
             this.displayToAccount = tempToAcc.name;  
+          this.activeFromAccId = this.transItem.fromaccount;
+          this.activeToAccId = this.transItem.toaccount;
         }
         this.transDate = this.$moment(this.transItem.date).format('DD MMMM YYYY');
         if(this.transItem.amount)
@@ -634,6 +649,8 @@
             this.displayAccount = tempAcc.name;
           else
             this.displayAccount = '';
+          this.activeAccId = this.transItem.account;
+          this.promochecked = this.transItem.usedpromo;
         }
         else if(this.transItem.type == 'Income'){
           let tempCat = this.getIncCat.find(o=>o.inccatid==this.transItem.category);
@@ -646,6 +663,7 @@
             this.displayIncAccount = tempAcc.name;
           else
             this.displayIncAccount = '';
+          this.activeAccId = this.transItem.account;
         }
         else if(this.transItem.type=='Transfer'){
           let tempFromAcc = this.getAccounts.find(o=>o.accid==this.transItem.fromaccount);
@@ -654,6 +672,8 @@
           let tempToAcc = this.getAccounts.find(o=>o.accid==this.transItem.toaccount);
           if(tempToAcc)
             this.displayToAccount = tempToAcc.name;  
+          this.activeFromAccId = this.transItem.fromaccount;
+          this.activeToAccId = this.transItem.toaccount;
         }
         this.transDate = this.$moment(this.transItem.date).format('DD MMMM YYYY');
         if(this.transItem.amount)

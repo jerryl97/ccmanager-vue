@@ -220,24 +220,18 @@ export default new Vuex.Store({
     updateAccountDates(state,value){
       let today = new Date();
       for(let i in state.allAccounts){
-        if(Vue.moment(today).date() > Vue.moment(state.allAccounts[i].sdate).date()){
-          if(Vue.moment(today).month() != Vue.moment(state.allAccounts[i].sdate).month()){
-            let tempsdate = Vue.moment(state.allAccounts[i].sdate).date() + Vue.moment(today).format(' MMMM YYYY');
-            state.allAccounts[i].sdate = tempsdate;
-            let temppdate = Vue.moment(state.allAccounts[i].pduedate).date() + Vue.moment(today).format(' MMMM YYYY');
-            state.allAccounts[i].pduedate = temppdate;
-            state.allAccounts[i].cutoffdate = Vue.moment(state.allAccounts[i].sdate).toDate();
-            state.allAccounts[i].cutoffdate = Vue.moment(state.allAccounts[i].cutoffdate).add('1','months').format('D MMMM YYYY');
-            state.allAccounts[i].nextduedate = Vue.moment(state.allAccounts[i].pduedate).toDate();
-            state.allAccounts[i].nextduedate = Vue.moment(state.allAccounts[i].nextduedate).add('1','months').format('D MMMM YYYY');  
-            if(state.allAccounts[i].outstdbalance != 0){
-              state.allAccounts[i].dueamount += state.allAccounts[i].outstdbalance;
-              state.allAccounts[i].outstdbalance = 0;
-            }
-            state.allAccounts[i].settlestatus = false;
+        if(state.allAccounts[i].accgroup==1){
+          let temptoday = Vue.moment(today);
+          let tempStatement  = Vue.moment(state.allAccounts[i].sdate);
+          let tempPayDue = Vue.moment(state.allAccounts[i].pduedate);
+          if(temptoday.isSameOrAfter(tempStatement)){
+            let countmonth = temptoday.month() - tempStatement.month() + 1; 
+            state.allAccounts[i].sdate = tempStatement.add(countmonth,'months').toDate(); 
+            state.allAccounts[i].pduedate = tempPayDue.add(countmonth,'months').toDate();
           }
         }
       }
+      this.commit('countAccBalance');
       scheduleNotification();
     },
     /////////////////////////////////
@@ -316,7 +310,8 @@ export default new Vuex.Store({
         }
       }
       state.allTrans.push(value);
-      switch(value.type){
+      this.commit('countAccBalance');
+      /*switch(value.type){
         case 'Expense':
           for(let i = 0;i<state.allAccounts.length;i++){
             if(state.allAccounts[i].accid == value.account)
@@ -349,7 +344,7 @@ export default new Vuex.Store({
                 state.allAccounts[i].balance += value.amount;
             }
           break;
-      }
+      }*/
       scheduleNotification();
     },
     //Edit Transactions
@@ -364,8 +359,8 @@ export default new Vuex.Store({
     },
     //Delete Transaction
     deleteTrans(state,value){
-      let deletedTrans = state.allTrans.find(trans => trans.transid == value);
-      switch(deletedTrans.type){
+      //let deletedTrans = state.allTrans.find(trans => trans.transid == value);
+      /*switch(deletedTrans.type){
         case 'Expense':
           for(let i = 0;i<state.allAccounts.length;i++){
             if(state.allAccounts[i].accid == deletedTrans.account)
@@ -400,11 +395,80 @@ export default new Vuex.Store({
             }
           } 
           break;
-      }
+      }*/
       state.allTrans = _.filter(state.allTrans,x=>{
         return x.transid != value 
       });
+      this.commit('countAccBalance');
       scheduleNotification();
+    },
+    countAccBalance(){
+      let tempToday = Vue.moment(new Date());
+      for(let i in state.allAccounts){
+        let tempStart = Vue.moment(state.allAccounts[i].sdate).subtract(1,'months').toDate();
+        tempStart = Vue.moment(tempStart);
+        let tempEnd = Vue.moment(state.allAccounts[i].sdate).subtract(1,'days').toDate();
+        tempEnd = Vue.moment(tempEnd); 
+        if(state.allAccounts[i].accgroup!=1)
+          state.allAccounts[i].balance = state.allAccounts[i].initialBalance;
+        else if(state.allAccounts[i].accgroup==1){
+          state.allAccounts[i].outstdbalance = 0;
+          state.allAccounts[i].dueamount = 0;
+          state.allAccounts[i].settlestatus = false;
+        }
+
+        for(let j in state.allTrans){
+          if(state.allTrans[j].account == state.allAccounts[i].accid || state.allTrans[j].fromaccount==state.allAccounts[i].accid||state.allTrans[j].toaccount==state.allAccounts[i].accid){
+
+            if(state.allAccounts[i].accgroup != 1){
+              if(state.allTrans[j].type=='Expense')
+                state.allAccounts[i].balance -= state.allTrans[j].amount;
+              if(state.allTrans[j].type=='Income')
+                state.allAccounts[i].balance += state.allTrans[j].amount;
+              if(state.allTrans[j].type=='Transfer'){
+                if(state.allTrans[j].fromaccount == state.allAccounts[j].accid)
+                  state.allAccounts[i].balance -= state.allTrans[j].amount;
+                if(state.allTrans[j].toaccount == state.allAccounts[j].accid)
+                  state.allAccounts[i].balance += state.allTrans[j].amount;
+              }
+            }
+            else if(state.allAccounts[i].accgroup == 1){
+              let tempDate = Vue.moment(state.allTrans[j].date);
+              if(tempDate.isBetween(tempStart,tempEnd)){
+                if(state.allTrans[j].type=='Expense')
+                  state.allAccounts[i].outstdbalance += state.allTrans[j].amount;
+                if(state.allTrans[j].type=='Income')
+                  state.allAccounts[i].outstdbalance -= state.allTrans[j].amount;
+                if(state.allTrans[j].type=='Transfer'){
+                  if(!state.allTrans[j].forSettle){
+                    if(state.allTrans[j].fromaccount == state.allAccounts[i].accid)
+                      state.allAccounts[i].outstdbalance += state.allTrans[j].amount;
+                    if(state.allTrans[j].toaccount == state.allAccounts[i].accid)
+                      state.allAccounts[i].outstdbalance -= state.allTrans[j].amount;
+                  }else{
+                    if(state.allTrans[j].toaccount == state.allAccounts[i].accid)
+                      state.allAccounts[i].dueamount -= state.allTrans[j].amount;
+                    else if(state.allTrans[j].fromaccount == state.allAccounts[i].accid)
+                      state.allAccounts[i].outstdbalance += state.allTrans[j].amount;
+                    state.allAccounts[i].settlestatus = true;
+                  }
+                }
+              }else if(tempDate.isBefore(tempStart)){
+                if(state.allTrans[j].type=='Expense')
+                  state.allAccounts[i].dueamount += state.allTrans[j].amount;
+                if(state.allTrans[j].type=='Income')
+                  state.allAccounts[i].dueamount -= state.allTrans[j].amount;
+                if(state.allTrans[j].type=='Transfer'){
+                  if(state.allTrans[j].fromaccount == state.allAccounts[j].accid)
+                    state.allAccounts[i].dueamount += state.allTrans[j].amount;
+                  if(state.allTrans[j].toaccount == state.allAccounts[j].accid)
+                    state.allAccounts[i].dueamount -= state.allTrans[j].amount;
+                }
+              }
+            }
+          }
+        }
+      }
     },
     //Set Max Id of Accounts
     setMaxTransId(state,value){
@@ -509,6 +573,27 @@ export default new Vuex.Store({
     setMaxPromoId(state,value){
       state.maxPromoId = value;
     }, 
+    //Update Promo Minimum Swipe & Maximum Spend Amount
+    updatePromoSwipeSpend(state,value){
+      for(let i in state.allTrans){
+        if(state.allTrans[i].type == 'Expense'){
+        if(state.allTrans[i].usedpromo.length>0){
+          for(let j in state.allTrans[i].usedpromo){
+            for(let k in state.allPromo){
+              if(state.allPromo[k].promoid == state.allTrans[i].usedpromo[j]){
+                if(state.allPromo[k].maxtranscount > 0){
+                  state.allPromo[k].transcount -= 1;
+                }
+                if(state.allPromo[k].maxtransspend > 0){
+                  state.allPromo[k].transspend -= state.allTrans[i].amount;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     /////////////////////////////////
 
     //////////////////Rewards Categories
@@ -552,7 +637,8 @@ export default new Vuex.Store({
             if(x.rltexpense.includes(value.transcat)){
               //Check Limit Usage
               if(x.maxtranscount==0 || (x.maxtranscount!=0&&x.transcount>0)){
-                return x; 
+                if(x.maxtransspend == 0 || (x.maxtransspend!=0&&x.transspend>0))
+                  return x; 
                 }
               }
             }

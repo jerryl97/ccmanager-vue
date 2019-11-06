@@ -27,7 +27,13 @@
         </div>
         <div slot="default">
           <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
-          <span v-if="promo.transcount!=0">Minimum Swipe: {{promo.transcount}}/{{promo.maxtranscount}} times <br/></span>
+          <!--<span v-if="promo.transcount!=0">Minimum Swipe: {{promo.transcount}}/{{promo.maxtranscount}} times <br/></span>-->
+          <span v-if="promo.maxtranscount!=0">Minimum Swipe:<br/>
+            <van-progress :percentage="getSwipePercent(promo)" :pivot-text="promo.transcount" color="#7232dd" text-color="#fff" stroke-width="5"/><br/>
+          </span>
+          <span v-if="promo.maxtransspend!=0">Available Spend:<br/>
+            <van-progress :percentage="getTransSpendPercent(promo)" :pivot-text="promo.transspend" color="red" text-color="#fff" stroke-width="5"/><br/>
+          </span>
           <span v-if="promo.rltexpense.length != getExpCat.length">Categories: {{getExpenseName(promo.rltexpense)}}<br/></span>
           <span v-if="promo.rltexpense.length == getExpCat.length">Categories: All<br/></span>
           <span v-if="promo.expmemo!=''">{{promo.expmemo}}</br></span>
@@ -122,6 +128,16 @@ export default{
         }
       }
       return result;
+    },
+    getSwipePercent(promo){
+      let result = promo.transcount / promo.maxtranscount;
+      result = result * 100;
+      return result; 
+    },
+    getTransSpendPercent(promo){
+      let result = promo.transspend / promo.maxtransspend;
+      result = result * 100;
+      return result; 
     },
     deletePromo(promoid){ 
       this.$dialog.confirm({

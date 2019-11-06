@@ -1,13 +1,9 @@
 <template>
-  <div style="padding-top:13%">
+  <div style="padding-top:13%;margin-bottom:25%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="addAccGroup" fixed>
-      <template slot="right">
-        <van-icon name="plus" size="15px"/>
-        <span style="color:#1989fa;font-size:15px">Add</span>
-      </template>
-    </van-nav-bar>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" fixed/>
 
+    <vue-fab :hidden="hideAddAccGrpFab" icon="icon-plus"  size="big" style="margin-bottom:10%" @clickMainBtn="addAccGroup"/>
     <!-- Account Groups List-->
       <van-cell-group>
         <van-cell v-for="(group,key) in getAccGrps" :border="true" :title="group.groupName">
@@ -40,6 +36,7 @@
         accGrpItem:{},
         accGroups:this.getAccGroups,
         tempKey:'',
+        hideAddAccGrpFab:false,
 
         //Popup Initialize
         addGroupPop:false,
@@ -116,6 +113,15 @@
     computed:{
       getAccGrps(){
         return this.$store.state.accGroups;
+      }
+    },
+    watch:{
+      addGroupPop(){
+        if(this.addGroupPop == true){
+          this.hideAddAccGrpFab = true;
+        }else{
+          this.hideAddAccGrpFab = false;
+        }
       }
     },
     mounted(){

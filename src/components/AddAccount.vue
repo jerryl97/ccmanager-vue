@@ -185,21 +185,34 @@
         hasError = this.saveValidation(hasError);
         if(hasError==false){
           if(this.accItem.accgroup!=1&&this.displayBalance==''){
+            this.accItem.initialBalance = 0
             this.accItem.balance = 0;
           }
           else if(this.accItem.accgroup!=1){
-            this.accItem.balance = parseFloat(this.displayBalance);
+            this.accItem.initialBalance = parseFloat(this.displayBalance);
+            this.accItem.balance = this.accItem.initialBalance;
           }
           else if(this.accItem.accgroup==1){
             this.accItem.settlestatus = false;
             this.accItem.dueamount = 0;
             this.accItem.outstdbalance = 0;
-            this.accItem.sdate = this.accItem.sdate + this.$moment(new Date()).format(' MMMM YYYY');
-            this.accItem.pduedate = this.accItem.pduedate + this.$moment(new Date()).format(' MMMM YYYY');
-            this.accItem.cutoffdate = this.$moment(this.accItem.sdate).toDate();
+            if(this.accItem.sdate > this.accItem.pduedate){
+              let tempcur = new Date();
+              this.accItem.sdate = this.accItem.sdate + this.$moment(tempcur).format(' MMMM YYYY');
+              this.accItem.sdate = this.$moment(this.accItem.sdate).toDate();
+              let tempnext = this.$moment(tempcur).add(1,'month');
+              this.accItem.pduedate = this.accItem.pduedate + this.$moment(tempnext).format(' MMMM YYYY');
+              this.accItem.pduedate = this.$moment(this.accItem.pduedate).toDate();
+            }else{
+             this.accItem.sdate = this.accItem.sdate + this.$moment(new Date()).format(' MMMM YYYY');
+             this.accItem.sdate = this.$moment(this.accItem.sdate).toDate();
+             this.accItem.pduedate = this.accItem.pduedate + this.$moment(new Date()).format(' MMMM YYYY');
+             this.accItem.pduedate = this.$moment(this.accItem.pduedate).toDate();
+            }
+            /*this.accItem.cutoffdate = this.$moment(this.accItem.sdate).toDate();
             this.accItem.cutoffdate = this.$moment(this.accItem.cutoffdate).add('1','months').format('D MMMM YYYY');
             this.accItem.nextduedate = this.$moment(this.accItem.pduedate).toDate();
-            this.accItem.nextduedate = this.$moment(this.accItem.nextduedate).add('1','months').format('D MMMM YYYY');  
+            this.accItem.nextduedate = this.$moment(this.accItem.nextduedate).add('1','months').format('D MMMM YYYY');*/
           }
           this.$store.commit('addAccount',this.accItem);
           this.$store.dispatch('storeAllStateData');
@@ -232,11 +245,17 @@
             this.pduedateError="Please insert payment due date";
             validstate = true;
           }
-          if(this.accItem.sdate>this.accItem.pduedate){
+          /*if(this.accItem.sdate>this.accItem.pduedate){
             this.sdateError="Payment due date must later than statement date";
             this.pduedateError="Payment due date must later than statement date"; 
             validstate = true;
+          }*/
+          if(this.accItem.sdate == this.accItem.pduedate){
+            this.sdateError="Payment due date and statement date cannot be the same.";
+            this.pduedateError="Payment due date and statement date cannot be the same."; 
+            validstate = true;
           }
+          
         }else if(this.accItem.accgroup=='Debit Card'){
           if(this.accItem.name==null){
             this.accNameError="Please insert name of the account";

@@ -8,87 +8,33 @@
       </template>
     </van-nav-bar>
 
-    <!--Accounts Section-->
-    <van-cell-group>
-      <template slot="title">
-        <van-icon name="credit-pay"/>&nbsp
-        <span>Accounts</span>
-      </template>
-      <!--Managing Account Groups-->
-      <van-cell title="Manage Account Groups" @click="showManageAccGroups=true" is-link/>
-    </van-cell-group>
+    <van-grid clickable :gutter="3">
+      <van-grid-item icon="credit-pay" text="Accounts" @click="accountsShow=true"/>
+      <van-grid-item icon="bars" text="Transactions" @click="transactionsShow=true"/>
+      <van-grid-item icon="point-gift-o" text="Promotions" @click="promotionsShow=true"/>
+      <van-grid-item icon="points" text="Data"i @click="dataShow=true"/>
+      <van-grid-item icon="comment-o" text="Notification" @click="notificationShow=true"/>
+      <van-grid-item icon="warn-o" text="Security" @click="securityShow=true"/>
+      <van-grid-item icon="records" text="Feedback" url="https://forms.gle/TBRfbhW6KRT9m9R78"/>
+    </van-grid>
 
-    <!--Tranactions Section-->
-    <van-cell-group>
-      <template slot="title">
-        <van-icon name="bars"/>&nbsp
-        <span>Transactions</span>
-      </template>
-      <!--Managing Expense Categories-->
-      <van-cell title="Manage Expense Categories" @click="showManageExpCat=true" is-link/>
-      <!--Managing Income Categories-->
-      <van-cell title="Manage Income Categories" @click="showManageIncCat=true" is-link/>
-      <!--Managing Recurring Transactions-->
-      <van-cell title="Manage Recurring Transactions" @click="showRecurringTrans=true" is-link/>
-    </van-cell-group>
+    <van-action-sheet v-model="accountsShow" :actions="accountsActions" description="Accounts" @select="onAccountsSelect"/>
 
-    <!--Promotions Section-->
-    <van-cell-group>
-      <template slot="title">
-        <van-icon name="point-gift-o"/>&nbsp
-        <span>Promotions</span>
-      </template>
-      <!--Managing Rewards Categories-->
-      <van-cell title="Manage Rewards Categories" @click="showManageRewards=true" is-link/>
-    </van-cell-group>
+    <van-action-sheet v-model="transactionsShow" :actions="transactionsActions" description="Transactions" @select="onTransactionsSelect"/>
 
-    <!--Data Section-->
-    <van-cell-group>
-      <template slot="title">
-        <van-icon name="points"/>&nbsp
-        <span>Data</span>
-      </template>
-      <!--Backup Data-->
-      <van-cell title="Backup Data" @click="backupAllData()" is-link/>
-      <!--Local Backup Manager-->
-      <van-cell title="Local Backup Manager" @click="getBackupList" is-link/>
-      <!--Import Data From File-->
-      <input type="file" ref="importinput" style="display:none" accept="text/plain" @change="readBackupFile($event)"/>
-      <van-cell title="Import Data From Google Drive" @click="$refs.importinput.click()" is-link/>
-      <!--Send Backup to Email using Composer Plugin-->
-      <van-cell title="Send Backup To Email" @click="emailComposer" is-link/>
-      <!--Reset to Default-->
-      <van-cell title="Reset To Default" @click="resetAllData()" is-link/>
-    </van-cell-group>
+    <van-action-sheet v-model="promotionsShow" :actions="promotionsActions" description="Promotions" @select="onPromotionsSelect"/>
 
-    <!--Notification Section-->
-    <van-cell-group>
-      <template slot="title">
-        <van-icon name="comment-o"/>&nbsp
-        <span>Notification</span>
-      </template>
+    <van-action-sheet v-model="dataShow" :actions="dataActions" description="Data" @select="onDataSelect"/>
+
+    <van-action-sheet v-model="notificationShow" description="Notification">
       <van-switch-cell v-model="getNotifyStats" :title="getNotifyStatsTitle(getNotifyStats)" @change="notifyTrigger"/>
-    </van-cell-group>
+    </van-action-sheet>
 
-    <!--Security Section-->
-    <van-cell-group>
-      <template slot="title">
-        <van-icon name="warn-o"/>&nbsp
-        <span>Security</span>
-      </template>
+    <van-action-sheet v-model="securityShow" description="Security">
       <van-switch-cell v-model="getPinStat" :title="getPinStatTitle(getPinStat)" @change="pinTrigger"/>
       <van-cell title="Change Pincode" @click="changePinTrigger" is-link/>
-    </van-cell-group>
+    </van-action-sheet>
 
-    <!--Feedback Form-->
-    <van-cell-group>
-      <template slot="title">
-        <van-icon name="records"/>&nbsp
-        <span>Feedback</span>
-      </template>
-      <!--Google Form Feedback Plugin link button-->
-      <van-cell title="Feedback Form Link" is-link url="https://forms.gle/TBRfbhW6KRT9m9R78"/>
-    </van-cell-group>
 
     <!-- Setting Pop Ups-->
     <!-- Manage Account Groups Pop-->
@@ -160,7 +106,6 @@
     data(){
       return{
         title:'Settings',
-        showManageAccGroups:false,
         showManageExpCat:false,
         showManageIncCat:false,
         showManageRewards:false,
@@ -171,15 +116,74 @@
         showPinInput:false,
         showChangePin:false,
 
+        //Accounts
+        accountsShow:false,
+        accountsActions:[
+          {name:'Manage Accounts Groups'}
+        ],
+        showManageAccGroups:false,
+
+        //Transactions
+        transactionsShow:false,
+        transactionsActions:[
+          {name:'Manage Expense Categories'},
+          {name:'Manage Income Categories'},
+          {name:'Manage Recurring Transactions'},
+        ],
+
+        //Promotions
+        promotionsShow:false,
+        promotionsActions:[
+          {name:'Manage Rewards Categories'},
+        ],
+
+        //Data
+        dataShow:false,
+        dataActions:[
+          {name:'Backup Data'},
+          {name:'Local Backup Manager'},
+          {name:'Import Data From Google Drive'},
+          {name:'Send Backup To Email'},
+          {name:'Reset to Default'},
+        ],
+
+        //Notification
+        notificationShow:false,
+
+        //Security
+        securityShow:false,
+
         //Backup list and popup init
         showBackup:false,
         backupList:[]
       }
     },
     methods:{
+      onAccountsSelect(item,index){
+        this.accountsShow = false;
+        switch(index){
+          case 0:
+            this.showManageAccGroups = true;
+            break;
+        }
+      },
       //Close Manage Account Groups
       closeManageAccGroups(){
         this.showManageAccGroups = false;
+      },
+      onTransactionsSelect(item,index){
+        this.transactionsShow = false;
+        switch(index){
+          case 0:
+            this.showManageExpCat = true;
+            break;
+          case 1:
+            this.showManageIncCat = true;
+            break;
+          case 2:
+            this.showRecurringTrans = true;
+            break;
+        }
       },
       //Close Manage Expense Categories
       closeManageExpCat(){
@@ -193,9 +197,37 @@
       closeRecurringTrans(){
         this.showRecurringTrans=false;
       },
+      onPromotionsSelect(item,index){
+        this.promotionsShow = false;
+        switch(index){
+          case 0:
+            this.showManageRewards = true;
+            break;
+        }
+      },
       //Close Manage Rewards Categories
       closeManageRewardsCat(){
         this.showManageRewards=false;
+      },
+      onDataSelect(item,index){
+        this.dataShow = false;
+        switch(index){
+          case 0:
+            this.backupAllData();
+            break;
+          case 1:
+            this.getBackupList();
+            break;
+          case 2:
+            this.$refs.importinput.click();
+            break;
+          case 3:
+            this.emailComposer();
+            break;
+          case 4:
+            this.resetAllData();
+            break;
+        }
       },
       //Close set New Pin
       closeNewPin(){
@@ -527,7 +559,8 @@
 <style scoped>
 #settingmaindiv{
   background-color:#f6f6f6;
-  margin-bottom:20%;
   padding-top:13%;
+  height:100%;
+  position:absolute;
 }
 </style>

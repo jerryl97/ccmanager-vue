@@ -17,8 +17,11 @@
       <!--Promotion's Title-->
       <van-field label="Title" clearable placeholder="Promotion's Title" v-model="promoItem.promotitle" required :error-message="titleErrorMsg"/>
       <!--Minimum Spend-->
-      <van-field readonly clickable label="Minimum" :value="displayMinimum" @touchstart.native.stop="showNumbKeyboard = true" placeholder="$ 0"/>
-      <van-number-keyboard v-model="displayMinimum" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/>
+      <van-field readonly clickable label="Minimum" :value="displayMinimum" @touchstart.native.stop="showMaxNumbKeyboard = false,showMinNumbKeyboard = true" placeholder="$ 0"/>
+      <!--Maximum Spend-->
+      <van-field readonly clickable label="Maximum" :value="displayMaximum" @touchstart.native.stop="showMaxNumbKeyboard = true, showMinNumbKeyboard = false" placeholder="$ 0"/>
+      <van-number-keyboard v-model="displayMinimum" :show="showMinNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMinNumbKeyboard = false"/>
+      <van-number-keyboard v-model="displayMaximum" :show="showMaxNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMaxNumbKeyboard = false"/>
       <!--Promotion's Desc-->
       <van-field label="Description" clearable placeholder="Promotion's Description" v-model="promoItem.promodesc"/>
 
@@ -39,7 +42,7 @@
 
       <!--Transactions Count-->
       <van-cell title="Minimum Swipe">
-        <van-stepper v-model="promoItem.transcount" min="0"></van-stepper>
+        <van-stepper v-model="promoItem.maxtranscount" min="0"></van-stepper>
       </van-cell>
     </van-cell-group>
 
@@ -150,6 +153,8 @@
           promodesc:'',
           transcount:0,
           maxtranscount:0,
+          transspend:0,
+          maxtransspend:0,
           expmemo:'',
         },
         nextBtnText:'Next',
@@ -166,11 +171,13 @@
  
         //Display Variables
         displayMinimum:'',
+        displayMaximum:'',
         fromPromoDate:'',
         toPromoDate:'',
 
         //Picker Initialize
-        showNumbKeyboard:false,
+        showMinNumbKeyboard:false,
+        showMaxNumbKeyboard:false,
         showFromPromoDate:false,
         showToPromoDate:false,
         showAddExpCat:false,
@@ -210,7 +217,7 @@
         this.promoItem={
           duration:false,
           promodesc:'',
-          transcount:0,
+          maxtranscount:0,
           expmemo:'',
         }
         this.showFromPromoDate=false;
@@ -360,7 +367,7 @@
       },
       //Save New Promotion
       saveNewPromo(){
-        this.promoItem.maxtranscount = this.promoItem.transcount;
+        this.promoItem.transcount = this.promoItem.maxtranscount;
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
         this.promoItem.rltrewards = this.rewardsInputs;
@@ -369,6 +376,11 @@
           this.promoItem.minimum = parseFloat(this.displayMinimum);
         else
           this.promoItem.minimum = 0;
+        if(this.displayMaximum != '')
+          this.promoItem.maxtransspend = parseFloat(this.displayMaximum);
+        else
+          this.promoItem.maxtransspend = 0;
+        this.promoItem.transspend = this.promoItem.maxtransspend;
         this.$store.commit('addNewPromo',this.promoItem);
         this.$store.dispatch('storeAllStateData');
         this.$notify({message:'Promotion Added', type:'success', duration:3000});

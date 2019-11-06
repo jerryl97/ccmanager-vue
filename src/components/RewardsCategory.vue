@@ -1,13 +1,9 @@
 <template>
-  <div style="padding-top:13%">
+  <div style="padding-top:13%;margin-bottom:25%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="addRewardsCat" fixed>
-      <template slot="right">
-        <van-icon name="plus" size="15px"/>
-        <span style="color:#1989fa;font-size:15px">Add</span>
-      </template>
-    </van-nav-bar>
+    <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" fixed/>
 
+    <vue-fab :hidden="hideAddRewCatFab" icon="icon-plus"  size="big" style="margin-bottom:10%" @clickMainBtn="addRewardsCat"/>
     <!-- Rewards Categories List -->
     <van-cell-group>
       <van-cell v-for="(cat,key) in getRewardsCat" :border="true" :title="cat.rewardsCatName">
@@ -39,6 +35,7 @@
         //Variable Initialize
         expCat:[],
         cat:{},
+        hideAddRewCatFab:false,
 
         //Popup Initialize
         isEdit:false,
@@ -118,6 +115,15 @@
     computed:{
       getRewardsCat(){
         return this.$store.state.rewardsCat; 
+      }
+    },
+    watch:{
+      addRewardsCatPop(){
+        if(this.addRewardsCatPop == true){
+          this.hideAddRewCatFab = true;
+        }else{
+          this.hideAddRewCatFab = false;
+        }
       }
     },
     mounted(){

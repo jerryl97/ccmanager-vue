@@ -48,34 +48,40 @@
        <van-field required readonly clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayAccount" @click="showAccSelection">
        </van-field>
 
-       <van-popup v-model="showAccList" position="bottom">
+       <van-popup v-model="showAccList" position="bottom" :style="{height:'100%'}">
 
-        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')"/>
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')" fixed/>
         <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
           <i style="color:#aaaaaa">Please add a new account.</i>
         </div>
-        <div v-if="getAccounts.length>0">
+        <div v-if="getAccounts.length>0" style="margin-top:13%">
         <van-tree-select @click-item="showRelatedPromo" :items="expAccSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
         
         <!--Suggested Accounts' Promotion-->
         <van-cell-group v-if="activeAccIndex==0&&activeAccId!=''&&expAccSelect[0].children.length>0" title="Promotions of this account">
-          <van-collapse v-model="activePromoNames" accordion>
+          <van-collapse v-model="activePromoNames">
             <van-checkbox-group v-model="promochecked">
             <van-collapse-item v-for="(promo,index) in relatedPromo" :label="promo.promodesc" :name="promo.promoid">
               <div slot="title"> 
-                {{promo.promotitle}}
+                <strong>{{promo.promotitle}}</strong>
               </div>
               <div slot="value"> 
                 Minimum: $ {{promo.minimum}}<br/>
               </div>
               <div slot="default">
                 <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
-                <span v-if="promo.transcount!=0">Limit: {{promo.transcount}} times <br/></span>
-                <span>Categories: {{getExpenseName(promo.rltexpense)}} </span><br/>
+                <span v-if="promo.maxtranscount!=0">Minimum Swipe:<br/>
+                  <van-progress :percentage="getSwipePercent(promo)" :pivot-text="promo.transcount" color="#7232dd" text-color="#fff" stroke-width="5"/><br/>
+                </span>
+                <span v-if="promo.maxtransspend!=0">Available Spend:<br/>
+                  <van-progress :percentage="getTransSpendPercent(promo)" :pivot-text="promo.transspend" color="red" text-color="#fff" stroke-width="5"/><br/>
+                </span>
+                <span v-if="promo.rltexpense.length != getExpCat.length">Categories: {{getExpenseName(promo.rltexpense)}}<br/></span>
+                <span v-if="promo.rltexpense.length == getExpCat.length">Categories: All<br/></span>
                 <span v-if="promo.expmemo!=''">{{promo.expmemo}}<br/></span>
                 <span>Accounts: {{getAccName(promo.rltacc)}}</span><br/>
                 <span>Rewards: {{getRewardsName(promo.rltrewards)}}</span><br/>
-                <van-checkbox :name="promo.promoid">Use for this transaction</van-checkbox>
+                <van-checkbox :name="promo.promoid">Use this promotion</van-checkbox>
                 <!--<van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
                 <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>-->
               </div>
@@ -109,8 +115,8 @@
             <i style="color:#aaaaaa">Please add a new account.</i>
           </div>
         <div v-if="getAccounts.length>0">
-          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
-          <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeFromAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
+          <van-tree-select :items="accSelect" :active-id.sync="activeFromAccId" :main-active-index.sync="activeAccIndex"/>
         </div>
        </van-popup>
     </div>
@@ -123,8 +129,8 @@
             <i style="color:#aaaaaa">Please add a new account.</i>
           </div>
         <div v-if="getAccounts.length>0">
-          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
-          <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeToAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
+          <van-tree-select :items="accSelect" :active-id.sync="activeToAccId" :main-active-index.sync="activeAccIndex"/>
         </div>
        </van-popup>
     </div>
@@ -168,12 +174,15 @@ import Calculator from './Calculator.vue'
           amount:0,
           recurringtype:0,
           recurringtime:0,
+          forSettle:false,
 
         },
         transOptions:['Expense','Income','Transfer'],
         expAccSelect:[],
         accSelect:[],
         activeAccId:'',
+        activeFromAccId:'',
+        activeToAccId:'',
         activeAccIndex:0,
         relatedPromo:[],
         showPromoSec:false,
@@ -298,8 +307,10 @@ import Calculator from './Calculator.vue'
       //Show Related Promotion of Account
       showRelatedPromo(data){
         this.relatedPromo = [];
+        this.activePromoNames = [];
         for(let i in data.rltpromo){
           let temp = this.getPromo.find(o => o.promoid == data.rltpromo[i]); 
+          this.activePromoNames.push(data.rltpromo[i]);
           this.relatedPromo.push(temp);
         }
       },
@@ -366,7 +377,6 @@ import Calculator from './Calculator.vue'
              else
               this.displayAccount = temp.name+'('+temp.last4digits+')';
              this.showAccList = false;
-             this.activeAccId = '';
              break;
             case 'incaccount':
              this.transItem.account = value;
@@ -375,7 +385,7 @@ import Calculator from './Calculator.vue'
              else
               this.displayIncAccount = temp.name+'('+temp.last4digits+')';
              this.showIncAccList = false;
-             this.activeAccId = '';
+this.activeAccId = '';
              break;
             case 'fromaccount':
              this.transItem.fromaccount = value;
@@ -384,7 +394,6 @@ import Calculator from './Calculator.vue'
              else
               this.displayFromAccount = temp.name+'('+temp.last4digits+')';
              this.showFromAccList = false;
-             this.activeAccId = '';
              break;
             case 'toaccount':
              this.transItem.toaccount = value;
@@ -393,7 +402,6 @@ import Calculator from './Calculator.vue'
              else
               this.displayToAccount = temp.name+'('+temp.last4digits+')';
              this.showToAccList = false;
-             this.activeAccId = '';
              break;
         
           }
@@ -414,12 +422,12 @@ import Calculator from './Calculator.vue'
             break;
           case 'fromaccount': 
             this.displayFromAccount = '';
-            this.activeAccId = '';
+            this.activeFromAccId = '';
             this.showFromAccList = false;
             break;
           case 'toaccount':
             this.displayToAccount = '';
-            this.activeAccId = '';
+            this.activeToAccId = '';
             this.showToAccList = false;
             break;
         }
@@ -470,20 +478,28 @@ import Calculator from './Calculator.vue'
             this.transItem.category = '';
           }
 
-          for(let i in this.promochecked){
-            let temp = this.getPromo.find(o => o.promoid == this.promochecked[i]); 
-            if(temp.maxtranscount!=0){
-              temp.transcount = temp.transcount - 1;
-              this.$store.commit('editPromo',temp);
-            }
+          if(this.transItem.type=="Expense"){
+            this.transItem.usedpromo = this.promochecked;
           }
           this.$store.commit('addTrans',this.transItem);
+          this.$store.commit('countAccBalance');
+          this.$store.commit('updatePromoSwipeSpend');
           this.$store.dispatch('storeAllStateData');
           this.$notify({message:'Transaction Added',type:'success',duration:3000});
           this.setDefault();
           this.$router.push({path:'/main/acctrans',query:{activeTab:1}});
         }       
       },
+    getSwipePercent(promo){
+      let result = promo.transcount / promo.maxtranscount;
+      result = result * 100;
+      return result; 
+    },
+    getTransSpendPercent(promo){
+      let result = promo.transspend / promo.maxtransspend;
+      result = result * 100;
+      return result; 
+    },
       
       //Save Validation
       addTransValidation(value){
