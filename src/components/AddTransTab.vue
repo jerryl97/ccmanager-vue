@@ -153,7 +153,8 @@
     <van-button type="primary" size="large" style="width:90%;margin:5%;" @click="saveNewTrans">Save</van-button>
     </van-cell-group>
 
-    <div style="margin:10px" v-if="getBudgetStat==true"> 
+    <!--Budget-->
+    <div style="margin:10px;text-align:center" v-if="getBudgetStat==true"> 
       <span style="font-size:15px;">Monthly Budget: $ {{getTotalSpend()}}/{{getBudgetAmount}}</span><br/>
 
       <van-progress v-if="getBudgetPercent()<=100":percentage="getBudgetPercent()" style="margin-top:10px;" :pivot-text="getBudgetPercent()+'%'" color="#f2826a" text-color="#fff" stroke-width="5"/>
@@ -566,8 +567,12 @@ this.activeAccId = '';
         return result;
       },
       getBudgetPercent(){
-        if(this.getBudgetStat)
-          return (this.getTotalSpend() / this.getBudgetAmount) * 100;
+        let result = 0;
+        if(this.getBudgetStat){
+          result = (this.getTotalSpend() / this.getBudgetAmount) * 100;
+          result = _.round(result,1);
+          return result;
+        }
       },
 
     },

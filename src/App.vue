@@ -106,11 +106,9 @@ export default {
       return temp;
     }
   },
-  created(){
+  mounted(){
     this.$store.dispatch('getAllStateData');
     document.addEventListener("backbutton",this.onBackKeyDown,false); 
-  },
-  mounted(){
   },
   updated(){
     let tempToday = this.$moment(new Date()).format('YYYY-MMM-DD');

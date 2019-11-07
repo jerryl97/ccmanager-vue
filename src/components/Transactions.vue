@@ -25,6 +25,14 @@
        </van-col>
      </van-row>
     </div>
+
+    <div style="padding:10px;background-color:#f6f6f6;text-align:center" v-if="getBudgetStat==true&&!isProfile"> 
+      <span style="font-size:15px;">Monthly Budget: $ {{monthTotalExp}}/{{getBudgetAmount}}</span><br/>
+
+      <van-progress v-if="getBudgetPercent()<=100":percentage="getBudgetPercent()" style="margin-top:10px;" :pivot-text="getBudgetPercent()+'%'" color="#f2826a" text-color="#fff" stroke-width="5"/>
+      <span style="color:red;font-size:15px;" v-if="getBudgetPercent()>100">Over Budget!!</span>
+
+    </div>
  
     <van-tabs background="#f6f6f6" title-active-color="#07c160" title-inactive-color="#333333" color="#07c160" v-model="transtab">
 
@@ -259,6 +267,16 @@
         this.monthTotal = this.monthTotalInc - this.monthTotalExp;   
       },
 
+      //Get Budget Percent
+      getBudgetPercent(){
+        let result = 0;
+        if(this.getBudgetStat){
+          result = (this.monthTotalExp/this.getBudgetAmount) * 100;
+          result = _.round(result,1);
+          return result;
+        }
+      },
+
       //Get Date Summary
       getDateSummary(date,type){
         let result = this.dateSummary.find(item => item.date == date);
@@ -491,7 +509,13 @@
       },
       getIncCat(){
         return this.$store.state.incCat;
-      }
+      },
+      getBudgetStat(){
+        return this.$store.state.budgetStat;
+      },
+      getBudgetAmount(){
+        return this.$store.state.budgetAmount;
+      },
     },
     mounted(){
     },

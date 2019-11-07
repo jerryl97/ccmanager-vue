@@ -24,6 +24,8 @@
             Oustd: <span :style="{color:getOutstdColor(acc.outstdbalance)}">{{acc.outstdbalance}}</span><br/>
             <van-button size="mini" plain type="info" @click="settlePop=true;settleDueOrOutstd=true">Settle</van-button>
             Due: <span :style="{color:getOutstdColor(acc.dueamount)}">{{acc.dueamount}}</span><br/>
+            <van-tag type="danger" v-if="!acc.settlestatus">Not Settled</van-tag>
+            <van-tag type="success" v-if="acc.settlestatus">Settled</van-tag>
           </span>
         </template>
         <template slot="label">
@@ -34,7 +36,6 @@
           </span>
         </template>
       </van-cell>
-      <van-switch-cell @change="changeSettleStatus" v-model="displaySettleStat" v-if="acc.accgroup==1" :style="{backgroundColor:'#f6f6f6',color:getSettleColor(acc.settlestatus)}" active-color="green" inactive-color="red"  :title="getSettleStatus(acc.settlestatus)"/>
     </van-cell-group>
     <div v-if="acc.accgroup==1" style="text-align:center;background-color:#f6f6f6;padding:10px 0px;border-bottom:1px solid #dddddd">
     <van-row type="flex">
@@ -106,7 +107,6 @@
         editAccPop:false,
         settlePop:false,
         settleDueOrOutstd:false,
-        displaySettleStat:false,
       }
     },
     methods:{
@@ -167,23 +167,6 @@
       closeSettlePage(){
         this.settlePop = false;
       },
-      getSettleStatus(stats){
-        if(stats==true)
-          return 'Settled'
-        else
-          return 'Not Settled'
-      },
-      getSettleColor(stats){
-        if(stats){
-          return 'green'
-        }else{
-          return 'red'
-        } 
-      },
-      changeSettleStatus(checked){
-        this.acc.settlestatus=checked;
-        this.$store.dispatch('storeAllStateData');
-      },
     },
     computed:{
       getAccGroups(){
@@ -191,14 +174,6 @@
       },
       getAccounts(){
         return this.$store.state.allAccounts;
-      }
-    },
-    mounted(){
-      this.displaySettleStat = this.acc.settlestatus;
-    },
-    watch:{
-      acc(){
-        this.displaySettleStat = this.acc.settlestatus;
       }
     },
     components:{

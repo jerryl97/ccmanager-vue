@@ -104,6 +104,7 @@
       
       },
       back(){
+        this.setDefault();
         this.$emit("closeSettlePage");
       },
       dateConfirm(value){
@@ -126,15 +127,19 @@
          switch(type){
             case 'fromaccount':
              this.transItem.fromaccount = value;
-             this.displayFromAccount = temp.name;
+             if(temp.accgroup!=1&&temp.accgroup!=2)
+              this.displayFromAccount = temp.name;
+             else
+              this.displayFromAccount = temp.name+'('+temp.last4digits+')';
              this.showFromAccList = false;
-             this.activeAccId = '';
              break;
             case 'toaccount':
              this.transItem.toaccount = value;
-             this.displayToAccount = temp.name;
+             if(temp.accgroup!=1&&temp.accgroup!=2)
+              this.displayToAccount = temp.name;
+             else
+              this.displayToAccount = temp.name+'('+temp.last4digits+')';
              this.showToAccList = false;
-             this.activeAccId = '';
              break;
         
           }
@@ -204,8 +209,8 @@
           }
           this.$store.commit('addTrans',this.transItem);
           this.$store.dispatch('storeAllStateData');
-          this.back();
           this.setDefault();
+          this.back();
         }       
       },
       
@@ -282,7 +287,7 @@
     },
     mounted(){
       this.transItem.toaccount = this.acc.accid;
-      this.displayToAccount = this.acc.name;
+      this.displayToAccount = this.acc.name+'('+this.acc.last4digits+')';
       if(this.settleDueOrOutstd==false){
         this.transAmount = this.acc.outstdbalance.toString();
         this.transItem.contents = 'Settle Outstanding Amount';

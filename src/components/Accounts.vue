@@ -14,9 +14,9 @@
             <strong>{{getGroupName(key)}}</strong>
           </template>
           <template slot="default">
-            <span v-if="key == 1">Due: <span :style="{color:getOutstdColor(getTotalDue(key))}">{{getTotalDue(key)}}</span></span>&nbsp
-            <span v-if="key == 1">Outstd: <span :style="{color:getOutstdColor(getTotalOutstd(key))}">{{getTotalOutstd(key)}}</span></span>
-            <span v-if="key != 1">Total: <span :style="{color:getBalanceColor(getTotalBalace(key))}">{{getTotalBalace(key)}}</span></span>
+            <span v-if="key == 1">Due: <span :style="{color:getOutstdColor(getTotalDue(key))}">$ {{getTotalDue(key)}}</span></span>&nbsp
+            <span v-if="key == 1">Outstd: <span :style="{color:getOutstdColor(getTotalOutstd(key))}">$ {{getTotalOutstd(key)}}</span></span>
+            <span v-if="key != 1">Total: <span :style="{color:getBalanceColor(getTotalBalace(key))}">$ {{getTotalBalace(key)}}</span></span>
           </template>
         </van-cell>
         <van-swipe-cell v-for="acc in group" :on-close="accOnClose" :name="acc.accid">
@@ -25,7 +25,7 @@
             <span>{{acc.name}}</span>
           </template>
           <template slot="default">
-            <span :style="{color:getBalanceColor(acc.balance)}">{{acc.balance}}</span>
+            <span :style="{color:getBalanceColor(acc.balance)}">$ {{acc.balance}}</span>
           </template>
           </van-cell>
           <van-cell v-if="key==1" is-link arrow-direction="left" @click="showAccActionSheet(acc)">
@@ -38,9 +38,9 @@
           </template>
           <template slot="default">
             <span>
-              Outstd: <span :style="{color:getOutstdColor(acc.outstdbalance)}">{{acc.outstdbalance}}</span>
+              Outstd: <span :style="{color:getOutstdColor(acc.outstdbalance)}">$ {{acc.outstdbalance}}</span>
               <br/>
-              Due: <span :style="{color:getOutstdColor(acc.dueamount)}">{{acc.dueamount}}</span>
+              Due: <span :style="{color:getOutstdColor(acc.dueamount)}">$ {{acc.dueamount}}</span>
             </span>
           </template>
         </van-cell>
