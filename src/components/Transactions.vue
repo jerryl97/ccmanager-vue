@@ -503,7 +503,6 @@
           this.hideAddTransFab = true;
         else if(this.transActionSheetShow == false && this.editTransPop == true)
           this.hideAddTransFab = true;
-
       }
     },
     components:{

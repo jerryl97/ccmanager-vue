@@ -1,7 +1,12 @@
 <template>
   <div style="padding-top:13%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()" fixed right-text="SMS" @click-right="getSMS()"/>
+    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()" fixed @click-right="getSMS()">
+      <template slot="right">
+        <van-icon color="#1989fa" name="envelop-o"/>
+        <span style="color:#1989fa">SMS</span>
+      </template>
+    </van-nav-bar>
 
     <!--Add Promotion Steps-->
     <van-steps :active="activeStep">
@@ -48,7 +53,8 @@
 
     <!-- Related Accounts-->
     <van-cell-group title="Select Accounts" v-if="activeStep==1">
-      <van-tree-select :items="accountSelect" :active-id.sync="activeAccIds" :main-active-index.sync="activeAccIndex"/>
+      <van-tree-select v-if="getAccounts.length>0" :items="accountSelect" :active-id.sync="activeAccIds" :main-active-index.sync="activeAccIndex"/>
+      <div v-if="getAccounts.length==0" style="text-align:center;font-style:italic;">Please add a new account</div>
     </van-cell-group>
 
     <!-- Related Expense Categories-->
@@ -227,6 +233,7 @@
         this.activeStep=0;
         this.titleErrorMsg='';
         this.displayMinimum='';
+        this.displayMaximum='';
         this.activeAccIds = [];
         this.activeAccIndex = 0;
         this.expcatchecked = [];

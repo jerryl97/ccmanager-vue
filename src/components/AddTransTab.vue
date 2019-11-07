@@ -50,10 +50,11 @@
 
        <van-popup v-model="showAccList" position="bottom" :style="{height:'100%'}">
 
-        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')" fixed/>
-        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:20% 0%">
           <i style="color:#aaaaaa">Please add a new account.</i>
         </div>
+
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')" fixed/>
         <div v-if="getAccounts.length>0" style="margin-top:13%">
         <van-tree-select @click-item="showRelatedPromo" :items="expAccSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
         
@@ -97,12 +98,12 @@
     <div v-if="transItem.type=='Income'">
        <van-field readonly required clickable :error-message="accountError" label="Account" placeholder="Choose an account" :value="displayIncAccount" @click="showIncAccList = true"/>
        <van-popup v-model="showIncAccList" position="bottom">
-          <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
-            <i style="color:#aaaaaa">Please add a new account.</i>
-          </div>
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'incaccount')" @click-left="cancelAccConfirm('incaccount')"/>
         <div v-if="getAccounts.length>0">
-          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'incaccount')" @click-left="cancelAccConfirm('incaccount')"/>
           <van-tree-select :items="accSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
+        </div>
+        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+            <i style="color:#aaaaaa">Please add a new account.</i>
         </div>
        </van-popup>
     </div>
@@ -111,11 +112,12 @@
     <div v-if="transItem.type=='Transfer'">
        <van-field readonly required clickable :error-message="fromAccountError" label="From" placeholder="Choose an account" :value="displayFromAccount" @click="showFromAccList = true"/>
        <van-popup v-model="showFromAccList" position="bottom">
-          <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeFromAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
+        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+
             <i style="color:#aaaaaa">Please add a new account.</i>
           </div>
         <div v-if="getAccounts.length>0">
-          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeFromAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
           <van-tree-select :items="accSelect" :active-id.sync="activeFromAccId" :main-active-index.sync="activeAccIndex"/>
         </div>
        </van-popup>
@@ -125,11 +127,11 @@
     <div v-if="transItem.type=='Transfer'">
        <van-field readonly required clickable label="To" :error-message="toAccountError" placeholder="Choose an account" :value="displayToAccount" @click="showToAccList = true"/>
        <van-popup v-model="showToAccList" position="bottom">
+          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeToAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
           <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
             <i style="color:#aaaaaa">Please add a new account.</i>
           </div>
         <div v-if="getAccounts.length>0">
-          <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeToAccId,'toaccount')" @click-left="cancelAccConfirm('toaccount')"/>
           <van-tree-select :items="accSelect" :active-id.sync="activeToAccId" :main-active-index.sync="activeAccIndex"/>
         </div>
        </van-popup>
@@ -149,8 +151,15 @@
 
     <!-- Save Button-->
     <van-button type="primary" size="large" style="width:90%;margin:5%;" @click="saveNewTrans">Save</van-button>
-
     </van-cell-group>
+
+    <div style="margin:10px" v-if="getBudgetStat==true"> 
+      <span style="font-size:15px;">Monthly Budget: $ {{getTotalSpend()}}/{{getBudgetAmount}}</span><br/>
+
+      <van-progress v-if="getBudgetPercent()<=100":percentage="getBudgetPercent()" style="margin-top:10px;" :pivot-text="getBudgetPercent()+'%'" color="#f2826a" text-color="#fff" stroke-width="5"/>
+      <span style="color:red;font-size:15px;" v-if="getBudgetPercent()>100">Over Budget!!</span>
+
+    </div>
 
   </div>
 </template>
@@ -482,10 +491,18 @@ this.activeAccId = '';
             this.transItem.usedpromo = this.promochecked;
           }
           this.$store.commit('addTrans',this.transItem);
-          this.$store.commit('countAccBalance');
           this.$store.commit('updatePromoSwipeSpend');
           this.$store.dispatch('storeAllStateData');
-          this.$notify({message:'Transaction Added',type:'success',duration:3000});
+          if(this.getBudgetStat){
+            if(this.getTotalSpend > this.getBudgetAmount){
+              this.$notify({message:'Transaction Added',type:'success',duration:3000});
+              this.$notify({message:'Over Monthy Budget!!',type:'danger',duration:3000});
+            }else{
+              this.$notify({message:'Transaction Added',type:'success',duration:3000});
+            }
+          }else{
+              this.$notify({message:'Transaction Added',type:'success',duration:3000});
+          }
           this.setDefault();
           this.$router.push({path:'/main/acctrans',query:{activeTab:1}});
         }       
@@ -533,7 +550,25 @@ this.activeAccId = '';
       confirmCalculator(calcResult){
         this.transAmount = parseFloat(calcResult);
         this.showCalculator=false;
-      }
+      },
+      getTotalSpend(){
+        let today =  new Date();
+        let filteredTrans = _.filter(this.getTrans,x=>{
+          let temptoday = this.$moment(today);
+          let tempdate = this.$moment(x.date);
+          return temptoday.month() == tempdate.month() && temptoday.year() == tempdate.year() && x.type=='Expense';
+        });
+
+        let result = 0;
+        for(let i in filteredTrans){
+          result += filteredTrans[i].amount;
+        }
+        return result;
+      },
+      getBudgetPercent(){
+        if(this.getBudgetStat)
+          return (this.getTotalSpend() / this.getBudgetAmount) * 100;
+      },
 
     },
     computed:{
@@ -544,6 +579,15 @@ this.activeAccId = '';
           days.push(tempitem);
         }
         return days;
+      },
+      getTrans(){
+        return this.$store.state.allTrans;
+      },
+      getBudgetStat(){
+        return this.$store.state.budgetStat;
+      },
+      getBudgetAmount(){
+        return this.$store.state.budgetAmount;
       },
       getExpCat(){
         return this.$store.state.expCat;

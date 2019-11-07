@@ -83,6 +83,7 @@
 
     data(){ 
       return{
+        accountsList:[],
         activeCollapse:[],
         addAccPop:false, 
         hideAddAccFab:false,
@@ -112,9 +113,9 @@
       },
       //Show Account Action Sheet
       showAccActionSheet(acc){
+        this.selectedAcc = acc;
         this.accActionSheetShow = true;
         this.accActionSheetDesc = acc.name;
-        this.selectedAcc = acc;
       },
       onAccActionSheetSelect(item,index){
         this.accActionSheetShow = false;
@@ -242,6 +243,12 @@
         }
         return grouped 
       }, 
+    },
+    mounted(){
+      this.accountsList = this.getGroupedAccounts;
+    },
+    updated(){
+      this.accountsList = this.getGroupedAccounts;
     },
     watch:{
       accActionSheetShow(){

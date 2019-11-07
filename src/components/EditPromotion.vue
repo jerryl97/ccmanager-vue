@@ -49,7 +49,8 @@
 
     <!-- Related Accounts-->
     <van-cell-group title="Select Accounts" v-if="activeStep==1">
-      <van-tree-select :items="accountSelect" :active-id.sync="activeAccIds" :main-active-index.sync="activeAccIndex"/>
+      <van-tree-select v-if="getAccounts.length>0" :items="accountSelect" :active-id.sync="activeAccIds" :main-active-index.sync="activeAccIndex"/>
+      <div v-if="getAccounts.length==0" style="text-align:center;font-style:italic;">Please add a new account</div>
     </van-cell-group>
 
     <!-- Related Expense Categories-->
@@ -174,6 +175,7 @@
         this.activeStep=0;
         this.titleErrorMsg='';
         this.displayMinimum='';
+        this.displayMaximum='';
         this.accountSelect = [];
         this.activeAccIds = [];
         this.activeAccIndex = [];

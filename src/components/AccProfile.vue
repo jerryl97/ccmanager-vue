@@ -34,7 +34,7 @@
           </span>
         </template>
       </van-cell>
-      <van-switch-cell @change="changeSettleStatus" v-if="acc.accgroup==1" :style="{backgroundColor:'#f6f6f6',color:getSettleColor(acc.settlestatus)}" active-color="green" inactive-color="red" v-model="acc.settlestatus" :title="getSettleStatus(acc.settlestatus)"/>
+      <van-switch-cell @change="changeSettleStatus" v-model="displaySettleStat" v-if="acc.accgroup==1" :style="{backgroundColor:'#f6f6f6',color:getSettleColor(acc.settlestatus)}" active-color="green" inactive-color="red"  :title="getSettleStatus(acc.settlestatus)"/>
     </van-cell-group>
     <div v-if="acc.accgroup==1" style="text-align:center;background-color:#f6f6f6;padding:10px 0px;border-bottom:1px solid #dddddd">
     <van-row type="flex">
@@ -106,6 +106,7 @@
         editAccPop:false,
         settlePop:false,
         settleDueOrOutstd:false,
+        displaySettleStat:false,
       }
     },
     methods:{
@@ -180,7 +181,7 @@
         } 
       },
       changeSettleStatus(checked){
-        this.$store.commit('editAccount',this.acc);
+        this.acc.settlestatus=checked;
         this.$store.dispatch('storeAllStateData');
       },
     },
@@ -190,6 +191,14 @@
       },
       getAccounts(){
         return this.$store.state.allAccounts;
+      }
+    },
+    mounted(){
+      this.displaySettleStat = this.acc.settlestatus;
+    },
+    watch:{
+      acc(){
+        this.displaySettleStat = this.acc.settlestatus;
       }
     },
     components:{

@@ -20,6 +20,9 @@ export default {
       this.$dialog.confirm({
         message:'Are you sure to quit?'
       }).then(()=>{
+        let today = new Date();
+        this.$store.commit('setTodayDate',today);
+        this.$store.dispatch('storeAllStateData');
         navigator.app.exitApp();
       }).catch(()=>{
         this.$dialog.close();
@@ -29,16 +32,18 @@ export default {
     addRecurringTrans(){
       let today = new Date();
       let allRecurTrans = this.getRecurringTrans;
-      let todayformatted = this.$moment(new Date()).format('YYYY-MM-DD');
+      let tempToday = this.$moment(today).format('YYYY-MMMM-DD');
       if(allRecurTrans.length>0){
       for(let i in allRecurTrans){
-          let tempdate = this.$moment(allRecurTrans[i].date).format('YYYY-MM-DD');
-          let existed = _.filter(this.getTrans,x=>{
-            return this.$moment(x.date).format('YYYY-MM-DD') == todayformatted && x.recurid == allRecurTrans[i].recurid;
-          }); 
-        if(existed.length == 0){
+          let tempdate = this.$moment(allRecurTrans[i].date).format('YYYY-MMMM-DD');
+          //let existed = _.filter(this.getTrans,x=>{
+          //  return this.$moment(x.date).format('YYYY-MM-DD') == todayformatted && x.recurid == allRecurTrans[i].recurid;
+          //});
+        let tempStoreDay = this.$moment(this.getTodayDate).format('YYYY-MMMM-DD');
+
+        if(tempToday!=tempStoreDay&&this.getRecurAddState==false){
         if(allRecurTrans[i].recurringtype == 0){
-          if(todayformatted != tempdate){
+          if(tempToday!=tempdate){
             let temp = Object.assign({},allRecurTrans[i]);
             temp.transid = null;
             temp.date = new Date();
@@ -67,6 +72,8 @@ export default {
             }
           }
         }
+      this.$store.commit('setRecurAddState',true);
+      this.$store.dispatch('storeAllStateData');
       }
     },
     updateAccDates(){
@@ -77,6 +84,12 @@ export default {
   computed:{
     getAccounts(){
       return this.$store.state.allAccounts;
+    },
+    getTodayDate(){
+      return this.$store.state.todayDate;
+    },
+    getRecurAddState(){
+      return this.$store.state.recurAddState;
     },
     getTrans(){
       return this.$store.state.allTrans; 
@@ -93,13 +106,22 @@ export default {
       return temp;
     }
   },
-  mounted(){
+  created(){
     this.$store.dispatch('getAllStateData');
     document.addEventListener("backbutton",this.onBackKeyDown,false); 
   },
-  beforeUpdate(){
-    this.updateAccDates();
-    this.addRecurringTrans();
+  mounted(){
+  },
+  updated(){
+    let tempToday = this.$moment(new Date()).format('YYYY-MMM-DD');
+    let tempStoreDay = this.$moment(this.getTodayDate).format('YYYY-MMM-DD');
+    if(tempToday != tempStoreDay){
+      this.$store.commit('setRecurAddState',false);
+      this.addRecurringTrans();
+      this.$store.commit('setTodayDate',new Date());
+      this.$store.dispatch('storeAllStateData');
+    }
+    this.updateAccDates(); 
   }
 }
 </script>

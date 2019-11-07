@@ -2365,7 +2365,8 @@ textarea {
     height: 46px;
     line-height: 46px;
     text-align: center;
-    background-color: #fff;
+    /*background-color: #fff;*/
+    background-color:#f6f6f9;
     -webkit-user-select: none;
     user-select: none
 }
@@ -3162,7 +3163,8 @@ textarea {
     display: -webkit-box;
     display: -webkit-flex;
     display: flex;
-    background-color: #fff;
+    /*background-color: #fff;*/
+    background-color:#f6f6f9;
     -webkit-user-select: none;
     user-select: none
 }

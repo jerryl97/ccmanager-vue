@@ -8,10 +8,11 @@
       </template>
     </van-nav-bar>
 
-    <van-grid clickable :gutter="3">
+    <van-grid clickable column-num="3">
       <van-grid-item icon="credit-pay" text="Accounts" @click="accountsShow=true"/>
       <van-grid-item icon="bars" text="Transactions" @click="transactionsShow=true"/>
       <van-grid-item icon="point-gift-o" text="Promotions" @click="promotionsShow=true"/>
+      <van-grid-item icon="notes-o" text="Budget" @click="budgetShow=true"/>
       <van-grid-item icon="points" text="Data"i @click="dataShow=true"/>
       <van-grid-item icon="comment-o" text="Notification" @click="notificationShow=true"/>
       <van-grid-item icon="warn-o" text="Security" @click="securityShow=true"/>
@@ -24,6 +25,12 @@
 
     <van-action-sheet v-model="promotionsShow" :actions="promotionsActions" description="Promotions" @select="onPromotionsSelect"/>
 
+    <van-action-sheet v-model="budgetShow" description="Budget">
+      <van-switch-cell v-model="getBudgetStat" :title="getBudgetStatTitle(getBudgetStat)" @change="budgetTrigger"/>
+        <van-cell clickable :title="'Monthly Budget: $ '+getBudgetAmount" @click="setBudgetPop=true"/>
+    </van-action-sheet>
+
+    <input type="file" ref="importinput" style="display:none" accept="text/plain" @change="readBackupFile($event)"/>
     <van-action-sheet v-model="dataShow" :actions="dataActions" description="Data" @select="onDataSelect"/>
 
     <van-action-sheet v-model="notificationShow" description="Notification">
@@ -56,6 +63,14 @@
     <!-- Manage Rewards Category Pop-->
     <van-popup v-model="showManageRewards" position="bottom" :style="{height:'100%'}">
        <v-rewardscat @closeManageRewardsCat="closeManageRewardsCat"></v-rewardscat>
+    </van-popup>
+
+    <!--Budget Pop-->
+    <van-popup v-model="setBudgetPop" position="top">
+       <van-field :value="budgetValue" readonly clickable @touchstart.native.stop="showNumbKeyboard=true" label="Amount: "/>
+       <van-button type="default" @click="setBudgetPop=false">Cancel</van-button>
+       <van-button type="primary" @click="saveBudgetAmount">Save</van-button>
+       <van-number-keyboard v-model="budgetValue" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/>
     </van-popup>
 
     <!-- Backup Manager Popup -->
@@ -136,6 +151,12 @@
         promotionsActions:[
           {name:'Manage Rewards Categories'},
         ],
+        
+        //Budget
+        budgetValue:'',
+        budgetShow:false,
+        setBudgetPop:false,
+        showNumbKeyboard:false,
 
         //Data
         dataShow:false,
@@ -367,6 +388,35 @@
           }
         });
       },
+      //Budget title
+      getBudgetStatTitle(stats){
+        if(stats){
+          return 'Enabled';
+        }else{
+          return 'Disabled';
+        }
+      },
+      saveBudgetAmount(){
+        let result = 0;
+        if(this.budgetValue == '')
+          result = 0;
+        else
+          result = parseFloat(this.budgetValue);
+        this.$store.commit('setBudgetAmount',result);
+        this.$store.dispatch('storeAllStateData');
+        this.setBudgetPop = false;
+      },
+      //Budget trigger
+      budgetTrigger(checked){
+        if(checked){
+          this.$store.commit('setBudgetState',true);
+          this.$notify({message:'Budget Enabled',type:'primary',duration:3000});
+        }else{
+          this.$store.commit('setBudgetState',false);
+          this.$notify({message:'Budget Disabled',type:'primary',duration:3000});
+        }
+        this.$store.dispatch("storeAllStateData");
+      },
       //Notification title
       getNotifyStatsTitle(stats){
         if(stats){
@@ -541,7 +591,16 @@
       },
       getPinCode(){
         return this.$store.state.PINCode;
+      },
+      getBudgetStat(){
+        return this.$store.state.budgetStat;
+      },
+      getBudgetAmount(){
+        return this.$store.state.budgetAmount;
       }
+    },
+    mounted(){
+      this.budgetValue = this.getBudgetAmount.toString();
     },
     components:{
       'v-accgroup':AccGroups,
