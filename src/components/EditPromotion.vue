@@ -30,13 +30,13 @@
       <!-- From Promo Date-->
       <div v-if="promoItem.duration == true">
       <van-field readonly clickable label="From" required :value="fromPromoDate" @click="showFromPromoDate = true" :error-message="fromDateErrorMsg" />
-      <van-popup v-model="showFromPromoDate" position="bottom">
+        <van-popup v-model="showFromPromoDate" position="bottom">
         <van-datetime-picker v-model="promoItem.fromdate" type="date" @cancel="showFromPromoDate=false" @confirm="fromPromoDateConfirm" />
       </van-popup>
 
       <!-- To Promo Date-->
       <van-field  readonly clickable label="To" required :value="toPromoDate" @click="showToPromoDate = true" :error-message="toDateErrorMsg" />
-      <van-popup v-model="showToPromoDate" position="bottom">
+        <van-popup v-model="showToPromoDate" position="bottom">
         <van-datetime-picker v-model="promoItem.todate" type="date" @cancel="showToPromoDate=false" @confirm="toPromoDateConfirm" />
       </van-popup>
       </div>
@@ -64,7 +64,7 @@
       </van-cell>
       </van-checkbox-group>
       <van-cell title="+Add New Expense Category" style="font-style:italic;color:#555555" @click="showAddExpCat=true"/>
-        <van-popup v-model="showAddExpCat" position="bottom" style="{height:'100%'}">
+        <van-popup v-model="showAddExpCat" position="bottom" :style="{height:'100%'}">
           <v-exp-category @closeManageExpCat="closeManageExpCat"/> 
         </van-popup>
       <van-field v-model="promoItem.expmemo" label="Memo" type="textarea" placeholder="Expenses' Memo" autosize rows="1"/>
@@ -77,7 +77,7 @@
           <van-checkbox :name="cat.rewardscatid" ref="rewardscatcheckboxes" slot="right-icon"/>
         </van-cell>
         <van-cell title="+Add New Reward Category" style="font-style:italic;color:#555555" @click="showAddRewardCat=true"/>
-          <van-popup v-model="showAddRewardCat" position="bottom" style="{height:'100%'}">
+          <van-popup v-model="showAddRewardCat" position="bottom" :style="{height:'100%'}">
             <v-rewards-category @closeManageRewardsCat="closeManageRewardsCat"/> 
           </van-popup>
       </van-cell-group>
@@ -85,7 +85,7 @@
 
     <!-- Rewards Inputs-->
     <van-cell-group title="The value for the rewards" v-if="activeStep==4">
-      <van-field v-for="(input,index) in rewardsInputs" :label="input.rewardsCatName" v-model="input.rewardsValue"/>
+      <van-field v-if="input.showInput == true" v-for="(input,index) in rewardsInputs" :label="input.rewardsCatName" v-model="input.rewardsValue"/>
     </van-cell-group>
 
     <!-- Next, Prev Button-->
@@ -184,6 +184,7 @@
         this.rewardscatchecked=[];
         this.rewardsInputs=[];
         this.nextBtnText = 'Next';
+        this.expCatSelectAll = false;
       },
       back(){
         this.activeStep = 0;
@@ -236,26 +237,27 @@
       closeManageRewardsCat(){
         this.showAddRewardCat = false;
       },
+      listRewardsInputs(){
+        this.rewardsInputs = [];
+        for(let i in this.getRewardsCat){
+          this.rewardsInputs.push({
+            rewardsID:this.rewardsCat[i].rewardscatid,
+            rewardsCatName:this.rewardsCat[i].rewardsCatName,
+            rewardsValue:'',
+            showInput:false,
+          });
+        }
+      },
       //Rewards Categories Inputs
       showRewardsInputs(){
-        this.rewardsInputs = [];
-        let existed = [];
-        console.log(this.promoItem.rltrewards);
-        if(this.promoItem.rltrewards.length>0){
-          this.rewardsInputs = this.promoItem.rltrewards;
-          for(let i in this.rewardsInputs){
-            existed.push(this.rewardsInputs[i].rewardsID);
-          }
-          console.log(existed);
+        for(let a in this.rewardsInputs){
+          this.rewardsInputs[a].showInput=false;
         }
         for(let i in this.rewardscatchecked){
-          if(!existed.includes(this.rewardscatchecked[i])){
-          let temp = this.getRewardsCat.find(o=>o.rewardscatid==this.rewardscatchecked[i])
-          this.rewardsInputs.push({
-            rewardsID:temp.rewardscatid,
-            rewardsCatName:temp.rewardsCatName,
-            rewardsValue:'',
-            });
+          for(let j in this.rewardsInputs){
+            if(this.rewardsInputs[j].rewardsID == this.rewardscatchecked[i]){
+              this.rewardsInputs[j].showInput = true;
+            }
           }
         }
       },
@@ -329,7 +331,12 @@
       saveNewPromo(){
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
-        this.promoItem.rltrewards = this.rewardsInputs;
+        this.promoItem.rltrewards = [];
+        for(let i in this.rewardsInputs){
+          if(this.rewardsInputs[i].showInput == true){
+            this.promoItem.rltrewards.push(this.rewardsInputs[i]);
+          }
+        }
         if(this.displayMinimum != '')
           this.promoItem.minimum = parseFloat(this.displayMinimum);
         else
@@ -401,26 +408,35 @@
           this.rewardscatchecked = [];
           for(let i in this.promoItem.rltrewards){
             this.rewardscatchecked.push(this.promoItem.rltrewards[i].rewardsID);
+            for(let j in this.rewardsInputs){
+              if(this.rewardsInputs[j].rewardsID == this.promoItem.rltrewards[i].rewardsID){
+                this.rewardsInputs[j].rewardsValue == this.promoItem.rltrewards[i].rewardsValue;
+              }
+            }
           }
-        }
-      
+        } 
       }
     },
     mounted(){
       this.accountSelect = this.getGroupedAccounts;
       this.rewardsCat = this.getRewardsCat;
+      this.listRewardsInputs();
       this.promoItem = Object.assign({},this.promo);
-      if(this.promoItem){
-        this.displayMinimum = this.promoItem.minimum.toString(); 
-        this.displayMaximum = this.promoItem.maxtransspend.toString();
-        if(this.promoItem.duration==true){
-          this.fromPromoDate = this.$moment(this.promoItem.fromdate).format('DD MMMM YYYY');
-          this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
-        }
-        this.activeAccIds = this.promoItem.rltacc;
-        this.expcatchecked = this.promoItem.rltexpense;
-        for(let i in this.promoItem.rltrewards){
-          this.rewardscatchecked.push(this.promoItem.rltrewards[i].rewardsID);
+      this.displayMinimum = this.promoItem.minimum.toString(); 
+      this.displayMaximum = this.promoItem.maxtransspend.toString();
+      if(this.promoItem.duration==true){
+        this.fromPromoDate = this.$moment(this.promoItem.fromdate).format('DD MMMM YYYY');
+        this.toPromoDate = this.$moment(this.promoItem.todate).format('DD MMMM YYYY');
+      }
+      this.activeAccIds = this.promoItem.rltacc;
+      this.expcatchecked = this.promoItem.rltexpense;
+      this.rewardscatchecked = [];
+      for(let i in this.promoItem.rltrewards){
+        this.rewardscatchecked.push(this.promoItem.rltrewards[i].rewardsID);
+        for(let j in this.rewardsInputs){
+          if(this.rewardsInputs[j].rewardsID == this.promoItem.rltrewards[i].rewardsID){
+            this.rewardsInputs[j].rewardsValue = this.promoItem.rltrewards[i].rewardsValue;
+          }
         }
       }
     },

@@ -35,7 +35,7 @@
             <van-progress :percentage="getTransSpendPercent(promo)" :pivot-text="promo.transspend" color="red" text-color="#fff" stroke-width="5"/><br/>
           </span>
           <span v-if="promo.rltexpense.length != getExpCat.length">Categories: {{getExpenseName(promo.rltexpense)}}<br/></span>
-          <span v-if="promo.rltexpense.length == getExpCat.length">Categories: All<br/></span>
+          <span v-if="promo.rltexpense.length >= getExpCat.length">Categories: All<br/></span>
           <span v-if="promo.expmemo!=''">{{promo.expmemo}}</br></span>
           <span>Accounts: {{getAccName(promo.rltacc)}}</span></br>
           <span>Rewards: {{getRewardsName(promo.rltrewards)}}</span></span><br/>
@@ -149,10 +149,10 @@ export default{
         this.$dialog.close();
       });
     },
-    showEditPromo(promoid){
+    showEditPromo(promo){
       this.editPromoPop = true;
       this.hideAddPromoFab = true; 
-      this.selectedPromo = promoid;
+      this.selectedPromo = promo;
     },
     closeEditPromo(){
       this.editPromoPop = false;

@@ -240,6 +240,8 @@
         this.rewardscatchecked=[];
         this.rewardsInputs=[];
         this.nextBtnText = 'Next';
+        this.expCatSelectAll = false;
+        this.expCatDisabled = false;
       },
       //Back Button
       back(){
@@ -378,7 +380,6 @@
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
         this.promoItem.rltrewards = this.rewardsInputs;
-        console.log(this.rewardsInputs);
         if(this.displayMinimum != '')
           this.promoItem.minimum = parseFloat(this.displayMinimum);
         else
