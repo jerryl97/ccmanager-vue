@@ -491,6 +491,7 @@ this.activeAccId = '';
           if(this.transItem.type=="Expense"){
             this.transItem.usedpromo = this.promochecked;
           }
+          this.transItem.forSettle = false;
           this.$store.commit('addTrans',this.transItem);
           this.$store.commit('updatePromoSwipeSpend');
           this.$store.dispatch('storeAllStateData');

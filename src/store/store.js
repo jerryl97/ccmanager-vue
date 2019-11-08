@@ -200,6 +200,7 @@ export default new Vuex.Store({
       } 
       state.maxAccId = value.accid;
       state.allAccounts.push(value);
+      this.commit('updateAccountDates');
       scheduleNotification();
     },
     //Edit Account
@@ -209,6 +210,7 @@ export default new Vuex.Store({
           state.allAccounts[i] = value; 
         }
       }
+      this.commit('updateAccountDates');
       scheduleNotification();
     },
     //Delete Account
@@ -216,6 +218,7 @@ export default new Vuex.Store({
       state.allAccounts = _.filter(state.allAccounts,x=>{
         return x.accid != value; 
       });
+      this.commit('updateAccountDates');
       scheduleNotification();
     },
     //Set Accounts to Vuex Store
@@ -365,9 +368,9 @@ export default new Vuex.Store({
               if(state.allTrans[j].type=='Income')
                 state.allAccounts[i].balance += state.allTrans[j].amount;
               if(state.allTrans[j].type=='Transfer'){
-                if(state.allTrans[j].fromaccount == state.allAccounts[j].accid)
+                if(state.allTrans[j].fromaccount == state.allAccounts[i].accid)
                   state.allAccounts[i].balance -= state.allTrans[j].amount;
-                if(state.allTrans[j].toaccount == state.allAccounts[j].accid)
+                if(state.allTrans[j].toaccount == state.allAccounts[i].accid)
                   state.allAccounts[i].balance += state.allTrans[j].amount;
               }
             }
@@ -385,11 +388,13 @@ export default new Vuex.Store({
                     if(state.allTrans[j].toaccount == state.allAccounts[i].accid)
                       state.allAccounts[i].outstdbalance -= state.allTrans[j].amount;
                   }else{
-                    if(state.allTrans[j].toaccount == state.allAccounts[i].accid)
+                    if(state.allTrans[j].toaccount == state.allAccounts[i].accid){
                       state.allAccounts[i].dueamount -= state.allTrans[j].amount;
-                    else if(state.allTrans[j].fromaccount == state.allAccounts[i].accid)
+                      state.allAccounts[i].settlestatus = true;
+                    }
+                    if(state.allTrans[j].fromaccount == state.allAccounts[i].accid){
                       state.allAccounts[i].outstdbalance += state.allTrans[j].amount;
-                    state.allAccounts[i].settlestatus = true;
+                    }
                   }
                 }
               }else if(tempDate.isBefore(tempStart)){
@@ -398,10 +403,12 @@ export default new Vuex.Store({
                 if(state.allTrans[j].type=='Income')
                   state.allAccounts[i].dueamount -= state.allTrans[j].amount;
                 if(state.allTrans[j].type=='Transfer'){
-                  if(state.allTrans[j].fromaccount == state.allAccounts[j].accid)
+                  if(state.allTrans[j].fromaccount == state.allAccounts[i].accid){
                     state.allAccounts[i].dueamount += state.allTrans[j].amount;
-                  if(state.allTrans[j].toaccount == state.allAccounts[j].accid)
+                  }
+                  if(state.allTrans[j].toaccount == state.allAccounts[i].accid){
                     state.allAccounts[i].dueamount -= state.allTrans[j].amount;
+                  }
                 }
               }
             }
