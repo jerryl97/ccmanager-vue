@@ -3,7 +3,7 @@
 <br>
 
 <p>GitHub Webpage: <a href="https://jerryl97.github.io/ccmanager-vue/">HERE</a></p>
-<p>Download the Lastest Version of the Android APK: <a href="https://github.com/jerryl97/ccmanager-vue/releases/download/1.2/ccmanagerv1.2.apk">HERE</a></p>
+<p>Download the Lastest Version of the Android APK: <a href="https://github.com/jerryl97/ccmanager-vue/releases/download/1.3/ccmanagerv1.3.apk">HERE</a></p>
 
 <br>
 
@@ -24,30 +24,7 @@
     Used for recommendation feature that advices users on which Account to use for a Expense Transaction.</li>
 </ul>
 
-<p>Recommendation feature primarily relies on 2 main factors:</p>
-<ul>
-  <li>
-    Requirements:
-    <ul>
-      <li>Minimum Spending</li>
-      <li>Valid Period</li>
-      <li>Related Accounts</li>
-      <li>Related Expense</li>
-    </ul>
-  </li>
-  <li>
-    Rewards:
-    <ul>
-      <li>Cashback</li>
-      <li>Discount</li>
-      <li>Others</li>
-    </ul>
-  </li>
- </ul>
-<p>
-  Requirements acts as a <b>filter</b> for only showing relevant Accounts for recommendation.<br/>
-  Rewards will act as the <b>weight</b> for the determining which Promotion is more significant.
-</p>
+<p>Suggestion feature will help <b>recommend which Credit Card/Account to use</b> when creating new expense transaction!</p>
 
 <br>
 
