@@ -49,39 +49,46 @@
        </van-field>
 
        <van-popup v-model="showAccList" position="bottom" :style="{height:'100%'}">
-
-        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')"/>
-        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
+        <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:20% 0%">
           <i style="color:#aaaaaa">Please add a new account.</i>
         </div>
-        <div v-if="getAccounts.length>0">
+
+        <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeAccId,'account')" @click-left="cancelAccConfirm('account')" fixed/>
+        <div v-if="getAccounts.length>0" style="margin-top:13%">
         <van-tree-select @click-item="showRelatedPromo" :items="expAccSelect" :active-id.sync="activeAccId" :main-active-index.sync="activeAccIndex"/>
         
         <!--Suggested Accounts' Promotion-->
         <van-cell-group v-if="activeAccIndex==0&&activeAccId!=''&&expAccSelect[0].children.length>0" title="Promotions of this account">
-         <van-collapse v-model="activePromoNames" accordion>
-           <van-collapse-item v-for="(promo,index) in relatedPromo" :label="promo.promodesc" :name="promo.promoid">
-           <div slot="title"> 
-            {{promo.promotitle}}
-           </div>
-           <div slot="value"> 
-            Minimum: $ {{promo.minimum}}
-          </div>
-          <div slot="default">
-            <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
-          <span v-if="promo.maxtranscount!=0">Minimum Swipe:<br/>
-            <van-progress :percentage="getSwipePercent(promo)" :pivot-text="promo.transcount" color="#7232dd" text-color="#fff" stroke-width="5"/><br/>
-          </span>
-          <span v-if="promo.maxtransspend!=0">Available Spend:<br/>
-            <van-progress :percentage="getTransSpendPercent(promo)" :pivot-text="promo.transspend" color="red" text-color="#fff" stroke-width="5"/><br/>
-          </span>
-                <span>Categories: {{getExpenseName(promo.rltexpense)}} </span><br/>
-            <span v-if="promo.expmemo!=null">{{promo.expmemo}}</br></span>
-            <span>Accounts: <span v-for="acc in promo.rltacc">{{getAccName(acc)}}, </span></span></br>
-            <span>Rewards: <span v-for="reward in promo.rltrewards">{{reward.rewardsCatName}} {{reward.rewardsValue}},</span></span><br/>
-            <van-checkbox :name="promo.promoid">Use for this transaction</van-checkbox>
-            </div>
+         <van-collapse v-model="activePromoNames">
+            <van-checkbox-group v-model="promochecked">
+            <van-collapse-item v-for="(promo,index) in relatedPromo" :label="promo.promodesc" :name="promo.promoid">
+              <div slot="title"> 
+                <strong>{{promo.promotitle}}</strong>
+              </div>
+              <div slot="value"> 
+                Minimum: $ {{promo.minimum}}<br/>
+              </div>
+              <div slot="default">
+                <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
+                <span v-if="promo.maxtranscount!=0">Minimum Swipe:<br/>
+                  <van-progress :percentage="getSwipePercent(promo)" :pivot-text="promo.transcount" color="#7232dd" text-color="#fff" stroke-width="5"/><br/>
+                </span>
+                <span v-if="promo.maxtransspend!=0">Available Spend:<br/>
+                  <van-progress :percentage="getTransSpendPercent(promo)" :pivot-text="promo.transspend" color="red" text-color="#fff" stroke-width="5"/><br/>
+                </span>
+                <span v-if="promo.rltexpense.length != getExpCat.length">Categories: {{getExpenseName(promo.rltexpense)}}<br/></span>
+                <span v-if="promo.rltexpense.length == getExpCat.length">Categories: All<br/></span>
+                <span v-if="promo.expmemo!=''">{{promo.expmemo}}<br/></span>
+                <span>Accounts: {{getAccName(promo.rltacc)}}</span><br/>
+                <span>Rewards: {{getRewardsName(promo.rltrewards)}}</span><br/>
+                <van-checkbox :name="promo.promoid" style="color:red">
+                  <template slot="default">
+                    <span style="color:blue">Select this promotion.</span>
+                  </template>
+                </van-checkbox>
+              </div>
             </van-collapse-item>
+            </van-checkbox-group>
          </van-collapse>
         </van-cell-group>
         </div>
@@ -146,6 +153,10 @@
     <van-button type="primary" size="large" style="width:90%;margin:5%;" @click="saveNewTrans">Save</van-button>
 
     </van-cell-group>
+
+    <div style="margin:10px;" v-if="relatedPromo.length>0&&promochecked==0">
+      <van-notice-bar>Warning: No promotion is selected.</van-notice-bar>
+    </div>
 
   </div>
 </template>
@@ -287,8 +298,10 @@
       //Show Related Promotion of Account
       showRelatedPromo(data){
         this.relatedPromo = [];
+        this.activePromoNames = [];
         for(let i in data.rltpromo){
           let temp = this.getPromo.find(o => o.promoid == data.rltpromo[i]); 
+          this.activePromoNames.push(data.rltpromo[i]);
           this.relatedPromo.push(temp);
         }
       },
@@ -310,6 +323,30 @@
           return temp.name;
         else
           return 'Deleted Account'; 
+      },
+      getRewardsName(rewards){
+        let temprew = [];
+        let tempval = [];
+        for(let i in rewards){
+          let temp = this.getRewardsCat.find(o=>o.rewardscatid == rewards[i].rewardsID);
+          if(temp){
+            temprew.push(temp.rewardsCatName);
+            tempval.push(rewards[i].rewardsValue);
+          }
+          else{
+            temprew.push('Other');
+            tempval.push(0);
+          } 
+        }
+        let result = '';
+        for(let j = 0; j < temprew.length;j++){
+          if(j == temprew.length - 1){
+            result += temprew[j]+' '+tempval[j]; 
+          }else{
+            result += temprew[j]+' '+tempval[j] + ', '; 
+          }
+        }
+        return result;
       },
 
       //Account Confirm
@@ -417,12 +454,22 @@
             this.transItem.usedpromo = this.promochecked;
           }
           this.$store.commit('editTrans',this.transItem);
-          this.$store.commit('updatePromoSwipeSpend');
           this.$store.dispatch('storeAllStateData');
           this.$notify({message:'Transaction Edited',type:'success',duration:3000});
           this.back();
         }       
       },
+
+    getSwipePercent(promo){
+      let result = promo.transcount / promo.maxtranscount;
+      result = result * 100;
+      return result; 
+    },
+    getTransSpendPercent(promo){
+      let result = promo.transspend / promo.maxtransspend;
+      result = result * 100;
+      return result; 
+    },
       
       //Save Validation
       addTransValidation(value){
@@ -495,6 +542,9 @@
       },
       getPromo(){
         return this.$store.state.allPromo;
+      },
+      getRewardsCat(){
+        return this.$store.state.rewardsCat;
       },
       getSuggestedGroupedAccounts(){ 
         let grouped = [];

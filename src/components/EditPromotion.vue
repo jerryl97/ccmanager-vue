@@ -17,9 +17,9 @@
       <!--Promotion's Title-->
       <van-field label="Title" clearable placeholder="Promotion's Title" v-model="promoItem.promotitle" required :error-message="titleErrorMsg"/>
       <!--Minimum Spend-->
-      <van-field readonly clickable label="Minimum" :value="displayMinimum" @touchstart.native.stop="showMaxNumbKeyboard = false,showMinNumbKeyboard = true" placeholder="$ 0"/>
+      <van-field readonly clickable label="Minimum Spend" :value="displayMinimum" @touchstart.native.stop="showMaxNumbKeyboard = false,showMinNumbKeyboard = true" placeholder="$ 0"/>
       <!--Maximum Spend-->
-      <van-field readonly clickable label="Maximum" :value="displayMaximum" @touchstart.native.stop="showMaxNumbKeyboard = true, showMinNumbKeyboard = false" placeholder="$ 0"/>
+      <van-field readonly clickable label="Accumulative Amount" :value="displayMaximum" @touchstart.native.stop="showMaxNumbKeyboard = true, showMinNumbKeyboard = false" placeholder="$ 0"/>
       <van-number-keyboard v-model="displayMinimum" :show="showMinNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMinNumbKeyboard = false"/>
       <van-number-keyboard v-model="displayMaximum" :show="showMaxNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMaxNumbKeyboard = false"/>
       <!--Promotion's Desc-->
@@ -329,6 +329,7 @@
       },
       //Save New Promotion
       saveNewPromo(){
+        this.promoItem.transcount = this.promoItem.maxtranscount;
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
         this.promoItem.rltrewards = [];
@@ -341,7 +342,13 @@
           this.promoItem.minimum = parseFloat(this.displayMinimum);
         else
           this.promoItem.minimum = 0;
+        if(this.displayMaximum != '')
+          this.promoItem.maxtransspend = parseFloat(this.displayMaximum);
+        else
+          this.promoItem.maxtransspend = 0;
+        this.promoItem.transspend = this.promoItem.maxtransspend;
         this.$store.commit('editPromo',this.promoItem);
+        this.$store.commit('updatePromoSwipeSpend');
         this.$store.dispatch('storeAllStateData');
         this.$notify({message:'Promotion Edited',type:'success',duration:3000});
         this.activeStep = 0;

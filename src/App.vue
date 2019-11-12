@@ -120,6 +120,7 @@ export default {
       this.$store.dispatch('storeAllStateData');
     }
     this.updateAccDates(); 
+    this.$store.commit("updatePromoSwipeSpend");
   }
 }
 </script>

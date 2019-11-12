@@ -40,8 +40,6 @@
       >
         <calculator @closeCalculator="closeCalculator" @confirmCalculator="confirmCalculator"></calculator>
       </van-popup>
-       <!-- <van-field readonly clickable label="Amount" :value="transAmount" @touchstart.native.stop="showNumbKeyboard = true" placeholder="0"/> -->
-       <!-- <van-number-keyboard v-model="transAmount" :show="showNumbKeyboard" extra-key="." close-button-text="Close" @blur="showNumbKeyboard = false"/> -->
 
     <!-- Field for Accounts(with Popup Picker)-->
     <div v-if="transItem.type=='Expense'">
@@ -82,9 +80,11 @@
                 <span v-if="promo.expmemo!=''">{{promo.expmemo}}<br/></span>
                 <span>Accounts: {{getAccName(promo.rltacc)}}</span><br/>
                 <span>Rewards: {{getRewardsName(promo.rltrewards)}}</span><br/>
-                <van-checkbox :name="promo.promoid">Use this promotion</van-checkbox>
-                <!--<van-button type="info" size="mini" @click="showEditPromo(promo)">Edit</van-button>
-                <van-button type="danger" size="mini" @click="deletePromo(promo.promoid)">Delete</van-button>-->
+                <van-checkbox :name="promo.promoid" style="color:red">
+                  <template slot="default">
+                    <span style="color:blue">Select this promotion.</span>
+                  </template>
+                </van-checkbox>
               </div>
             </van-collapse-item>
             </van-checkbox-group>
@@ -114,7 +114,6 @@
        <van-popup v-model="showFromAccList" position="bottom">
         <van-nav-bar left-text="Cancel" right-text="Confirm" @click-right="accConfirm(activeFromAccId,'fromaccount')" @click-left="cancelAccConfirm('fromaccount')"/>
         <div v-if="getAccounts.length==0" style="background-color:white;text-align:center;margin:10% 0%">
-
             <i style="color:#aaaaaa">Please add a new account.</i>
           </div>
         <div v-if="getAccounts.length>0">
@@ -156,10 +155,12 @@
     <!--Budget-->
     <div style="margin:10px;text-align:center" v-if="getBudgetStat==true"> 
       <span style="font-size:15px;">Monthly Budget: $ {{getTotalSpend()}}/{{getBudgetAmount}}</span><br/>
-
       <van-progress v-if="getBudgetPercent()<=100":percentage="getBudgetPercent()" style="margin-top:10px;" :pivot-text="getBudgetPercent()+'%'" color="#f2826a" text-color="#fff" stroke-width="5"/>
       <span style="color:red;font-size:15px;" v-if="getBudgetPercent()>100">Over Budget!!</span>
+    </div>
 
+    <div style="margin:10px;" v-if="relatedPromo.length>0&&promochecked.length==0">
+      <van-notice-bar>Warning: No promotion is selected.</van-notice-bar>
     </div>
 
   </div>
@@ -395,7 +396,6 @@ import Calculator from './Calculator.vue'
              else
               this.displayIncAccount = temp.name+'('+temp.last4digits+')';
              this.showIncAccList = false;
-this.activeAccId = '';
              break;
             case 'fromaccount':
              this.transItem.fromaccount = value;
@@ -493,7 +493,6 @@ this.activeAccId = '';
           }
           this.transItem.forSettle = false;
           this.$store.commit('addTrans',this.transItem);
-          this.$store.commit('updatePromoSwipeSpend');
           this.$store.dispatch('storeAllStateData');
           if(this.getBudgetStat){
             if(this.getTotalSpend > this.getBudgetAmount){

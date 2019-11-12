@@ -22,9 +22,9 @@
       <!--Promotion's Title-->
       <van-field label="Title" clearable placeholder="Promotion's Title" v-model="promoItem.promotitle" required :error-message="titleErrorMsg"/>
       <!--Minimum Spend-->
-      <van-field readonly clickable label="Minimum" :value="displayMinimum" @touchstart.native.stop="showMaxNumbKeyboard = false,showMinNumbKeyboard = true" placeholder="$ 0"/>
+      <van-field readonly clickable label="Minimum Spend" :value="displayMinimum" @touchstart.native.stop="showMaxNumbKeyboard = false,showMinNumbKeyboard = true" placeholder="$ 0"/>
       <!--Maximum Spend-->
-      <van-field readonly clickable label="Maximum" :value="displayMaximum" @touchstart.native.stop="showMaxNumbKeyboard = true, showMinNumbKeyboard = false" placeholder="$ 0"/>
+      <van-field readonly clickable label="Accumulative Amount" :value="displayMaximum" @touchstart.native.stop="showMaxNumbKeyboard = true, showMinNumbKeyboard = false" placeholder="$ 0"/>
       <van-number-keyboard v-model="displayMinimum" :show="showMinNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMinNumbKeyboard = false"/>
       <van-number-keyboard v-model="displayMaximum" :show="showMaxNumbKeyboard" extra-key="." close-button-text="Close" @blur="showMaxNumbKeyboard = false"/>
       <!--Promotion's Desc-->

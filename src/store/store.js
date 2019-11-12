@@ -324,12 +324,14 @@ export default new Vuex.Store({
       }
       state.allTrans.push(value);
       this.commit('countAccBalance');
+      this.commit('updatePromoSwipeSpend');
       scheduleNotification();
     },
     //Edit Transactions
     editTrans(state,value){
       this.commit('deleteTrans',value.transid);
       this.commit('addTrans',value);
+      this.commit('updatePromoSwipeSpend');
       scheduleNotification();
     },
     //Set Transactions to Vuex Store
@@ -342,6 +344,7 @@ export default new Vuex.Store({
         return x.transid != value 
       });
       this.commit('countAccBalance');
+      this.commit('updatePromoSwipeSpend');
       scheduleNotification();
     },
     countAccBalance(){
@@ -539,10 +542,12 @@ export default new Vuex.Store({
           for(let j in state.allTrans[i].usedpromo){
             for(let k in state.allPromo){
               if(state.allPromo[k].promoid == state.allTrans[i].usedpromo[j]){
-                if(state.allPromo[k].maxtranscount > 0){
-                  state.allPromo[k].transcount -= 1;
-                }
-                if(state.allPromo[k].maxtransspend > 0){
+                  state.allPromo[k].transcount = state.allPromo[k].maxtranscount;
+                  state.allPromo[k].transspend = state.allPromo[k].maxtransspend;
+                  if(state.allPromo[k].maxtranscount > 0){
+                    state.allPromo[k].transcount -= 1;
+                  }
+                  if(state.allPromo[k].maxtransspend > 0){
                   state.allPromo[k].transspend -= state.allTrans[i].amount;
                   }
                 }
