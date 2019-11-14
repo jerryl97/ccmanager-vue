@@ -323,15 +323,14 @@ export default new Vuex.Store({
         }
       }
       state.allTrans.push(value);
-      this.commit('countAccBalance');
       this.commit('updatePromoSwipeSpend');
+      this.commit('countAccBalance');
       scheduleNotification();
     },
     //Edit Transactions
     editTrans(state,value){
       this.commit('deleteTrans',value.transid);
       this.commit('addTrans',value);
-      this.commit('updatePromoSwipeSpend');
       scheduleNotification();
     },
     //Set Transactions to Vuex Store
@@ -343,8 +342,8 @@ export default new Vuex.Store({
       state.allTrans = _.filter(state.allTrans,x=>{
         return x.transid != value 
       });
-      this.commit('countAccBalance');
       this.commit('updatePromoSwipeSpend');
+      this.commit('countAccBalance');
       scheduleNotification();
     },
     countAccBalance(){
@@ -536,21 +535,18 @@ export default new Vuex.Store({
     }, 
     //Update Promo Minimum Swipe & Maximum Spend Amount
     updatePromoSwipeSpend(state,value){
-      for(let i in state.allTrans){
-        if(state.allTrans[i].type == 'Expense'){
-        if(state.allTrans[i].usedpromo.length>0){
-          for(let j in state.allTrans[i].usedpromo){
-            for(let k in state.allPromo){
-              if(state.allPromo[k].promoid == state.allTrans[i].usedpromo[j]){
-                  state.allPromo[k].transcount = state.allPromo[k].maxtranscount;
-                  state.allPromo[k].transspend = state.allPromo[k].maxtransspend;
-                  if(state.allPromo[k].maxtranscount > 0){
-                    state.allPromo[k].transcount -= 1;
-                  }
-                  if(state.allPromo[k].maxtransspend > 0){
-                  state.allPromo[k].transspend -= state.allTrans[i].amount;
-                  }
-                }
+      for(let i in state.allPromo){
+        state.allPromo[i].transcount = state.allPromo[i].maxtranscount;
+        state.allPromo[i].transspend = state.allPromo[i].maxtransspend;
+        for(let j in state.allTrans){
+          let temp = state.allTrans[j].usedpromo;
+          if(temp.length>0){
+            for(let k in temp){
+              if(temp[k] == state.allPromo[i].promoid){
+                if(state.allPromo[i].maxtranscount>0)
+                  state.allPromo[i].transcount -= 1;
+                if(state.allPromo[i].maxtransspend>0)
+                  state.allPromo[i].transspend -= state.allTrans[j].amount;
               }
             }
           }

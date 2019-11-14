@@ -186,6 +186,7 @@ import Calculator from './Calculator.vue'
           recurringtype:0,
           recurringtime:0,
           forSettle:false,
+          usedpromo:[],
 
         },
         transOptions:['Expense','Income','Transfer'],
@@ -488,7 +489,7 @@ import Calculator from './Calculator.vue'
             this.transItem.category = '';
           }
 
-          if(this.transItem.type=="Expense"){
+          if(this.transItem.type=='Expense'){
             this.transItem.usedpromo = this.promochecked;
           }
           this.transItem.forSettle = false;
