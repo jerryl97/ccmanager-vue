@@ -201,6 +201,7 @@ export default new Vuex.Store({
       state.maxAccId = value.accid;
       state.allAccounts.push(value);
       this.commit('updateAccountDates');
+      Vue.forceUpdate();
       scheduleNotification();
     },
     //Edit Account
@@ -211,6 +212,7 @@ export default new Vuex.Store({
         }
       }
       this.commit('updateAccountDates');
+      Vue.forceUpdate();
       scheduleNotification();
     },
     //Delete Account
@@ -219,6 +221,7 @@ export default new Vuex.Store({
         return x.accid != value; 
       });
       this.commit('updateAccountDates');
+      Vue.forceUpdate();
       scheduleNotification();
     },
     //Set Accounts to Vuex Store
@@ -266,6 +269,7 @@ export default new Vuex.Store({
       } 
       state.maxAccGrpId = value.grpid;
       state.accGroups.push(value);
+      Vue.forceUpdate();
     },
     //Set Account Group to Vuex Store
     setAccGroup(state,value){
@@ -325,12 +329,14 @@ export default new Vuex.Store({
       state.allTrans.push(value);
       this.commit('updatePromoSwipeSpend');
       this.commit('countAccBalance');
+      Vue.forceUpdate();
       scheduleNotification();
     },
     //Edit Transactions
     editTrans(state,value){
       this.commit('deleteTrans',value.transid);
       this.commit('addTrans',value);
+      Vue.forceUpdate();
       scheduleNotification();
     },
     //Set Transactions to Vuex Store
@@ -344,6 +350,7 @@ export default new Vuex.Store({
       });
       this.commit('updatePromoSwipeSpend');
       this.commit('countAccBalance');
+      Vue.forceUpdate();
       scheduleNotification();
     },
     countAccBalance(){
@@ -453,6 +460,7 @@ export default new Vuex.Store({
       } 
       state.maxExpCatId = value.expcatid;
       state.expCat.push(value);
+      Vue.forceUpdate();
     },
     //Set Expense Categories to Vuex Store
     setExpCat(state,value){
@@ -481,6 +489,7 @@ export default new Vuex.Store({
       } 
       state.maxIncCatId = value.inccatid;
       state.incCat.push(value);
+      Vue.forceUpdate();
     },
     //Set Income Categories to Vuex Store
     setIncCat(state,value){
@@ -510,6 +519,7 @@ export default new Vuex.Store({
       } 
       state.maxPromoId = value.promoid;
       state.allPromo.push(value);
+      Vue.forceUpdate();
     },
     //Edit Promotion
     editPromo(state,value){
@@ -518,12 +528,14 @@ export default new Vuex.Store({
           state.allPromo[i] = value;
         }
       }
+      Vue.forceUpdate();
     },
     //Delete Promotion
     deletePromo(state,value){
       state.allPromo = _.filter(state.allPromo,x=>{
         return x.promoid != value;
       }); 
+      Vue.forceUpdate();
     },
     //Set Promotions to Vuex Store
     setPromotions(state,value){
@@ -572,6 +584,7 @@ export default new Vuex.Store({
       } 
       state.maxRewardsCatId = value.rewardscatid;
       state.rewardsCat.push(value);
+      Vue.forceUpdate();
     },
     //Set Rewards Categories to Vuex Store
     setRewardsCat(state,value){
@@ -677,8 +690,10 @@ export default new Vuex.Store({
       localForage.getItem('state').then(value=>{
         if(value!=null){
           context.commit('setAllStateData',value);
+          Vue.forceUpdate();
         }else{
           localForage.setItem('state',context.state);
+          Vue.forceUpdate();
         }
       })
     },
