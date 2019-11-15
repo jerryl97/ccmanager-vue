@@ -185,6 +185,7 @@
             }).then(()=>{
               this.$store.commit('deleteTrans',this.selectedTrans.transid);
               this.$store.dispatch('storeAllStateData');
+              this.$forceUpdate();
             }).catch(()=>{
               this.$dialog.close();
             });
