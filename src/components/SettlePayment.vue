@@ -64,6 +64,7 @@
           recurringtype:0,
           recurringtime:'',
           forSettle:true,
+          usedpromo:false,
         },
         transDate:this.$moment(new Date()).format('DD MMMM YYYY'), //Default Display Date
         showTransDate:false,
@@ -90,7 +91,7 @@
     },
     methods:{
       setDefault(){
-        this.transItem = {};
+        //this.transItem = {};
         this.transItem.type='Transfer';
         this.transItem.date=new Date();
         this.transItem.amount=0;
@@ -104,7 +105,7 @@
       
       },
       back(){
-        this.setDefault();
+        //this.setDefault();
         this.$emit("closeSettlePage");
       },
       dateConfirm(value){
@@ -209,7 +210,7 @@
           }
           this.$store.commit('addTrans',this.transItem);
           this.$store.dispatch('storeAllStateData');
-          this.setDefault();
+          //this.setDefault();
           this.back();
         }       
       },
