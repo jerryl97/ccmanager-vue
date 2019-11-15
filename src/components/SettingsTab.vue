@@ -17,6 +17,7 @@
       <van-grid-item icon="comment-o" text="Notification" @click="notificationShow=true"/>
       <van-grid-item icon="warn-o" text="Security" @click="securityShow=true"/>
       <van-grid-item icon="records" text="Feedback" url="https://forms.gle/TBRfbhW6KRT9m9R78"/>
+      <van-grid-item icon="phone-o" text="Contact Us" @click="contactUs()"/>
     </van-grid>
 
     <van-action-sheet v-model="accountsShow" :actions="accountsActions" description="Accounts" @select="onAccountsSelect"/>
@@ -577,6 +578,15 @@
         }else{
           this.showChangePin = true;
         }
+      },
+      contactUs(){
+        cordova.plugins.email.open({
+          to:      'benevolenceapp@gmail.com',
+          cc:      '',
+          bcc:     '',
+          subject: 'Contact Us from Credit Card Smart Manager App',
+          body:    ''
+        });
       }
     },
     computed:{
