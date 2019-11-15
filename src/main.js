@@ -40,6 +40,7 @@ const vueApp = new Vue({
       navigator.splashscreen.show();
       window.setTimeout(function () {
         navigator.splashscreen.hide();
+        screen.orientation.lock('portrait');
         if(store.state.firstTime==true){
           router.push({path:'/welcome'});
         }else if(store.state.firstTime == false && store.state.PINStat==true){
