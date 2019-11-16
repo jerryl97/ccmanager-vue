@@ -209,11 +209,8 @@
              this.accItem.pduedate = this.accItem.pduedate + this.$moment(new Date()).format(' MMMM YYYY');
              this.accItem.pduedate = this.$moment(this.accItem.pduedate).toDate();
             }
-            /*this.accItem.cutoffdate = this.$moment(this.accItem.sdate).toDate();
-            this.accItem.cutoffdate = this.$moment(this.accItem.cutoffdate).add('1','months').format('D MMMM YYYY');
-            this.accItem.nextduedate = this.$moment(this.accItem.pduedate).toDate();
-            this.accItem.nextduedate = this.$moment(this.accItem.nextduedate).add('1','months').format('D MMMM YYYY');*/
           }
+          console.log(this.accItem);
           this.$store.commit('addAccount',this.accItem);
           this.$store.dispatch('storeAllStateData');
           this.$notify({message:'Account Added',type:'success',duration:3000});

@@ -141,6 +141,7 @@ export default{
     getTransSpendPercent(promo){
       let result = promo.transspend / promo.maxtransspend;
       result = result * 100;
+      result = _.round(result,1);
       return result; 
     },
     deletePromo(promoid){ 
