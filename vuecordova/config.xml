@@ -2,10 +2,10 @@
 <widget id="com.vue.expensemanager.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Credit Card Smart Manager</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Expense manager app that helps you with your budgeting needs.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="benevolenceapp@gmail.com" href="http://cordova.io">
+        SUTS Team
     </author>
     <hook src="../node_modules/vue-cli-plugin-cordova/serve-config-hook.js" type="after_prepare" />
     <content src="index.html" />
@@ -70,5 +70,6 @@
     <plugin name="cordova-plugin-admob-free" spec="0.27.0">
         <variable name="ADMOB_APP_ID" value="&#xA;ca-app-pub-9542103869311945~1223033245" />
     </plugin>
+    <plugin name="cordova-plugin-inappbrowser" spec="3.1.0" />
     <engine name="android" spec="^8.1.0" />
 </widget>

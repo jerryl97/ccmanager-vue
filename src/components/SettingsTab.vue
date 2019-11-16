@@ -16,7 +16,8 @@
       <van-grid-item icon="points" text="Data"i @click="dataShow=true"/>
       <van-grid-item icon="comment-o" text="Notification" @click="notificationShow=true"/>
       <van-grid-item icon="warn-o" text="Security" @click="securityShow=true"/>
-      <van-grid-item icon="records" text="Feedback" url="https://forms.gle/TBRfbhW6KRT9m9R78"/>
+      <van-grid-item icon="newspaper-o" text="Guide"  @click="showGuide()"/>
+      <van-grid-item icon="records" text="Feedback" @click="showFeedback()"/>
       <van-grid-item icon="phone-o" text="Contact Us" @click="contactUs()"/>
     </van-grid>
 
@@ -181,6 +182,12 @@
       }
     },
     methods:{
+      showGuide(){
+        var ref = cordova.InAppBrowser.open('https://github.com/jerryl97/ccmanager-vue/wiki/User-Manual','_system','location=yes');
+      },
+      showFeedback(){
+        var ref = cordova.InAppBrowser.open('https://forms.gle/TBRfbhW6KRT9m9R78','_system','location=yes');
+      },
       onAccountsSelect(item,index){
         this.accountsShow = false;
         switch(index){
@@ -587,7 +594,7 @@
           subject: 'Contact Us from Credit Card Smart Manager App',
           body:    ''
         });
-      }
+      },
     },
     computed:{
       getStateData(){

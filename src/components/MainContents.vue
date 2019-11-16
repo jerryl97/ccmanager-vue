@@ -2,6 +2,7 @@
   <div>
     <router-view/>
     <!--Main Tabbar-->
+    <div></div>
     <van-tabbar active-color="#07c160" inactive-color="#333333" route>
       <van-tabbar-item name="addtrans" replace to="/main/addtrans" icon="add-o">Add Trans</van-tabbar-item>
       <van-tabbar-item name="acctrans" replace to="/main/acctrans" icon="balance-list-o">Acc & Trans</van-tabbar-item>

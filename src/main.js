@@ -37,9 +37,19 @@ const vueApp = new Vue({
   router,
   methods:{
     onDeviceReady(){
+      admob.interstitial.config({
+        id: 'ca-app-pub-9542103869311945/8594751641'
+      });
+      admob.banner.config({
+        id: 'ca-app-pub-9542103869311945/4687296229'
+      });
+      admob.interstitial.prepare();
+      admob.banner.prepare();
       navigator.splashscreen.show();
       window.setTimeout(function () {
         navigator.splashscreen.hide();
+        admob.interstitial.show();
+        admob.banner.show();
         screen.orientation.lock('portrait');
         if(store.state.firstTime==true){
           router.push({path:'/welcome'});
