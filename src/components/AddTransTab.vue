@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top:13%">
+  <div style="padding:13% 0">
     <!--Top Navbar-->
     <van-nav-bar :title="title" fixed>
       <template slot="title">
@@ -69,10 +69,10 @@
               </div>
               <div slot="default">
                 <span v-if="promo.duration==true">Valid: {{getDateFormatted(promo.fromdate)}} - {{getDateFormatted(promo.todate)}} <br/></span>
-                <span v-if="promo.maxtranscount!=0">Minimum Swipe:<br/>
+                <span v-if="promo.maxtranscount!=0">Minimum Swipe: {{promo.transcount}}/{{promo.maxtranscount}}<br/>
                   <van-progress :percentage="getSwipePercent(promo)" :pivot-text="getString(promo.transcount)" color="#7232dd" text-color="#fff" stroke-width="5"/><br/>
                 </span>
-                <span v-if="promo.maxtransspend!=0">Available Spend:<br/>
+                <span v-if="promo.maxtransspend!=0">Available Spend: $ {{promo.transspend}}/{{promo.maxtransspend}}<br/>
                   <van-progress :percentage="getTransSpendPercent(promo)" :pivot-text="getString(promo.transspend)" color="red" text-color="#fff" stroke-width="5"/><br/>
                 </span>
                 <span v-if="promo.rltexpense.length != getExpCat.length">Categories: {{getExpenseName(promo.rltexpense)}}<br/></span>
@@ -161,6 +161,9 @@
 
     <div style="margin:10px;" v-if="relatedPromo.length>0&&promochecked.length==0">
       <van-notice-bar>Warning: No promotion is selected.</van-notice-bar>
+    </div>
+    <div style="margin:10px;" v-if="transItem.recurring==true">
+      <van-notice-bar wrapable>You may need to open the application when the day you set for the recurring!</van-notice-bar>
     </div>
 
   </div>

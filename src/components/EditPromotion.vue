@@ -329,7 +329,6 @@
       },
       //Save New Promotion
       saveNewPromo(){
-        this.promoItem.transcount = this.promoItem.maxtranscount;
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
         this.promoItem.rltrewards = [];
@@ -346,7 +345,6 @@
           this.promoItem.maxtransspend = parseFloat(this.displayMaximum);
         else
           this.promoItem.maxtransspend = 0;
-        this.promoItem.transspend = this.promoItem.maxtransspend;
         this.$store.commit('editPromo',this.promoItem);
         this.$store.commit('updatePromoSwipeSpend');
         this.$store.dispatch('storeAllStateData');

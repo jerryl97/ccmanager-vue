@@ -71,5 +71,4 @@
         <variable name="ADMOB_APP_ID" value="&#xA;ca-app-pub-9542103869311945~1223033245" />
     </plugin>
     <plugin name="cordova-plugin-inappbrowser" spec="3.1.0" />
-    <engine name="android" spec="^8.1.0" />
 </widget>

@@ -1835,7 +1835,8 @@ textarea {
     padding: 16px 16px 8px;
     color: #969799;
     font-size: 14px;
-    line-height: 16px
+    line-height: 16px;
+    background-color:#f9f9f9
 }
 
 .van-col {

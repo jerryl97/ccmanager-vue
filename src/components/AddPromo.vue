@@ -1,11 +1,11 @@
 <template>
   <div style="padding-top:13%">
     <!--Top Nav Bar-->
-    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()" fixed @click-right="getSMS()">
-      <template slot="right">
+    <van-nav-bar :title="title" left-arrow left-text="Back" @click-left="back()" fixed>
+      <!--<template slot="right">
         <van-icon color="#1989fa" name="envelop-o"/>
         <span style="color:#1989fa">SMS</span>
-      </template>
+      </template>-->
     </van-nav-bar>
 
     <!--Add Promotion Steps-->
@@ -105,30 +105,30 @@
     </van-row>
 
     <!-- SMS Promotion Popup List -->
-    <van-popup v-model="showSMSPromos" position="bottom" :style="{ height: '100%' }">
+    <!--<van-popup v-model="showSMSPromos" position="bottom" :style="{ height: '100%' }">
       <van-nav-bar title="SMS Promotions" left-text="Back" left-arrow @click-left="showSMSPromos = false" right-text="Keywords" @click-right="showKeywordManager=true"/>
        <van-pull-refresh v-model="isLoading" @refresh="getSMS()">
         <van-cell-group v-for="bank in bankSMS" :title="bank.bankName">
           <div v-if="bank.length==0" style="background-color:white;text-align:center;margin-top:10%">
             <i style="color:#bbbbbb">No promotions found from SMS.</i>
           </div>
-          <van-cell v-for="SMS in bank.SMSContent" :title="SMS.address" :label="SMS.body" :border="true" clickable @click="selectSMS(SMS.body)"/>
+          <van-cell v-for="SMS in bank.SMSContent" :title="SMS.address" :label="SMS.body" :border="true" clickable @click="selectSMS(SMS.body)"/>-->
 
           <!-- Keyword manager popup -->
-          <van-popup v-model="showKeywordManager" position="bottom" :style="{ height:'100%' }">
-            <van-nav-bar title="SMS Search Keywords" left-text="Back" left-arrow @click-left="showKeywordManager=false" right-text="Add" @click-right="addKeywordPop=true,SMSNewKeyword=''"/>
+          <!--<van-popup v-model="showKeywordManager" position="bottom" :style="{ height:'100%' }">
+          <van-nav-bar title="SMS Search Keywords" left-text="Back" left-arrow @click-left="showKeywordManager=false" right-text="Add" @click-right="addKeywordPop=true,SMSNewKeyword=''"/>-->
 
             <!-- SMS Keyword List -->
-            <van-cell-group>
+            <!--<van-cell-group>
               <van-cell v-for="(keyword, index) in SMSKeyword" :border="true" :title="keyword">
                 <template slot="default" v-if="index>=3">
                   <van-button size="small" type="danger" @click="deleteKeyword(index)">Delete</van-button>
                 </template>
               </van-cell>
-            </van-cell-group>
+            </van-cell-group>-->
 
             <!-- Add SMS Keyword Pop -->
-            <van-popup v-model="addKeywordPop" closeable position="bottom" :style="{ height: '20%' }">
+            <!--<van-popup v-model="addKeywordPop" closeable position="bottom" :style="{ height: '20%' }">
                 <van-field v-model="SMSNewKeyword" required label="Keyword: " :error-message="errorMessage"/>
 
                 <van-button type="default" @click="addKeywordPop=false,SMSNewKeyword=''">Cancel</van-button>
@@ -138,7 +138,7 @@
           
         </van-cell-group>
       </van-pull-refresh>
-    </van-popup>
+    </van-popup>-->
   </div>
 </template>
 <script>
@@ -376,7 +376,7 @@
       },
       //Save New Promotion
       saveNewPromo(){
-        this.promoItem.transcount = this.promoItem.maxtranscount;
+        this.promoItem.transcount = 0;
         this.promoItem.rltacc = this.activeAccIds;
         this.promoItem.rltexpense = this.expcatchecked;
         this.promoItem.rltrewards = this.rewardsInputs;
@@ -388,7 +388,7 @@
           this.promoItem.maxtransspend = parseFloat(this.displayMaximum);
         else
           this.promoItem.maxtransspend = 0;
-        this.promoItem.transspend = this.promoItem.maxtransspend;
+        this.promoItem.transspend = 0;
         this.$store.commit('addNewPromo',this.promoItem);
         this.$store.dispatch('storeAllStateData');
         this.$notify({message:'Promotion Added', type:'success', duration:3000});
@@ -397,7 +397,7 @@
 
       //SMS Promotion START
       //get Promotions from SMS
-      getSMS(){
+      /*getSMS(){
         this.showSMSPromos=true;
         this.showKeywordManager=false;
         this.addKeywordPop=false;
@@ -506,7 +506,7 @@
             this.getSMS();
           });
         });
-      },
+      },*/
       //SMS Promotion END
     },
     computed:{

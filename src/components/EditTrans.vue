@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top:13%">
+  <div style="padding:13% 0">
     <!--Top Navbar-->
     <van-nav-bar :title="title" left-text="Back" left-arrow @click-left="back()" @click-right="deleteTrans()" fixed>
       <template slot="right">
@@ -158,6 +158,9 @@
       <van-notice-bar>Warning: No promotion is selected.</van-notice-bar>
     </div>
 
+    <div style="margin:10px;" v-if="transItem.recurring==true">
+      <van-notice-bar wrapable>You may need to open the application when the day you set for the recurring!</van-notice-bar>
+    </div>
   </div>
 </template>
 

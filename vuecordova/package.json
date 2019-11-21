@@ -25,7 +25,6 @@
     "cordova-plugin-screen-orientation": "^3.0.2",
     "cordova-plugin-splashscreen": "^5.0.3",
     "cordova-promise-polyfill": "0.0.2",
-    "cordova-sms-reader": "0.0.3",
     "es6-promise-plugin": "^4.2.2"
   },
   "devDependencies": {
@@ -39,7 +38,6 @@
       "card.io.cordova.mobilesdk": {},
       "cordova-plugin-email-composer": {},
       "cordova-plugin-local-notification": {},
-      "cordova-sms-reader": {},
       "cordova-plugin-screen-orientation": {},
       "cordova-plugin-admob-free": {
         "ADMOB_APP_ID": "\nca-app-pub-9542103869311945~1223033245"

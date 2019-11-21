@@ -84,6 +84,10 @@ const getDefaultState = ()=>{
     //Pincode
     PINStat:false,
     PINCode:'',
+
+    //Contact
+    contactName:'',
+    contactRoom:'',
   }
 }
 
@@ -536,17 +540,19 @@ export default new Vuex.Store({
     //Update Promo Minimum Swipe & Maximum Spend Amount
     updatePromoSwipeSpend(state,value){
       for(let i in state.allPromo){
-        state.allPromo[i].transcount = state.allPromo[i].maxtranscount;
-        state.allPromo[i].transspend = state.allPromo[i].maxtransspend;
+        //state.allPromo[i].transcount = state.allPromo[i].maxtranscount;
+        //state.allPromo[i].transspend = state.allPromo[i].maxtransspend;
+        state.allPromo[i].transcount = 0;
+        state.allPromo[i].transspend = 0;
         for(let j in state.allTrans){
           let temp = state.allTrans[j].usedpromo;
           if(temp.length>0){
             for(let k in temp){
               if(temp[k] == state.allPromo[i].promoid){
-                if(state.allPromo[i].maxtranscount>0)
-                  state.allPromo[i].transcount -= 1;
-                if(state.allPromo[i].maxtransspend>0)
-                  state.allPromo[i].transspend -= state.allTrans[j].amount;
+                if(state.allPromo[i].transcount<state.allPromo[i].maxtranscount&&state.allPromo[i].maxtranscount>0)
+                  state.allPromo[i].transcount += 1;
+                if(state.allPromo[i].transspend<state.allPromo[i].maxtransspend&&state.allPromo[i].maxtransspend>0)
+                  state.allPromo[i].transspend += state.allTrans[j].amount;
               }
             }
           }
@@ -595,8 +601,8 @@ export default new Vuex.Store({
             //Check Expense Category
             if(x.rltexpense.includes(value.transcat)){
               //Check Limit Usage
-              if(x.maxtranscount==0 || (x.maxtranscount!=0&&x.transcount>0)){
-                if(x.maxtransspend == 0 || (x.maxtransspend!=0&&x.transspend>0))
+              if(x.maxtranscount==0 || (x.maxtranscount!=0&&x.transcount<x.maxtranscount)){
+                if(x.maxtransspend == 0 || (x.maxtransspend!=0&&x.transspend<x.maxtransspend))
                   return x; 
                 }
               }
@@ -663,7 +669,15 @@ export default new Vuex.Store({
     },
     setPinStat(state,value){
       state.PINStat = value;
-    }
+    },
+    /////////////////////////////////
+    //////////////////Contact Us Feature
+    setContactName(state,value){
+      state.contactName = value;
+    },
+    setContactRoom(state,value){
+      state.contactRoom = value;
+    },
   },
   /////////////////////////////////
   

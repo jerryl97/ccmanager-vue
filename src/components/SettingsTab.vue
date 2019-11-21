@@ -8,7 +8,7 @@
       </template>
     </van-nav-bar>
 
-    <van-grid clickable column-num="3">
+    <van-grid clickable :column-num="3" style="padding-top:13%">
       <van-grid-item icon="credit-pay" text="Accounts" @click="accountsShow=true"/>
       <van-grid-item icon="bars" text="Transactions" @click="transactionsShow=true"/>
       <van-grid-item icon="point-gift-o" text="Promotions" @click="promotionsShow=true"/>
@@ -18,7 +18,7 @@
       <van-grid-item icon="warn-o" text="Security" @click="securityShow=true"/>
       <van-grid-item icon="newspaper-o" text="Guide"  @click="showGuide()"/>
       <van-grid-item icon="records" text="Feedback" @click="showFeedback()"/>
-      <van-grid-item icon="phone-o" text="Contact Us" @click="contactUs()"/>
+      <van-grid-item icon="phone-o" text="Contact Us" @click="showContactUs=true"/>
     </van-grid>
 
     <van-action-sheet v-model="accountsShow" :actions="accountsActions" description="Accounts" @select="onAccountsSelect"/>
@@ -101,6 +101,10 @@
       <v-changepin @closeChangePin="closeChangePin"/>
     </van-popup>
 
+    <van-popup v-model="showContactUs" position="bottom" :style="{height:'100%'}">
+      <v-contact @closeContactUs="closeContactUs"/>
+    </van-popup>
+
   </div>
 </template>
 
@@ -115,6 +119,7 @@
   import NewPin from './NewPin.vue'
   import PinInput from './PinInput.vue'
   import ChangePin from './ChangePin.vue'
+  import ContactUs from './ContactUs.vue'
 
     //Import crypto-js
   import CryptoJS from 'crypto-js';
@@ -178,15 +183,18 @@
 
         //Backup list and popup init
         showBackup:false,
-        backupList:[]
+        backupList:[],
+
+        //Contact Us 
+        showContactUs:false,
       }
     },
     methods:{
       showGuide(){
-        var ref = cordova.InAppBrowser.open('https://github.com/jerryl97/ccmanager-vue/wiki/User-Manual','_system','location=yes');
+        var ref = cordova.InAppBrowser.open('https://github.com/jerryl97/ccmanager-vue/wiki/User-Manual','_self','location=yes');
       },
       showFeedback(){
-        var ref = cordova.InAppBrowser.open('https://forms.gle/TBRfbhW6KRT9m9R78','_system','location=yes');
+        var ref = cordova.InAppBrowser.open('https://docs.google.com/forms/d/e/1FAIpQLSceaUNJ02orBN-PPGlMNBcLfAm8WJ_8sVAI7QStJY1WUyqR9g/viewform','_self','location=yes');
       },
       onAccountsSelect(item,index){
         this.accountsShow = false;
@@ -595,6 +603,9 @@
           body:    ''
         });
       },
+      closeContactUs(){
+        this.showContactUs = false;
+      }
     },
     computed:{
       getStateData(){
@@ -628,6 +639,7 @@
       'v-newpin':NewPin,
       'v-pininput':PinInput,
       'v-changepin':ChangePin,
+      'v-contact':ContactUs,
     }
   }
 
@@ -635,7 +647,6 @@
 <style scoped>
 #settingmaindiv{
   background-color:#f6f6f6;
-  padding-top:13%;
   height:100%;
   position:absolute;
 }
